@@ -203,3 +203,4 @@ Make sure to symlink the configs for i3!
 #### Terminator Config
 
 Right click inside of terminator to change the settings. From here you can deselect the scroll bar, the title bar, and set the font to the Monaco Nerd Font if it was installed earlier.
+To install terminator colours you can use this addon https://github.com/EliverLara/terminator-themes.
