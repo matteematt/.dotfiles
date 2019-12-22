@@ -191,5 +191,5 @@ bar {
 for_window [class=".*"] border pixel 0
 
 # Set the gaps
-gaps inner 5
+gaps inner 10
 gaps outer 5
