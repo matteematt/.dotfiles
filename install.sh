@@ -27,6 +27,7 @@ ln -s ~/dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/arch/.xinitrc ~/.xinitrc
 ln -s ~/dotfiles/arch/.Xresources ~/.Xresources
 ln -s ~/dotfiles/arch/i3/config ~/.config/i3
+ln -s ~/dotfiles/arch/terminator/config ~/.config/terminator
 
 # Check that vim snippets are added to ~/.vim/snippets but it looks like that is done automatically
 
