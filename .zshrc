@@ -117,6 +117,7 @@ export PATH="/home/matt/anaconda3/bin:$PATH"
 #Turn off caps lock
 #To enable caps lock exec $ setxkbmap -option
 setxkbmap -option ctrl:nocaps
-#Test
+
+source ~/dotfiles/shell_includes.sh
 
 export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
