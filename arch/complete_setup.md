@@ -171,6 +171,13 @@ To run our vim config some packages such as bat need installing through brew. In
 `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
 `
 
+#### Misc
+
+Here is a list of useful packages that I use. AUR pacakges are installed with git clone and then running `makepkg -si` in the cloned directory.
+
+* Vim config uses ctags, to do this you [need a package from the AUR](https://aur.archlinux.org/packages/universal-ctags-git/)
+* (Spotify from the AUR)[https://aur.archlinux.org/packages/spotify/]
+
 ## Part 3 - Graphical Environment
 
 This covers the i3 gaps window manager and other items for the graphical environment.
