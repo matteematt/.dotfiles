@@ -184,3 +184,12 @@ bindsym $mod+r mode "resize"
 bar {
         status_command i3status
 }
+
+# Set up the gaps
+
+# Remove the window titlebars and set the border to 1pixel
+for_window [class=".*"] border pixel 0
+
+# Set the gaps
+gaps inner 5
+gaps outer 5
