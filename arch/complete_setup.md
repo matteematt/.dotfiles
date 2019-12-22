@@ -139,3 +139,67 @@ You should now have finished the core install. Run reboot to restart your comput
 
 Arch linux is installed, but almost nothing else. This next section will cover configuring another user, sound, network, window managers etc.
 
+### Add another user
+
+`useradd -m -g wheel <user>` and then `passwd <user>`. Adding to the wheel group so you can elevate your privallages with `sudo`. To allow wheel group to do this edit the `/etc/sudoers` file and remove the comment from the line `%wheel ALL=(ALL) ALL`. You can now logout of the root user and login as oyur new user.
+
+### Setting up network connection
+
+This is only to set up ethernet connection. To ensure the ethernet connection service is started during launch we add it to systemd. To list the available internet devices run `iip link`. Find the ethernet one, for example `enp2s0`. Then run `sudo systemctl start dhcpcd@<device>`, so mine would be `dhcpcd@enp2s0`.
+
+### Audio
+
+Now there is an internet connection we can use the `pacman` package manager. Get the alsa utils using `pacman -S alsa-utils`. Configure the sound using `alsamixer`, remember to unmute the device using `m`.
+
+### Other packages
+
+You can install any packages you need with `pacman`. Some good packages to get at this time would be ssh access and git access. `sudo pacman -S git openssh`.
+
+#### Dotfiles
+
+With git we can now pull our dotfiles into our home directory. You may need a browser such as chromium at this point to acess the repo online. One we have dotfiles we can start installing configs such as out `.vimrc` and `.zshrc`.
+
+#### ZSH
+
+To get zsh we can run `sudo pacman -S zsh` and then install `oh-my-zsh` using the curl and ruby command found on their website. Running this should set zsh as the default shell.
+
+`sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
+
+#### Linuxbrew
+
+To run our vim config some packages such as bat need installing through brew. Install brew. The `.zshrc` from the dotfiles already has the linuxbrew path set. Install the required brew packages using the `install.sh` dotfiles script, remember to set the path for fzf.
+`sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+`
+
+## Part 3 - Graphical Environment
+
+This covers the i3 gaps window manager and other items for the graphical environment.
+
+#### Fonts
+
+Over the next steps we are going to start working with a graphical environment so its a ghood time to get some fonts. You can get some useful fonts from google using `pacman -S noto-fonts`. To install the nerd front from the dotfiles `cp ~/dotfiles/Monaco Nerd Font Complete Mono.otf /usr/share/fonts/<create a folder>/` and then run `fc-cache` to refresh the fonts cache. The nerd font should now be installed for use.
+
+#### Install the display server
+
+`sudo pacman -S xorg-server xorg-xinit` and remember to symlink the `.xinitrc` and `.Xresources` from the dotfiles. NOTE: your graphical enviroment will go back to using USA layout so you need to add your country code in `.xinitrc`. Mine cointains `setxkbmap gb`.
+
+Start the display server when logged in with `startx`.
+
+#### Graphics card driver
+
+For my card I am using `sudo pacman -S mesa` but you will most likely need to look up your own card.
+
+#### Window Manager
+
+`pacman -S i3-gaps i3-status terminator dmenu`
+
+* i3-gaps is the window manager based on i3 but with optional gaps between windows
+* i3-status is used for the status bar, but will likely replace this with polybar
+* terminator is the terminal emulator used in the graphical environment
+* dmenu is used to launch programs
+
+Make sure to symlink the configs for i3!
+
+#### Terminator Config
+
+Right click inside of terminator to change the settings. From here you can deselect the scroll bar, the title bar, and set the font to the Monaco Nerd Font if it was installed earlier.
