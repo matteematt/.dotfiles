@@ -191,7 +191,7 @@ For my card I am using `sudo pacman -S mesa` but you will most likely need to lo
 
 #### Window Manager
 
-`pacman -S i3-gaps i3-status terminator dmenu`
+`pacman -S i3-gaps i3status terminator dmenu`
 
 * i3-gaps is the window manager based on i3 but with optional gaps between windows
 * i3-status is used for the status bar, but will likely replace this with polybar
@@ -203,4 +203,8 @@ Make sure to symlink the configs for i3!
 #### Terminator Config
 
 Right click inside of terminator to change the settings. From here you can deselect the scroll bar, the title bar, and set the font to the Monaco Nerd Font if it was installed earlier.
-To install terminator colours you can use this addon https://github.com/EliverLara/terminator-themes.
+To install terminator colours you can use this addon https://github.com/EliverLara/terminator-themes. For now I am using the config in the dotfiles.
+
+#### Setting up monitors
+
+Use `xrandr` and `arandr` to set up multiple monitors such as resoltions. You can then get the output from arandr and add it to the i3 config. However, this is not currently used as the default it working fine.
