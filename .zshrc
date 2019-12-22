@@ -8,6 +8,7 @@
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+POWERLEVEL9K_MODE='nerdfont-complete'
 ZSH_THEME="robbyrussell"
 
 # Set list of themes to pick from when loading at random
@@ -117,3 +118,5 @@ export PATH="/home/matt/anaconda3/bin:$PATH"
 #To enable caps lock exec $ setxkbmap -option
 setxkbmap -option ctrl:nocaps
 #Test
+
+export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
