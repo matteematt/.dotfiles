@@ -198,10 +198,10 @@ For my card I am using `sudo pacman -S mesa` but you will most likely need to lo
 
 #### Window Manager
 
-`pacman -S i3-gaps i3status terminator dmenu`
+`pacman -S i3-gaps i3blocks terminator dmenu`
 
 * i3-gaps is the window manager based on i3 but with optional gaps between windows
-* i3-status is used for the status bar, but will likely replace this with polybar
+* i3blocks is used on the status bar. By default i3 uses i3status but this configuratiuon uses i3blocks instead
 * terminator is the terminal emulator used in the graphical environment
 * dmenu is used to launch programs
 
