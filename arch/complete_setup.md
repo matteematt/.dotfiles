@@ -153,7 +153,7 @@ Now there is an internet connection we can use the `pacman` package manager. Get
 
 ### Other packages
 
-You can install any packages you need with `pacman`. Some good packages to get at this time would be ssh access and git access. `sudo pacman -S git openssh`.
+You can install any packages you need with `pacman`. Some good packages to get at this time would be ssh access and git access. `sudo pacman -S git openssh`. Once the ssh key has been set up for git you can run `ssh-add` once per boot and add your password so you don't need to keep adding in the passowrd again. Starting the agent with `ssh-agent` is taken care of in the `~/.xinitrc` which is used for the graphical environment in part 3.
 
 #### Dotfiles
 
@@ -176,7 +176,7 @@ To run our vim config some packages such as bat need installing through brew. In
 Here is a list of useful packages that I use. AUR pacakges are installed with git clone and then running `makepkg -si` in the cloned directory.
 
 * Vim config uses ctags, to do this you [need a package from the AUR](https://aur.archlinux.org/packages/universal-ctags-git/)
-* (Spotify from the AUR)[https://aur.archlinux.org/packages/spotify/]
+* [Spotify from the AUR](https://aur.archlinux.org/packages/spotify/)
 
 ## Part 3 - Graphical Environment
 
@@ -206,6 +206,10 @@ For my card I am using `sudo pacman -S mesa` but you will most likely need to lo
 * dmenu is used to launch programs
 
 Make sure to symlink the configs for i3!
+
+##### i3blocks
+
+i3blocks is the status indicators shown on the right hand size of the i3 bar. They are cusomised in a `i3blocks.conf` file which should be symlinked. They work by running scripts at set intervals and showing STDOUT in the i3 bar. Some of the scripts used have dependancies - a link to a pack on github is found in the conf file. Clone this to `~/installs/misc`. The required dependancy for each script is a comment above each block. Some will require packages to be downloaded.
 
 #### Terminator Config
 
