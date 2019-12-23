@@ -207,6 +207,8 @@ For my card I am using `sudo pacman -S mesa` but you will most likely need to lo
 
 Make sure to symlink the configs for i3!
 
+From the i3 conf, i3 is attempting to put workspace 10 on `DVI-I-1` monitor. The name of monitors to configure this can be found by running `xrandr --listmonitors`.
+
 ##### i3blocks
 
 i3blocks is the status indicators shown on the right hand size of the i3 bar. They are cusomised in a `i3blocks.conf` file which should be symlinked. They work by running scripts at set intervals and showing STDOUT in the i3 bar. Some of the scripts used have dependancies - a link to a pack on github is found in the conf file. Clone this to `~/installs/misc`. The required dependancy for each script is a comment above each block. Some will require packages to be downloaded.
@@ -214,7 +216,7 @@ i3blocks is the status indicators shown on the right hand size of the i3 bar. Th
 #### Terminator Config
 
 Right click inside of terminator to change the settings. From here you can deselect the scroll bar, the title bar, and set the font to the Monaco Nerd Font if it was installed earlier.
-To install terminator colours you can use this addon https://github.com/EliverLara/terminator-themes. For now I am using the config in the dotfiles.
+To install terminator colours you can use [this addon](https://github.com/EliverLara/terminator-themes). For now I am using the config in the dotfiles.
 
 #### Setting up monitors
 
