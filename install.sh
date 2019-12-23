@@ -36,4 +36,3 @@ ln -s ~/dotfiles/arch/terminator/config ~/.config/terminator
 
 # Set the global gitignore
 git config --global core.excludesfile ~/dotfiles/.gitignore_global
-
