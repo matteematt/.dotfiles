@@ -276,6 +276,8 @@ nnoremap <leader><CR> :noh<CR>
 
 nnoremap <leader>u :UndotreeToggle<CR>
 
+command! W :wa
+
 "===Imports
 
 " Snippets functions
