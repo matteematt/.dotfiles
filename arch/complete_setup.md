@@ -173,10 +173,11 @@ To run our vim config some packages such as bat need installing through brew. In
 
 #### Misc
 
-Here is a list of useful packages that I use. AUR pacakges are installed with git clone and then running `makepkg -si` in the cloned directory.
+Here is a list of useful packages that I use. AUR pacakges are installed with git clone and then running `makepkg -si` in the cloned directory. `-s` checks for dependancies using pacman, and `-i` installs the build package after a sucessful build.
 
 * Vim config uses ctags, to do this you [need a package from the AUR](https://aur.archlinux.org/packages/universal-ctags-git/)
 * [Spotify from the AUR](https://aur.archlinux.org/packages/spotify/)
+* [ckb-next](https://aur.archlinux.org/packages/ckb-next/) is an open source port of the proprietary corsair CUE software for mac and linux. To start as a systemd service `sudo systemctl enable ckb-next-daemon.service`
 
 ## Part 3 - Graphical Environment
 
