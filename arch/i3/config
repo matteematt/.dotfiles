@@ -221,5 +221,9 @@ for_window [class=".*"] border pixel 0
 gaps inner 5
 gaps outer 5
 
+#### STARTUP PROGRAMS
 # create background wallpaper
 exec_always feh --bg-scale ~/.config/wallpaper.jpg
+# start the corsair keyboard and mouse driver, but put it to the scratchpad so its not seen on launch
+exec ckb-next &
+for_window [class="ckb-next"] move scratchpad
