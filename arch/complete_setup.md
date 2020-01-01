@@ -210,6 +210,8 @@ Make sure to symlink the configs for i3!
 
 From the i3 conf, i3 is attempting to put workspace 10 on `DVI-I-1` monitor. The name of monitors to configure this can be found by running `xrandr --listmonitors`.
 
+ckb-next is the program used to control the corsair hardware. It is launched on startup of i3wm, but the GUI is sent to the scratchpad as it is not needed to be interacted with every session. To interact with the GUI it must be brought back from the scratchpad.
+
 ##### i3blocks
 
 i3blocks is the status indicators shown on the right hand size of the i3 bar. They are cusomised in a `i3blocks.conf` file which should be symlinked. They work by running scripts at set intervals and showing STDOUT in the i3 bar. Some of the scripts used have dependancies - a link to a pack on github is found in the conf file. Clone this to `~/installs/misc`. The required dependancy for each script is a comment above each block. Some will require packages to be downloaded.
