@@ -24,8 +24,20 @@ function addLastDiffFile {
   fi
 }
 
+# Performs the same job as the update button on giuthub when a branch
+# is behind master, but with rebase instead
+function getUpdateWithRebase {
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  git checkout master
+  git pull
+  git checkout $branch
+  git rebase origin/master
+  git push --force-with-lease
+}
+
 #git diff list
 alias gdl="getDiffByList"
 #git add last
 alias gal="addLastDiffFile"
-
+#git update rebase
+alias gur="getUpdateWithRebase"
