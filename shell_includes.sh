@@ -41,3 +41,12 @@ alias gdl="getDiffByList"
 alias gal="addLastDiffFile"
 #git update rebase
 alias gur="getUpdateWithRebase"
+
+function changeDirShortcut {
+  chosen_dir=`cat ~/dotfiles/shell/fav_dirs | fzf | tr -d '[:cntrl:]'`
+  cd "$chosen_dir"
+  unset chosen_dir
+  unset favs
+}
+
+alias cdf="changeDirShortcut"
