@@ -21,6 +21,7 @@
     show_titlebar = False
     use_system_font = False
   [[theone]]
+    allow_bold = False
     background_color = "#272b33"
     cursor_color = "#abb2c0"
     font = Monaco Nerd Font Mono 13
