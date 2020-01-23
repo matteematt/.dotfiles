@@ -43,7 +43,7 @@ alias gal="addLastDiffFile"
 alias gur="getUpdateWithRebase"
 
 function changeDirShortcut {
-  chosen_dir=`cat ~/dotfiles/shell/fav_dirs | fzf | tr -d '[:cntrl:]'`
+  chosen_dir=`cat ~/dotfiles/shell/fav_dirs_$(uname -s) | fzf | tr -d '[:cntrl:]'`
   cd "$chosen_dir"
   unset chosen_dir
   unset favs
