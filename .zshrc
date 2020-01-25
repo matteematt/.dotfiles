@@ -121,3 +121,6 @@ setxkbmap -option ctrl:nocaps
 source ~/dotfiles/shell_includes.sh
 
 export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
+
+# Set the system for the interactive tldr man pages
+export TLDR_OS=linux
