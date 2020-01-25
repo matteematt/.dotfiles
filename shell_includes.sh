@@ -50,3 +50,15 @@ function changeDirShortcut {
 }
 
 alias cdf="changeDirShortcut"
+
+function dockerContainerNuke {
+  sudo docker stop $(sudo docker ps -a -q)
+  sudo docker rm -f $(sudo docker ps -a -q)
+}
+
+function dockerImageNuke {
+  sudo docker rmi $(sudo docker images -a -q)
+}
+
+alias dcnuke="dockerContainerNuke"
+alias dinuke="dockerImageNuke"
