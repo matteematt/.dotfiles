@@ -52,3 +52,15 @@ alias cdf="changeDirShortcut"
 
 # Docker alias
 alias dcup="docker-compose up"
+
+function dockerContainerNuke {
+  docker stop $(sudo docker ps -a -q)
+  docker rm -f $(sudo docker ps -a -q)
+}
+
+function dockerImageNuke {
+  docker rmi $(sudo docker images -a -q)
+}
+
+alias dcnuke="dockerContainerNuke"
+alias dinuke="dockerImageNuke"
