@@ -46,10 +46,12 @@ function changeDirShortcut {
   chosen_dir=`cat ~/dotfiles/shell/fav_dirs_$(uname -s) | fzf | tr -d '[:cntrl:]'`
   cd "$chosen_dir"
   unset chosen_dir
-  unset favs
 }
 
 alias cdf="changeDirShortcut"
+
+# Docker alias
+alias dcup="docker-compose up"
 
 function dockerContainerNuke {
   docker stop $(docker ps -a -q)
@@ -57,7 +59,7 @@ function dockerContainerNuke {
 }
 
 function dockerImageNuke {
-  docker rmi $(docker images -a -q)
+  docker rmi $(sudo docker images -a -q)
 }
 
 alias dcnuke="dockerContainerNuke"
