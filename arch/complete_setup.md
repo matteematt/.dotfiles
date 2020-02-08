@@ -171,13 +171,17 @@ To run our vim config some packages such as bat need installing through brew. In
 `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
 `
 
-#### Misc
+#### Misc Packages
 
-Here is a list of useful packages that I use. AUR pacakges are installed with git clone and then running `makepkg -si` in the cloned directory. `-s` checks for dependancies using pacman, and `-i` installs the build package after a sucessful build.
+##### AUR
+
+Here is a list of useful packages that I use. AUR pacakges are installed with git clone and then running `makepkg -si` in the cloned directory. `-s` checks for dependancies using pacman, and `-i` installs the build package after a sucessful build. To update a package you can `git pull` and then run `makepkg -si` again, or you can use a tool like `yay` which can automate this process.
+The best way I have found so far for checking whther AUR packages need to be updated is just to use the i3 blocks AUR plugin, which is set up in the i3 blocks config.
 
 * Vim config uses ctags, to do this you [need a package from the AUR](https://aur.archlinux.org/packages/universal-ctags-git/)
 * [Spotify from the AUR](https://aur.archlinux.org/packages/spotify/)
 * [ckb-next](https://aur.archlinux.org/packages/ckb-next/) is an open source port of the proprietary corsair CUE software for mac and linux. To start as a systemd service `sudo systemctl enable ckb-next-daemon.service`
+* [yay](https://aur.archlinux.org/packages/yay/) is a AUR helper which uses the same API as pacman for updating AUR packages
 
 ## Part 3 - Graphical Environment
 
