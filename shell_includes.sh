@@ -59,7 +59,7 @@ function dockerContainerNuke {
 }
 
 function dockerImageNuke {
-  docker rmi $(sudo docker images -a -q)
+  docker rmi -f $(sudo docker images -a -q)
 }
 
 alias dcnuke="dockerContainerNuke"
