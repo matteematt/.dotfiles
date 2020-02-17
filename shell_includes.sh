@@ -64,3 +64,6 @@ function dockerImageNuke {
 
 alias dcnuke="dockerContainerNuke"
 alias dinuke="dockerImageNuke"
+
+# Platform specific incldues
+source ~/dotfiles/shell/$(uname -s)_includes.sh
