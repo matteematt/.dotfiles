@@ -51,7 +51,7 @@ function changeDirShortcut {
 alias cdf="changeDirShortcut"
 
 # Docker alias
-alias dcup="docker-compose up"
+alias dcup="docker-compose up -V"
 
 function dockerContainerNuke {
   docker stop $(docker ps -a -q)
