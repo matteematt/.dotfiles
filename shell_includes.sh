@@ -68,7 +68,7 @@ alias dinuke="dockerImageNuke"
 
 # Commands
 # RipGrep Files
-alias rgf="rg --files | rg"
+alias rgf="rg -uu --files | rg --invert-match \.git | rg"
 
 # Platform specific incldues
 source ~/dotfiles/shell/$(uname -s)_includes.sh
