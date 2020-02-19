@@ -65,5 +65,10 @@ function dockerImageNuke {
 alias dcnuke="dockerContainerNuke"
 alias dinuke="dockerImageNuke"
 
+
+# Commands
+# RipGrep Files
+alias rgf="rg --files | rg"
+
 # Platform specific incldues
 source ~/dotfiles/shell/$(uname -s)_includes.sh
