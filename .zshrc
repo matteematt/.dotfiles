@@ -73,7 +73,7 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6c66a,bold,underline"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#808080,bold,underline"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
