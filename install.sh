@@ -35,5 +35,8 @@ ln -s ~/dotfiles/arch/terminator/config ~/.config/terminator
 
 # Other
 
+# ZSH plugins
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
 # Set the global gitignore
 git config --global core.excludesfile ~/dotfiles/.gitignore_global
