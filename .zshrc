@@ -113,6 +113,10 @@ function precmd() {
 	print ""
     fi
 }
+
+# Add the current time to the right hand side of the prompt
+RPROMPT="%*"
+
 export PATH="/home/matt/anaconda3/bin:$PATH"
 
 #Turn off caps lock
