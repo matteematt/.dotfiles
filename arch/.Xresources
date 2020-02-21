@@ -1,6 +1,9 @@
 URxvt.font: xft:Monaco\ Nerd\ Font\ Mono:size=14:antialias=true
 !URxvt.boldFont: xft:bitstream Monaco Nerd Font Complete Mono:bold:size=14:antialias=true
 
+! Used for monitor scaling, or wouldnt show on qhd monitor
+Xft.dpi: 96
+
 URxvt*color0:  #000000 // black
 URxvt*color1:  #B40000 // red
 URxvt*color2:  #00AA00 // green
