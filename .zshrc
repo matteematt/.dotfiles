@@ -133,3 +133,14 @@ export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
 
 # Set the system for the interactive tldr man pages
 export TLDR_OS=linux
+
+# Adding directories to PATH:
+export PATH=$PATH:/home/matt/installs/misc/emsdk
+export PATH=$PATH:/home/matt/installs/misc/emsdk/upstream/emscripten
+export PATH=$PATH:/home/matt/installs/misc/emsdk/node/12.9.1_64bit/bin
+
+#Setting environment variables:
+export EMSDK=/home/matt/installs/misc/emsdk
+export EM_CONFIG=/home/matt/.emscripten
+export EMSDK_NODE=/home/matt/installs/misc/emsdk/node/12.9.1_64bit/bin/node
+
