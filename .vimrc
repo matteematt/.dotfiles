@@ -265,6 +265,9 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 " ===Special Keybindings
 
+" Delete a buffer but dont delete the split
+nnoremap <leader>bd :b#<bar>bd#<CR>
+
 " Use the FZF Buffers selection
 nnoremap <leader><leader> :Buffers<CR>
 
