@@ -64,23 +64,13 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'Valloric/YouCompleteMe'
 " Show git diff inmfo at the side
 Plugin 'mhinz/vim-signify'
-" Adds git commands such as :G to use from inside of VIM
-"Plugin 'tpope/vim-fugitive'
 " Syntax checking
 Plugin 'scrooloose/syntastic'
 " Surround for html tags
 Plugin 'tpope/vim-surround'
 " Extra syntax checking stuff for Javascript
-"Plugin 'othree/yajs.vim'
 " Show the colour in css
 Plugin 'ap/vim-css-color'
-" Modifies Vim's indentation behaviour to compley witj PEP8
-"Plugin 'Vimjas/vim-python-pep8-indent'
-"Aschronous syntax checking for pytrhon
-"Plugin 'klen/pylama'
-" Can select verbs using distinct letters, TODO: Same activation as new window
-" currently
-"Plugin 'easymotion/vim-easymotion'
 " Allow to use tab to do autocompletions in insert mode
 Plugin 'ervandew/supertab'
 " Multiple selections like from sublime text, <C-n>
@@ -91,11 +81,12 @@ Plugin 'vim-airline/vim-airline-themes'
 " Highlight match tags in html files
 Plugin 'gregsexton/matchtag'
 " TODO Not sure but looks like it could be good
-"Plugin 'taglist.vim'
 " Large but fast syntax language pack
 Plugin 'sheerun/vim-polyglot'
 " Opens a tree view to look at undos
 Plugin 'mbbill/undotree'
+" Allows easy viewing of marks
+Plugin 'Yilin-Yang/vim-markbar'
 
 " Colours
 Plugin 'flrnd/candid.vim'
@@ -155,6 +146,13 @@ set gdefault
 " Prettier default: false
 let g:prettier#config#single_quote = 'false'
 
+nmap <Leader>' <Plug>ToggleMarkbar
+let g:markbar_peekaboo_apostrophe_mapping = '<leader>m'
+" only display alphabetic marks a-i and A-I
+let g:markbar_peekaboo_marks_to_display = 'abcdefghiABCDEFGHI'
+" number of lines of context to retrieve per mark
+let g:markbar_num_lines_context = 1
+
 let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
 
 " ==== NERDTREE
@@ -163,28 +161,6 @@ let NERDTreeIgnore = ['__pycache__', '\.pyc$', '\.o$', '\.so$', '\.a$', '\.swp',
 let NERDTreeShowHidden=1
 let g:NERDTreeWinPos="left"
 let g:NERDTreeDirArrows=0
-
-"" ==== Syntastic
-"let g:syntastic_always_populate_loc_list = 1
-"let g:syntastic_auto_loc_list = 1
-"let g:syntastic_check_on_open = 1
-"let g:syntastic_check_on_wq = 0
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%*
-"let g:syntastic_javascript_checkers = ['eslint']
-"let g:syntastic_javascript_mri_args = "--config=$HOME/.jshintrc"
-"let g:syntastic_python_checkers = [ 'pylint', 'flake8', 'python' ]
-"let g:syntastic_yaml_checkers = ['jsyaml']
-"let g:syntastic_html_tidy_exec = 'tidy5'
-"let g:syntastic_python_flake8_config_file='.flake8'
-
-"" === flake8
-"let g:flake8_show_in_file=1
-
-" ==== snippets
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
 
 " make YCM compatible with UltiSnips (using supertab)
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
@@ -196,11 +172,6 @@ let g:SuperTabDefaultCompletionType = '<C-n>'
 let g:UltiSnipsExpandTrigger = "<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
-
-"" ==== Easymotion
-"let g:EasyMotion_do_mapping = 0
-"let g:EasyMotion_smartcase = 1
-"nmap f <Plug>(easymotion-s)
 
 " Open nerdtree
 map <C-e> :NERDTreeToggle<CR>
