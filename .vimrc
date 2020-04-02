@@ -65,22 +65,22 @@ Plugin 'Valloric/YouCompleteMe'
 " Show git diff inmfo at the side
 Plugin 'mhinz/vim-signify'
 " Adds git commands such as :G to use from inside of VIM
-Plugin 'tpope/vim-fugitive'
+"Plugin 'tpope/vim-fugitive'
 " Syntax checking
 Plugin 'scrooloose/syntastic'
 " Surround for html tags
 Plugin 'tpope/vim-surround'
 " Extra syntax checking stuff for Javascript
-Plugin 'othree/yajs.vim'
+"Plugin 'othree/yajs.vim'
 " Show the colour in css
 Plugin 'ap/vim-css-color'
 " Modifies Vim's indentation behaviour to compley witj PEP8
 Plugin 'Vimjas/vim-python-pep8-indent'
 "Aschronous syntax checking for pytrhon
-Plugin 'klen/pylama'
+"Plugin 'klen/pylama'
 " Can select verbs using distinct letters, TODO: Same activation as new window
 " currently
-Plugin 'easymotion/vim-easymotion'
+"Plugin 'easymotion/vim-easymotion'
 " Allow to use tab to do autocompletions in insert mode
 Plugin 'ervandew/supertab'
 " Multiple selections like from sublime text, <C-n>
@@ -91,7 +91,7 @@ Plugin 'vim-airline/vim-airline-themes'
 " Highlight match tags in html files
 Plugin 'gregsexton/matchtag'
 " TODO Not sure but looks like it could be good
-Plugin 'taglist.vim'
+"Plugin 'taglist.vim'
 " Large but fast syntax language pack
 Plugin 'sheerun/vim-polyglot'
 " Opens a tree view to look at undos
@@ -162,23 +162,23 @@ let NERDTreeShowHidden=1
 let g:NERDTreeWinPos="left"
 let g:NERDTreeDirArrows=0
 
-" ==== Syntastic
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-let g:syntastic_javascript_checkers = ['eslint']
-let g:syntastic_javascript_mri_args = "--config=$HOME/.jshintrc"
-let g:syntastic_python_checkers = [ 'pylint', 'flake8', 'python' ]
-let g:syntastic_yaml_checkers = ['jsyaml']
-let g:syntastic_html_tidy_exec = 'tidy5'
-let g:syntastic_python_flake8_config_file='.flake8'
+"" ==== Syntastic
+"let g:syntastic_always_populate_loc_list = 1
+"let g:syntastic_auto_loc_list = 1
+"let g:syntastic_check_on_open = 1
+"let g:syntastic_check_on_wq = 0
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+"let g:syntastic_javascript_checkers = ['eslint']
+"let g:syntastic_javascript_mri_args = "--config=$HOME/.jshintrc"
+"let g:syntastic_python_checkers = [ 'pylint', 'flake8', 'python' ]
+"let g:syntastic_yaml_checkers = ['jsyaml']
+"let g:syntastic_html_tidy_exec = 'tidy5'
+"let g:syntastic_python_flake8_config_file='.flake8'
 
-" === flake8
-let g:flake8_show_in_file=1
+"" === flake8
+"let g:flake8_show_in_file=1
 
 " ==== snippets
 " If you want :UltiSnipsEdit to split your window.
@@ -195,10 +195,10 @@ let g:UltiSnipsExpandTrigger = "<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
-" ==== Easymotion
-let g:EasyMotion_do_mapping = 0
-let g:EasyMotion_smartcase = 1
-nmap f <Plug>(easymotion-s)
+"" ==== Easymotion
+"let g:EasyMotion_do_mapping = 0
+"let g:EasyMotion_smartcase = 1
+"nmap f <Plug>(easymotion-s)
 
 " Open nerdtree
 map <C-e> :NERDTreeToggle<CR>
@@ -216,14 +216,14 @@ let g:airline#extensions#tabline#left_alt_sep = ''
 let g:airline_theme='bubblegum'
 
 
-" === generate ctags
-" echo "generating tags..."
-" call system('ctags -R . ')
+"" === generate ctags
+"" echo "generating tags..."
+"" call system('ctags -R . ')
 
-let g:pymode_indent = 0
-" ==== custom commands
-command JsonPretty execute ":%!python -m json.tool"
-set secure
+"let g:pymode_indent = 0
+"" ==== custom commands
+"command JsonPretty execute ":%!python -m json.tool"
+"set secure
 
 " ====MOVEMENT COMMADNS====
 nmap <silent> <A-Up> :wincmd k<CR>
