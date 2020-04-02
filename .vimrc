@@ -151,7 +151,9 @@ let g:markbar_num_lines_context = 3
 " set the oufile mark format
 let g:markbar_file_mark_format_string = '%s'
 let g:markbar_file_mark_arguments = ['fname']
-
+let g:markbar_peekaboo_section_separation = 1
+let g:markbar_context_indent_block = 2
+let g:markbar__peekaboo_context_indent_block = 2
 
 let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
 
