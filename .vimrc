@@ -64,11 +64,8 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'Valloric/YouCompleteMe'
 " Show git diff inmfo at the side
 Plugin 'mhinz/vim-signify'
-" Syntax checking
-Plugin 'scrooloose/syntastic'
 " Surround for html tags
 Plugin 'tpope/vim-surround'
-" Extra syntax checking stuff for Javascript
 " Show the colour in css
 Plugin 'ap/vim-css-color'
 " Allow to use tab to do autocompletions in insert mode
@@ -80,7 +77,6 @@ Plugin 'bling/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 " Highlight match tags in html files
 Plugin 'gregsexton/matchtag'
-" TODO Not sure but looks like it could be good
 " Large but fast syntax language pack
 Plugin 'sheerun/vim-polyglot'
 " Opens a tree view to look at undos
@@ -127,7 +123,7 @@ set softtabstop=2
 :set guioptions-=T  "remove toolbar
 :set guioptions-=r  "remove right-hand scroll bar
 :set guioptions-=L  "remove left-hand scroll bar
-:set lines=999 columns=999
+":set lines=999 columns=999
 set ttimeoutlen=50
 set hlsearch
 " Disable mouse
@@ -149,7 +145,7 @@ let g:prettier#config#single_quote = 'false'
 nmap <Leader>' <Plug>ToggleMarkbar
 let g:markbar_peekaboo_apostrophe_mapping = '<leader>m'
 " only display alphabetic marks a-i and A-I
-let g:markbar_peekaboo_marks_to_display = 'abcdefghiABCDEFGHI'
+let g:markbar_peekaboo_marks_to_display = 'abcdefghejklmopqrstuvwxyzABCDEFGHEJKLMOPQRSTUVWXYZ'
 " number of lines of context to retrieve per mark
 let g:markbar_num_lines_context = 1
 
@@ -188,16 +184,6 @@ let g:airline#extensions#tabline#left_alt_sep = ''
 let g:airline#extensions#eclim#enabled = 0
 " Set Airline bar theme
 let g:airline_theme='bubblegum'
-
-
-"" === generate ctags
-"" echo "generating tags..."
-"" call system('ctags -R . ')
-
-"let g:pymode_indent = 0
-"" ==== custom commands
-"command JsonPretty execute ":%!python -m json.tool"
-"set secure
 
 " ====MOVEMENT COMMADNS====
 nmap <silent> <A-Up> :wincmd k<CR>
