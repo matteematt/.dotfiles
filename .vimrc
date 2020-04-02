@@ -75,7 +75,7 @@ Plugin 'tpope/vim-surround'
 " Show the colour in css
 Plugin 'ap/vim-css-color'
 " Modifies Vim's indentation behaviour to compley witj PEP8
-Plugin 'Vimjas/vim-python-pep8-indent'
+"Plugin 'Vimjas/vim-python-pep8-indent'
 "Aschronous syntax checking for pytrhon
 "Plugin 'klen/pylama'
 " Can select verbs using distinct letters, TODO: Same activation as new window
@@ -130,7 +130,7 @@ set st=2 sw=2 et
 set shiftwidth=2
 set tabstop=2
 set softtabstop=2
-let g:vim_json_syntax_conceal = 0
+"let g:vim_json_syntax_conceal = 0
 " set colorcolumn=80
 :set guioptions-=m  "remove menu bar
 :set guioptions-=T  "remove toolbar
@@ -154,6 +154,8 @@ set gdefault
 " single quotes over double quotes
 " Prettier default: false
 let g:prettier#config#single_quote = 'false'
+
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
 
 " ==== NERDTREE
 let NERDTreeIgnore = ['__pycache__', '\.pyc$', '\.o$', '\.so$', '\.a$', '\.swp', '*\.swp', '\.swo', '\.swn', '\.swh', '\.swm', '\.swl', '\.swk', '\.sw*$', '[a-zA-Z]*egg[a-zA-Z]*', '.DS_Store']
@@ -212,6 +214,7 @@ let g:airline#extensions#tabline#buffer_nr_show = 1
 " Set the seperator for the tabs
 let g:airline#extensions#tabline#left_sep = ''
 let g:airline#extensions#tabline#left_alt_sep = ''
+let g:airline#extensions#eclim#enabled = 0
 " Set Airline bar theme
 let g:airline_theme='bubblegum'
 
