@@ -147,7 +147,11 @@ let g:markbar_peekaboo_apostrophe_mapping = '<leader>m'
 " only display alphabetic marks a-i and A-I
 let g:markbar_peekaboo_marks_to_display = 'abcdefghejklmopqrstuvwxyzABCDEFGHEJKLMOPQRSTUVWXYZ'
 " number of lines of context to retrieve per mark
-let g:markbar_num_lines_context = 1
+let g:markbar_num_lines_context = 3
+" set the oufile mark format
+let g:markbar_file_mark_format_string = '%s'
+let g:markbar_file_mark_arguments = ['fname']
+
 
 let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
 
