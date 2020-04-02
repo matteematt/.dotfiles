@@ -245,6 +245,8 @@ nnoremap <leader>u :UndotreeToggle<CR>
 
 command! W :wa
 
+nnoremap <leader>t :!ctags -R .<CR>
+
 "===Imports
 
 " Snippets functions
