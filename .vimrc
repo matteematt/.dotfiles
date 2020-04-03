@@ -171,7 +171,19 @@ let g:NERDTreeDirArrows=0
 " make YCM compatible with UltiSnips (using supertab)
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-let g:ycm_semantic_triggers =  { 'c' : ['->', '.', '::', 're!gl'], 'objc': ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s'] }
+let g:ycm_semantic_triggers =  {
+  \   'c' : ['->', '.', '::', 're!gl'],
+  \   'objc': ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+  \            're!\[.*\]\s'],
+  \   'ocaml': ['.', '#'],
+  \   'cpp,cuda,objcpp': ['->', '.', '::'],
+  \   'perl': ['->'],
+  \   'php': ['->', '::'],
+  \   'cs,d,elixir,go,groovy,java,javascript,julia,perl6,python,scala,typescript,vb': ['.'],
+  \   'ruby,rust': ['.', '::'],
+  \   'lua': ['.', ':'],
+  \   'erlang': [':'],
+  \ }
 let g:SuperTabDefaultCompletionType = '<C-n>'
 " disable syntax info from ycm
 let g:ycm_show_diagnostics_ui = 0
@@ -291,4 +303,9 @@ augroup configgroup
   autocmd BufWritePre * :call StripTrailingWhitespaces()
   autocmd Filetype yaml source ~/dotfiles/ftconfig/showblankspaces.vim
   autocmd Filetype python source ~/dotfiles/ftconfig/showblankspaces.vim
+augroup END
+
+augroup configgroup
+  autocmd!
+  autocmd Filetype javascriptreact :set ft=javascript
 augroup END
