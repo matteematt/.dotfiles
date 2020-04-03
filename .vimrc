@@ -137,6 +137,12 @@ set ignorecase
 set smartcase
 set gdefault
 
+" Folds
+set foldmethod=indent " set the automatic fold function
+set nofoldenable  "" but dont close folds by default
+set foldlevelstart=99 " dont be greedy when toggling folds
+nnoremap <space> za
+
 " ====PLUGIN SETTINGS===
 " single quotes over double quotes
 " Prettier default: false
