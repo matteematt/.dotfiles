@@ -182,8 +182,6 @@ nmap <silent> gr <Plug>(coc-references)
 " Prettier default: false
 let g:prettier#config#single_quote = 'false'
 
-source ~/dotfiles/vim_functions/coc_setup.vim
-
 nmap <Leader>' <Plug>ToggleMarkbar
 let g:markbar_peekaboo_apostrophe_mapping = '<leader>m'
 " only display alphabetic marks a-i and A-I
