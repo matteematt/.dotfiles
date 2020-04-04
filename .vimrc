@@ -60,16 +60,12 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'vim-scripts/L9'
 " Used as a file expolorer
 Plugin 'scrooloose/nerdtree'
-" Autocompletion functionality
-Plugin 'Valloric/YouCompleteMe'
 " Show git diff inmfo at the side
 Plugin 'mhinz/vim-signify'
 " Surround for html tags
 Plugin 'tpope/vim-surround'
 " Show the colour in css
 Plugin 'ap/vim-css-color'
-" Allow to use tab to do autocompletions in insert mode
-Plugin 'ervandew/supertab'
 " Multiple selections like from sublime text, <C-n>
 Plugin 'terryma/vim-multiple-cursors'
 " Show info in the statusbar
@@ -83,6 +79,8 @@ Plugin 'sheerun/vim-polyglot'
 Plugin 'mbbill/undotree'
 " Allows easy viewing of marks
 Plugin 'Yilin-Yang/vim-markbar'
+" Autocompletion, has a readme in the dotfiles for more install sutff
+Plugin 'neoclide/coc.nvim'
 
 " Colours
 Plugin 'flrnd/candid.vim'
@@ -144,9 +142,47 @@ set foldlevelstart=99 " dont be greedy when toggling folds
 nnoremap <space> za
 
 " ====PLUGIN SETTINGS===
+
+" ==== COC
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+" I think this allows the autocomplete to detect when you used bacspace
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
+if has('patch8.1.1068')
+  " Use `complete_info` if your (Neo)Vim version supports it.
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" ==== Prettier
 " single quotes over double quotes
 " Prettier default: false
 let g:prettier#config#single_quote = 'false'
+
+source ~/dotfiles/vim_functions/coc_setup.vim
 
 nmap <Leader>' <Plug>ToggleMarkbar
 let g:markbar_peekaboo_apostrophe_mapping = '<leader>m'
@@ -167,34 +203,6 @@ let NERDTreeIgnore = ['__pycache__', '\.pyc$', '\.o$', '\.so$', '\.a$', '\.swp',
 let NERDTreeShowHidden=1
 let g:NERDTreeWinPos="left"
 let g:NERDTreeDirArrows=0
-
-" make YCM compatible with UltiSnips (using supertab)
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-let g:ycm_semantic_triggers =  {
-  \   'c' : ['->', '.', '::', 're!gl'],
-  \   'objc': ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-  \            're!\[.*\]\s'],
-  \   'ocaml': ['.', '#'],
-  \   'cpp,cuda,objcpp': ['->', '.', '::'],
-  \   'perl': ['->'],
-  \   'php': ['->', '::'],
-  \   'cs,d,elixir,go,groovy,java,javascript,julia,perl6,python,scala,typescript,vb': ['.'],
-  \   'ruby,rust': ['.', '::'],
-  \   'lua': ['.', ':'],
-  \   'erlang': [':'],
-  \ }
-let g:SuperTabDefaultCompletionType = '<C-n>'
-" disable syntax info from ycm
-let g:ycm_show_diagnostics_ui = 0
-let g:ycm_enable_diagnostic_signs = 0
-let g:ycm_enable_diagnostic_highlighting = 0
-nnoremap <leader><space> :YcmCompleter GoTo<CR>
-
-" better key bindings for UltiSnipsExpandTrigger
-let g:UltiSnipsExpandTrigger = "<tab>"
-let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 " Open nerdtree
 map <C-e> :NERDTreeToggle<CR>
