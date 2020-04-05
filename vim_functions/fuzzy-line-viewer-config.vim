@@ -8,7 +8,7 @@ endif
 " Files + devicons
 function! Fzf_lines()
   " {} is replaced to the single-quoted string of the focused line
-  let l:fzf_files_options = '--preview "~/dotfiles/vim_functions/fuzzy-line-viewer-2.sh {2..-1} '.&lines.'"'
+  let l:fzf_files_options = '--preview "~/dotfiles/vim_functions/fuzzy-line-viewer-2.sh {} '.&lines.'"'
 
   function! s:files()
     let l:files = split(system($FZF_LINES_COMMAND), '\n')
@@ -40,6 +40,6 @@ function! Fzf_lines()
   call fzf#run({
         \ 'source': <sid>files(),
         \ 'sink':   function('s:edit_file'),
-        \ 'options': '-m ' . l:fzf_files_options,
+        \ 'options': '-m  -d : -n 3.. ' . l:fzf_files_options,
         \ 'top':    '60%' })
 endfunction
