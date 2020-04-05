@@ -8,7 +8,7 @@ endif
 " Files + devicons
 function! Fzf_lines()
   " {} is replaced to the single-quoted string of the focused line
-  let l:fzf_files_options = '--preview "~/dotfiles/vim_functions/fuzzy-line-viewer.sh {2..-1}"'
+  let l:fzf_files_options = '--preview "~/dotfiles/vim_functions/fuzzy-line-viewer-2.sh {2..-1} '.&lines.'"'
 
   function! s:files()
     let l:files = split(system($FZF_LINES_COMMAND), '\n')
