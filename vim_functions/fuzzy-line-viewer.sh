@@ -6,5 +6,8 @@
 # 2nd index is the line number
 # 3rd index is the rest
 IFS=':' read -r -a array <<< "$1"; 
-printf "  ${array[0]} l:${array[1]}\n\n"
-bat --theme="OneHalfDark" --style=changes --color always "${array[0]}" | tail -n +"${array[1]}" | head -n 20
+file_name="${array[0]}"
+# Need to trim away the file icon and the whitespace left behind
+file_name="$(echo "$file_name" | cut -c 4- | tr -d '[:space:]')"
+printf "  $file_name l:${array[1]}\n\n"
+bat --theme="OneHalfDark" --style=changes --color always "$file_name" | tail -n +"${array[1]}" | head -n 20

@@ -10,10 +10,11 @@
 # 3rd index is the rest
 IFS=':' read -r -a array <<< "$1"; 
 file_name="${array[0]}"
+# Need to trim away the file icon and the whitespace left behind
+file_name="$(echo "$file_name" | cut -c 4- | tr -d '[:space:]')"
 sel_line="${array[1]}"
 total_lines="$2"
 max_section_len=$((($total_lines - 3) / 2 ))
-echo "$total_lines $max_section_len"
 
 s1_start=$(($sel_line - $max_section_len ))
 [[ $s1_start -lt 0 ]] && s1_start=0
