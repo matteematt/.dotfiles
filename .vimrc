@@ -289,6 +289,8 @@ source ~/dotfiles/vim_functions/fill-output.vim
 " Open the GFiles command with fzf which ignores .git folder
 nnoremap <silent> <leader>o :call Fzf_dev()<CR>
 source ~/dotfiles/vim_functions/fuzzy-file-viewer-config.vim
+nnoremap <silent> <leader>f :call Fzf_lines()<CR>
+source ~/dotfiles/vim_functions/fuzzy-line-viewer-config.vim
 
 " Convert from project root to relative between files
 source ~/dotfiles/vim_functions/path-converter.vim
