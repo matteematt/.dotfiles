@@ -11,7 +11,7 @@
 IFS=':' read -r -a array <<< "$1"; 
 file_name="${array[0]}"
 # Need to trim away the file icon and the whitespace left behind
-file_name="$(echo "$file_name" | cut -c 2- | tr -d '[:space:]')"
+file_name="$(echo "$file_name" | tr -dc '`\0-\177`' | tr -d '[:space:]')"
 sel_line="${array[1]}"
 total_lines="$2"
 max_section_len=$((($total_lines - 3) / 2 ))

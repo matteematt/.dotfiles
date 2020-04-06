@@ -8,6 +8,6 @@
 IFS=':' read -r -a array <<< "$1"; 
 file_name="${array[0]}"
 # Need to trim away the file icon and the whitespace left behind
-file_name="$(echo "$file_name" | cut -c 4- | tr -d '[:space:]')"
+file_name="$(echo "$file_name" | tr -dc '`\0-\177`' | tr -d '[:space:]')"
 printf "  $file_name l:${array[1]}\n\n"
 bat --theme="OneHalfDark" --style=changes --color always "$file_name" | tail -n +"${array[1]}" | head -n 20
