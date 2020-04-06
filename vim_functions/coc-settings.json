@@ -1,6 +1,11 @@
 {
   "diagnostic.enable": false,
   "languageserver": {
+    "groovy": {
+      "command": "java",
+      "args": ["-jar", "/Users/mwa75/installs/groovy-language-server/build/libs/groovy-language-server.jar"],
+      "filetypes": ["groovy"]
+    },
     "ccls": {
       "command": "ccls",
       "filetypes": ["c", "cpp", "objc", "objcpp"],

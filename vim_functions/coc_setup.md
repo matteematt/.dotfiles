@@ -16,6 +16,21 @@ Install the marketplace with `:CocInstall coc-marketplace`. Once it is installed
 
 Each language needs their own server to be insalled and configured with the text editor. This usually requires a system install and a vim plugin. Below are instructions for each language done so far.
 
+## Groovy
+
+1. [Download and setup to repo](https://github.com/prominic/groovy-language-server) and build it with gradle
+2. Add the required config in `coc-settings.json`
+```
+  "languageserver": {
+    "groovy": {
+      "command": "java",
+      "args" : ["-jar", "/path/to/groovy-language-server-all.jar"],
+      "filetypes": ["groovy"]
+     }
+  }
+```
+Not sure this is actually working though
+
 ## C Family
 
 [coc-ccls](https://github.com/MaskRay/ccls/wiki) appears to be the preferred language server for the C family of languages. The other option is `clangd`.
