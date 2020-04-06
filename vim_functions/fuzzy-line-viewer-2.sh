@@ -11,7 +11,7 @@
 IFS=':' read -r -a array <<< "$1"; 
 file_name="${array[0]}"
 # Need to trim away the file icon and the whitespace left behind
-file_name="$(echo "$file_name" | cut -c 4- | tr -d '[:space:]')"
+file_name="$(echo "$file_name" | cut -c 2- | tr -d '[:space:]')"
 sel_line="${array[1]}"
 total_lines="$2"
 max_section_len=$((($total_lines - 3) / 2 ))
@@ -22,6 +22,6 @@ s1_len=$(( $sel_line - $s1_start - 1))
 
 s2_start=$(( $sel_line + 1 ))
 printf "  $file_name l:$sel_line\n\n"
-bat --theme="OneHalfDark" --style=changes --color never "$file_name" | tail -n +"$s1_start" | head -n "$s1_len"
+[[ $s1_len -eq 0 ]] || bat --theme="OneHalfDark" --style=changes --color never "$file_name" | tail -n +"$s1_start" | head -n "$s1_len"
 bat --theme="OneHalfDark" --style=changes --color always "$file_name" | tail -n +"${array[1]}" | head -n 1
 bat --theme="OneHalfDark" --style=changes --color never "$file_name" | tail -n +"$s2_start" | head -n "$max_section_len"
