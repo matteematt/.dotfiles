@@ -123,7 +123,6 @@ set softtabstop=2
 :set guioptions-=L  "remove left-hand scroll bar
 ":set lines=999 columns=999
 set ttimeoutlen=50
-set hlsearch
 " Disable mouse
 set mouse=c
 " Disable swap file warning
@@ -263,6 +262,18 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 " ===Special Keybindings
 
+" toggle hlsearch
+let searchcolourcounter=0
+function! ToggleHLSearch()
+  let g:searchcolourcounter = g:searchcolourcounter + 1
+  if g:searchcolourcounter % 2 == 1
+    set hlsearch
+  else
+    set nohlsearch
+  endif
+endfunction
+nnoremap <leader>h :call ToggleHLSearch()<CR>
+
 " Delete a buffer but dont delete the split
 nnoremap <leader>bd :b#<bar>bd#<CR>
 
@@ -273,7 +284,6 @@ nnoremap <leader><leader> :Buffers<CR>
 map <Leader>la :set noconfirm<CR>:bufdo e<CR>:set confirm<CR>
 
 " Un-highlight items selected with / or * etc
-nnoremap <leader><CR> :noh<CR>
 
 nnoremap <leader>u :UndotreeToggle<CR>
 
