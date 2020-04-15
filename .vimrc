@@ -325,9 +325,5 @@ augroup configgroup
   autocmd BufWritePre * :call StripTrailingWhitespaces()
   autocmd Filetype yaml source ~/dotfiles/ftconfig/showblankspaces.vim
   autocmd Filetype python source ~/dotfiles/ftconfig/showblankspaces.vim
-augroup END
-
-augroup configgroup
-  autocmd!
   autocmd Filetype javascriptreact :set ft=javascript
 augroup END
