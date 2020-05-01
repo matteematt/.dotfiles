@@ -137,6 +137,7 @@ set gdefault
 if &history < 1000
   set history=1000
 endif
+set scrolloff=5
 
 " Folds
 set foldmethod=indent " set the automatic fold function
