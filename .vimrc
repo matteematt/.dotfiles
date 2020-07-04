@@ -115,6 +115,7 @@ set st=2 sw=2 et
 set shiftwidth=2
 set tabstop=2
 set softtabstop=2
+set lazyredraw
 "let g:vim_json_syntax_conceal = 0
 " set colorcolumn=80
 :set guioptions-=m  "remove menu bar
@@ -136,6 +137,7 @@ set gdefault
 if &history < 1000
   set history=1000
 endif
+set scrolloff=5
 
 " Folds
 set foldmethod=indent " set the automatic fold function

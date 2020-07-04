@@ -3,3 +3,5 @@
 [._]s[a-v][a-z]
 [._]sw[a-p]
 tags
+.java-version
+.idea
