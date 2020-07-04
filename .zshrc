@@ -125,7 +125,7 @@ export PATH="/home/matt/anaconda3/bin:$PATH"
 
 #Turn off caps lock
 #To enable caps lock exec $ setxkbmap -option
-setxkbmap -option ctrl:nocaps
+#setxkbmap -option ctrl:nocaps
 
 source ~/dotfiles/shell_includes.sh
 
