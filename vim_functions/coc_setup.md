@@ -59,4 +59,7 @@ Not sure this is actually working though
 
 ## Scala
 
-[coc-metals](https://github.com/scalameta/coc-metals) 
+[coc-metals](https://github.com/scalameta/coc-metals)
+
+1. In vim, run `:CocInstall coc-metals`
+2. That seemed to have worked with the other vim config that was already there
