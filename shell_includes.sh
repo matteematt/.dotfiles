@@ -65,6 +65,15 @@ function dockerImageNuke {
 alias dcnuke="dockerContainerNuke"
 alias dinuke="dockerImageNuke"
 
+function choosedToolboxScript {
+  chosen_script=`ls ~/toolbox/script/ | fzf`
+  echo "Exec script $chosen_script"
+  if [[ -z "$chosen_script" ]]; then
+  else
+    eval "~/toolbox/script/$chosen_script"
+  fi
+}
+alias toolbox="choosedToolboxScript"
 
 # Commands
 # RipGrep Files
