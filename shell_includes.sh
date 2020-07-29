@@ -75,6 +75,26 @@ function choosedToolboxScript {
 }
 alias toolbox="choosedToolboxScript"
 
+# Does not work properly on filepaths with a space in
+function pushChangedDirToList {
+  cdhistory="$HOME/dotfiles/data/cdhistory"
+  cd $1
+  touch "$cdhistory"
+  echo "`pwd` `date +'%s'`" >> "$cdhistory"
+  sort -r "$cdhistory" | sort -k1,1 --unique | sort -k 2,2 | tail -n 1000 > "$cdhistory.tmp"
+  mv -f "$cdhistory.tmp" "$cdhistory"
+}
+alias cd="pushChangedDirToList"
+
+function changeDirFromHistory {
+  cdhistory="$HOME/dotfiles/data/cdhistory"
+  chosen_dir=`rev "$cdhistory" | cut -d" " -f 2- | rev | fzf --tac`
+  if [[ -d "$chosen_dir" ]]; then
+    cd "$chosen_dir"
+  fi
+}
+alias cdd="changeDirFromHistory"
+
 # Commands
 # RipGrep Files
 alias rgf="rg -uu --files | rg --invert-match \.git | rg"
