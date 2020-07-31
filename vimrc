@@ -52,7 +52,7 @@ set shortmess+=A								" disable swap file prompt
 set ignorecase									" together ignorecase and smartcase ignore case until an uppcase
 set smartcase										" is specified, and then use case sensitivity
 set shiftround									" rounds indents such as with >> to a tabstop 
-set wildcharm=<C-z>
+set wildcharm=<Tab>
 if &history < 1000
 	set history=1000
 endif
@@ -80,3 +80,5 @@ nnoremap <C-l> <C-w>l
  " Highlight the last inserted text
  nnoremap gV `[v`]`
 
+" Open wildmenu with open buffers
+nnoremap <leader><leader> :buffer<space>
