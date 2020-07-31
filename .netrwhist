@@ -1,0 +1,5 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/Users/mwa75/Documents/general_projects/advent_of_code_2019/src/intcode_scala/15/target/streams/compile/run'
+let g:netrw_dirhist_2='/Users/mwa75/Documents/general_projects/advent_of_code_2019/src/intcode_scala/15/target/scala-2.13/classes/intcode'
+let g:netrw_dirhist_1='/Users/mwa75/.vim/plugin'
