@@ -18,6 +18,7 @@ endif
 " dirs to ignore
 set wildignore+=*/node_modules/*
 set wildignore+=*/.git/*
+set wildignore+=*/undo/*
 " ignore compiled and binary files
 set wildignore+=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*.pdf,*.bak,*.beam,*.cache
 " only show files not dirs

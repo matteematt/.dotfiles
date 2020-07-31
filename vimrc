@@ -45,8 +45,16 @@ set number	                   " shows the absolute number for the current line
 set shiftwidth=2								" sets the shift tab and indent width to 2
 set tabstop=2
 set softtabstop=2
+set gdefault										" global flag is on by default in searches, use /g to turn it off
+set lazyredraw									" don't redraw when executing a macro
+set ttimeoutlen=50
+set shortmess+=A								" disable swap file prompt
+set ignorecase									" together ignorecase and smartcase ignore case until an uppcase
+set smartcase										" is specified, and then use case sensitivity
+set shiftround									" rounds indents such as with >> to a tabstop 
+set wildcharm=<C-z>
 if &history < 1000
-	set history = 1000
+	set history=1000
 endif
 
 " You must create the dir set, it will not do it for you!
@@ -71,3 +79,4 @@ nnoremap <C-l> <C-w>l
 
  " Highlight the last inserted text
  nnoremap gV `[v`]`
+
