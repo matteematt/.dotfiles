@@ -29,6 +29,8 @@ elseif g:os == "Linux"
   let &t_EI = "\<Esc>[2 q"
 endif
 
+color xcodedarkhc
+
 " various settings
 set autoindent                 " Minimal automatic indenting for any filetype.
 set smartindent 		" smart indent for better indenting
@@ -56,6 +58,8 @@ set wildcharm=<Tab>
 if &history < 1000
 	set history=1000
 endif
+set spell
+set spelllang=en
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
