@@ -29,13 +29,16 @@ elseif g:os == "Linux"
   let &t_EI = "\<Esc>[2 q"
 endif
 
-color xcodedarkhc
-augroup vim-colors-xcode
-    autocmd!
-augroup END
-
-autocmd vim-colors-xcode ColorScheme * hi Comment        cterm=italic gui=italic
-autocmd vim-colors-xcode ColorScheme * hi SpecialComment cterm=italic gui=italic
+" Colour scheme
+" https://github.com/joshdick/onedark.vim README explains setting termguicolors, need extra check for tmux
+if (has("nvim"))
+	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+endif
+if (has("termguicolors"))
+	set termguicolors
+endif
+let g:onedark_hide_endofbuffer=1	" hide end of buffer lines
+colorscheme onedark
 
 " various settings
 set autoindent                 " Minimal automatic indenting for any filetype.
@@ -78,7 +81,7 @@ endif
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 " keybindings
-let mapleader = ","
+let mapleader="\<Space>"
 
 " Open split and get focus, remap the window movement keys
 nnoremap <leader>w <C-w>v<C-w>l
