@@ -3,10 +3,12 @@
 " bettergrep.vim
 
 if executable('rg')
-	function! FindFile(args)
-		let rgcmd="rg -uu --files | rg --invert-match \.git | rg"
-		return system(join([rgcmd] + a:000), ' ')
+	function! FindFile(...)
+		echo "Running function"
+		let rgcmd="rg -uu --files | rg --invert-match \.git | rg ".join(a:000, ' ')." | awk '{print $1\":0:0\"}'"
+		echo rgcmd
+		return system(rgcmd)
 	endfunction
 
-	command! -nargs=+ FilePicker cgetexpr FindFile(<f-args>)
+	command! -nargs=+ FilePicker cgetexpr [] <bar> caddexpr FindFile(<f-args>) <bar> cwindow
 endif
