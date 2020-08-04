@@ -24,4 +24,4 @@ set wildignore+=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*
 " only show files not dirs
 " set wildignore+=*/
 
-nnoremap <leader>o :find<space>
+"nnoremap <leader>o :find<space>

@@ -4,11 +4,12 @@
 
 if executable('rg')
 	function! FindFile(...)
-		echo "Running function"
 		let rgcmd="rg -uu --files | rg --invert-match \.git | rg ".join(a:000, ' ')." | awk '{print $1\":0:0\"}'"
 		echo rgcmd
 		return system(rgcmd)
 	endfunction
 
 	command! -nargs=+ FilePicker cgetexpr [] <bar> caddexpr FindFile(<f-args>) <bar> cwindow
+
+	nnoremap <leader>o :FilePicker<space>
 endif
