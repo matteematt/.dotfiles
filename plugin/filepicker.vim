@@ -11,5 +11,4 @@ if executable('rg')
 
 	command! -nargs=+ FilePicker cgetexpr [] <bar> caddexpr FindFile(<f-args>) <bar> cwindow
 
-	nnoremap <leader>o :FilePicker<space>
 endif
