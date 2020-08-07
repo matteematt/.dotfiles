@@ -2,9 +2,13 @@
 
 ## Dependencies 
 
-Current dependencies are `ripgrep`
+Current non-bundled dependencies are `ripgrep` binary
 
 I like to have as little dependencies as possible so I have bundled the colour schemes into this repo. 
+
+### Undo Tree
+
+
 
 ### XCode Colour Scheme
 
