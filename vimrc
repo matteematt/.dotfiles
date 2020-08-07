@@ -30,10 +30,7 @@ elseif g:os == "Linux"
 endif
 
 " Colour scheme
-" https://github.com/joshdick/onedark.vim README explains setting termguicolors, need extra check for tmux
-if (has("nvim"))
-	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-endif
+" https://github.com/joshdick/onedark.vim README explains setting termguicolors, need extra check for tmux or nvim
 if (has("termguicolors"))
 	set termguicolors
 endif
@@ -63,7 +60,6 @@ set shortmess+=A								" disable swap file prompt
 set ignorecase									" together ignorecase and smartcase ignore case until an uppcase
 set smartcase										" is specified, and then use case sensitivity
 set shiftround									" rounds indents such as with >> to a tabstop 
-set wildcharm=<Tab>
 if &history < 1000
 	set history=1000
 endif
