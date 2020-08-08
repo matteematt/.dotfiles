@@ -48,7 +48,7 @@ set ruler                      " Shows the current line number at the bottom-rig
 set wildmenu                   " Great command-line completion, use `<Tab>` to move
 set wildmode=longest:full,full
                                " around and `<CR>` to validate
-set relativenumber             " add relative numbers 
+set relativenumber             " add relative numbers
 set number	                   " shows the absolute number for the current line
 set shiftwidth=2								" sets the shift tab and indent width to 2
 set tabstop=2
@@ -59,7 +59,7 @@ set ttimeoutlen=50
 set shortmess+=A								" disable swap file prompt
 set ignorecase									" together ignorecase and smartcase ignore case until an uppcase
 set smartcase										" is specified, and then use case sensitivity
-set shiftround									" rounds indents such as with >> to a tabstop 
+set shiftround									" rounds indents such as with >> to a tabstop
 if &history < 1000
 	set history=1000
 endif
@@ -71,7 +71,7 @@ if has('persistent_undo')      "check if your vim version supports it
   set undodir=$HOME/.vim/undo  "directory where the undo files will be stored
   set undofile                 "turn on the feature
   :silent call system('mkdir -p ' . &undodir)
-endif	
+endif
 
 " Turn off comments automatically continuing onto the next line
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
