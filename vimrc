@@ -92,6 +92,9 @@ nnoremap <C-l> <C-w>l
 " Open wildmenu with open buffers
 nnoremap <leader><leader> :buffer<space>
 
+" Open the undotree buffer
+nnoremap <leader>u :UndotreeToggle<CR>
+
 " Use these and then call :profile pause to find out why slowdown occurs
 "profile start profile.log
 "profile func *
