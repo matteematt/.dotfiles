@@ -1,11 +1,10 @@
-" Need to change this!!
-function! GitBranch()
-  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
-endfunction
-
-function! StatuslineGit()
-  let l:branchname = GitBranch()
-  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
+" Only update this on buf write or something
+function! GetGitBranch()
+	let l:gitBranch = system("git branch --show-current")
+	" need to delete what I think is a newline char at the end
+	" v:shell_error catches this not being a git repo, but also not show
+	" for any other reason
+	return v:shell_error ? "" : " ".l:gitBranch[0:strlen(l:gitBranch)-2]." "
 endfunction
 
 let s:modesDict={
@@ -45,7 +44,7 @@ function! CreateStatusLine()
 	let l:statusline.=GetModeColour()
 	let l:statusline.=GetModeText()
 	let l:statusline.="%#VisualNOS#"															" set highlight group colour to VisualNOS
-	let l:statusline.="%{StatuslineGit()}"												" show the git branch
+	let l:statusline.=GetGitBranch()												" show the git branch
 	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr
 	let l:statusline.=" %f"																				" path to the file in the buffer
 	let l:statusline.="%m"																				" modified flag for the file in the buffer
