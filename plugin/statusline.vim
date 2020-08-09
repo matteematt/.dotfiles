@@ -1,3 +1,4 @@
+" Need to change this!!
 function! GitBranch()
   return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
 endfunction
@@ -7,19 +8,57 @@ function! StatuslineGit()
   return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
 endfunction
 
-set laststatus=2																						" Always show the status bar
+let s:modesDict={
+	\ "n": ' NORMAL ',
+	\ "i": ' INSERT ',
+	\ "R": 'REPLACE ',
+	\ "v": ' VISUAL ',
+	\ "V": 'VISUAL-L',
+	\ "": 'VISUAL-B',
+	\ "t": 'TERMINAL',
+	\ }
+let s:lastMode="n"
 
-set statusline=																							" clear the existing status bar
-set statusline+=%#PmenuSel#																	" set highlight group colour to PmenuSel
-set statusline+=%{StatuslineGit()}													" show the git branch
-set statusline+=%#LineNr#																		" set the highlight group to LineNr
-set statusline+=\ %f																				" path to the file in the buffer
-set statusline+=%m																					" modified flag for the file in the buffer
-set statusline+=%=																					" separation point between right and left aligned items
-set statusline+=%#CursorColumn#															" set highlight group colour to the cursor column
-set statusline+=\ %y																				" type of file e.g [vim]
-set statusline+=\ %{&fileencoding?&fileencoding:&encoding}	" show file encoding e.g. utf-8
-set statusline+=\[%{&fileformat}\]													" show file format e.g. [unix]
-set statusline+=\ %p%%																			" the percentage down the file the cursor is on, and add % symbol
-set statusline+=\ %l:%c																			" the line and column position of the cursor
-set statusline+=\
+function! GetModeText()
+	let l:mode = mode()
+	if has_key(s:modesDict, l:mode)
+		let s:lastMode = l:mode
+	endif
+	return " ".s:modesDict[s:lastMode]." "
+endfunction
+
+function! GetModeColour()
+	let l:mode = mode()
+	if (l:mode =~# '\v(i|R)')
+		return "%#DiffAdd#"
+	elseif (l:mode =~# '\v(v|V|)')
+		return "%#DiffText#"
+	elseif (l:mode =~# '\v(t)')
+		return "%#ToolbarButton#"
+	else
+		return "%#PMenuSel#"
+	endif
+endfunction
+
+function! CreateStatusLine()
+	let l:statusline=""
+	let l:statusline.=GetModeColour()
+	let l:statusline.=GetModeText()
+	let l:statusline.="%#VisualNOS#"															" set highlight group colour to VisualNOS
+	let l:statusline.="%{StatuslineGit()}"												" show the git branch
+	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr
+	let l:statusline.=" %f"																				" path to the file in the buffer
+	let l:statusline.="%m"																				" modified flag for the file in the buffer
+	let l:statusline.="%="																				" separation point between right and left aligned items
+	let l:statusline.="%#CursorColumn#"														" set highlight group colour to the cursor column
+	let l:statusline.=" %y"																				" type of file e.g [vim]
+	let l:statusline.=" %{&fileencoding?&fileencoding:&encoding}"	" show file encoding e.g. utf-8
+	let l:statusline.="\[%{&fileformat}\]"												" show file format e.g. [unix]
+	let l:statusline.=" %p%%"																			" the percentage down the file the cursor is on, and add % symbol
+	let l:statusline.=" %l:%c "																		" the line and column position of the cursor
+	return	l:statusline
+endfunction
+
+set laststatus=2																						" Always show the status bar
+set statusline=%!CreateStatusLine()
+
