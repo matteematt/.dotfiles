@@ -1,10 +1,23 @@
-" Only update this on buf write or something
+let s:gitBranch=""
+if executable("git")
+	" get the git major and minor version number
+	" getting branch name on older versions (2.21 >=) was causing slowdown
+	let s:gitversion = system("git --version | cut -d' ' -f 3  | cut -d '.' -f 1-2")
+	if (str2float(s:gitversion) >= 2.22)
+		augroup GetGitBranch
+			au!
+			au BufWritePre * call GetGitBranch()
+			au BufReadPre * call GetGitBranch()
+		augroup END
+	endif
+endif
+
 function! GetGitBranch()
 	let l:gitBranch = system("git branch --show-current")
 	" need to delete what I think is a newline char at the end
 	" v:shell_error catches this not being a git repo, but also not show
 	" for any other reason
-	return v:shell_error ? "" : " ".l:gitBranch[0:strlen(l:gitBranch)-2]." "
+	let s:gitBranch =  v:shell_error ? "" : " ⎇ ".l:gitBranch[0:strlen(l:gitBranch)-2]." "
 endfunction
 
 let s:modesDict={
@@ -44,7 +57,7 @@ function! CreateStatusLine()
 	let l:statusline.=GetModeColour()
 	let l:statusline.=GetModeText()
 	let l:statusline.="%#VisualNOS#"															" set highlight group colour to VisualNOS
-	let l:statusline.=GetGitBranch()												" show the git branch
+	let l:statusline.=s:gitBranch																	" show the git branch
 	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr
 	let l:statusline.=" %f"																				" path to the file in the buffer
 	let l:statusline.="%m"																				" modified flag for the file in the buffer
