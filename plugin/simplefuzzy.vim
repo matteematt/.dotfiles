@@ -3,7 +3,7 @@
 if g:os == "Windows" || !executable("rg")
 	echoerr "Unsupported OS or fzf not in path"
 else
-	let s:fzfPreview = executable("bat") ? 
+	let s:fzfPreview = executable("bat") ?
 		\ ' --preview "bat --theme="OneHalfDark" --style=numbers --color always {} | head -'.&lines.'"' : ''
 	let s:fileCmd= executable("rg") ? 'rg --files --hidden --follow --glob "\!.git/*" | ' : ''
 
@@ -14,7 +14,7 @@ else
 		execute "silent !".s:fileCmd."fzf".s:fzfPreview." > ".chosenFileLoc
 		redraw!
 		if v:shell_error
-			echoerr "There was an error with the shell"
+			" Error with the shell - or just didn't pick an item
 		else
 			let expandedFilePath = expand(chosenFileLoc)
 			if filereadable(expandedFilePath)
