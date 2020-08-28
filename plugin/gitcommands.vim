@@ -14,4 +14,8 @@ if executable("git")
 			echoerr l:returnText
 		endif
 	endfunction
+
+	function MergeConflictList()
+		cgetexpr system('rg --vimgrep "<<<<<<< HEAD"')
+	endfunction
 endif

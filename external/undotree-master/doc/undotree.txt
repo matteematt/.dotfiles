@@ -31,7 +31,7 @@ CONTENTS                                                   *undotree-contents*
     6. License .............................. |undotree-license|
 
 ==============================================================================
-1. Intro                                                      *undotree-intro*
+2. Intro                                                      *undotree-intro*
 
 The plug-in visualizes undo history and makes it easier to browse and switch
 between different undo branches. You might wonder what is undo "branches"?
