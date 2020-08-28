@@ -65,6 +65,8 @@ if &history < 1000
 endif
 set spell
 set spelllang=en
+set foldmethod=indent
+set foldlevelstart=2
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
