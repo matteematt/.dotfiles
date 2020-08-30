@@ -6,13 +6,12 @@ if executable("git")
 	if (str2float(s:gitversion) >= 2.22)
 		augroup GetGitBranch
 			au!
-			au BufWritePre * call GetGitBranch()
-			au BufReadPre * call GetGitBranch()
+			au BufWritePre,BufReadPre * call s:GetGitBranch()
 		augroup END
 	endif
 endif
 
-function! GetGitBranch()
+function! s:GetGitBranch()
 	let l:gitBranch = system("git branch --show-current")
 	" need to delete what I think is a newline char at the end
 	" v:shell_error catches this not being a git repo, but also not show
@@ -31,7 +30,7 @@ let s:modesDict={
 	\ }
 let s:lastMode="n"
 
-function! GetModeText()
+function! s:GetModeText()
 	let l:mode = mode()
 	if has_key(s:modesDict, l:mode)
 		let s:lastMode = l:mode
@@ -39,7 +38,7 @@ function! GetModeText()
 	return " ".s:modesDict[s:lastMode]." "
 endfunction
 
-function! GetModeColour()
+function! s:GetModeColour()
 	let l:mode = mode()
 	if (l:mode =~# '\v(i|R)')
 		return "%#DiffAdd#"
@@ -54,8 +53,8 @@ endfunction
 
 function! CreateStatusLine()
 	let l:statusline=""
-	let l:statusline.=GetModeColour()
-	let l:statusline.=GetModeText()
+	let l:statusline.=s:GetModeColour()
+	let l:statusline.=s:GetModeText()
 	let l:statusline.="%#VisualNOS#"															" set highlight group colour to VisualNOS
 	let l:statusline.=s:gitBranch																	" show the git branch
 	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr
