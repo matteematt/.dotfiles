@@ -75,14 +75,17 @@ function choosedToolboxScript {
 }
 alias toolbox="choosedToolboxScript"
 
-# Does not work properly on filepaths with a space in
-function pushChangedDirToList {
+# TODO: Does not work properly on filepaths with a space in
+function pushChangedDirToListSave {
   cdhistory="$HOME/dotfiles/data/cdhistory"
-  cd $1
   touch "$cdhistory"
   echo "`pwd` `date +'%s'`" >> "$cdhistory"
   sort -r "$cdhistory" | sort -k1,1 --unique | sort -k 2,2 | tail -n 1000 > "$cdhistory.tmp"
   mv -f "$cdhistory.tmp" "$cdhistory"
+}
+function pushChangedDirToList {
+  cd $1
+	(pushChangedDirToListSave &) &>/dev/null
 }
 alias cd="pushChangedDirToList"
 
