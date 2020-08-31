@@ -18,3 +18,5 @@ utf
 #imscript
 filepath
 javascript
+linter
+eslint
