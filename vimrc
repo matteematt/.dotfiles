@@ -67,6 +67,7 @@ set spell
 set spelllang=en
 set foldmethod=indent
 set foldlevelstart=2
+set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
@@ -77,6 +78,9 @@ endif
 
 " Turn off comments automatically continuing onto the next line
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+" This autocommand tells Vim to open the quickfix window whenever a quickfix command is executed
+" AND there are valid errors to display.
+autocmd QuickFixCmdPost [^l]* cwindow
 
 " keybindings
 let mapleader="\<Space>"
@@ -87,6 +91,9 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+
+nnoremap <Down> :cnext<CR>
+nnoremap <Up> :cprev<CR>
 
  " Highlight the last inserted text
  nnoremap gV `[v`]`

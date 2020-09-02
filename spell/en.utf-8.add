@@ -20,3 +20,10 @@ filepath
 javascript
 linter
 eslint
+quickfix
+filetype
+#tatmenet
+config
+init
+ESLint
+json
