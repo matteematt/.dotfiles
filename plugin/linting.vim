@@ -22,6 +22,7 @@ else
 		let cursorPos = getcurpos()
 		normal ggdG
 		execute "0read " . g:linterCurrentFile
+		normal Gdd
 		call setpos('.', cursorPos)
 		execute "silent !rm " . g:linterCurrentFile
 		unlet g:linterCurrentFile
