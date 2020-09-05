@@ -67,7 +67,8 @@ else
 	let s:errCmdMappings = {
 				\ "javascript": s:javascriptLikeErr,
 				\ "javascriptreact": s:javascriptLikeErr,
-				\ "json": s:javascriptLikeErr
+				\ "json": s:javascriptLikeErr,
+				\ "scala": $HOME . "/.vim/bin/scalalinter.sh"
 				\}
 
 	function linting#LinterErrSuccessCallback(channel)
@@ -123,7 +124,8 @@ else
 	let s:initCmdMappings = {
 				\ "javascript": s:javascriptLikeInit,
 				\ "javascriptreact": s:javascriptLikeInit,
-				\ "json": s:javascriptLikeInit
+				\ "json": s:javascriptLikeInit,
+				\ "scala": $HOME . "/.vim/bin/scalalinter.sh"
 				\}
 	let s:hasInitFiletype = {}
 
@@ -150,6 +152,6 @@ else
 
 	augroup InitLinter
 		au!
-		autocmd BufReadPost *.js,*.json,*.jsx	call <SID>RunLinterInit()
+		autocmd BufReadPost *.js,*.json,*.jsx,*.scala	call <SID>RunLinterInit()
 	augroup END
 endif

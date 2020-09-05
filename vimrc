@@ -82,6 +82,9 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " AND there are valid errors to display.
 autocmd QuickFixCmdPost [^l]* cwindow
 
+" Filetype detect
+autocmd BufNewFile,BufRead *.scala  setfiletype scala
+
 " keybindings
 let mapleader="\<Space>"
 
