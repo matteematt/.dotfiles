@@ -40,3 +40,6 @@ vimscript
 sprintf
 dotfiles
 xml
+Scalastyle
+scalastyle
+filesystem
