@@ -51,10 +51,18 @@ function! s:GetModeColour()
 	endif
 endfunction
 
+" Only show the mode for the statusline of the current window
+" Only works on version vim > 8.1.1372
+function! s:GetShowMode()
+	return g:statusline_winid == win_getid(winnr())
+endfunction
+
 function! CreateStatusLine()
 	let l:statusline=""
-	let l:statusline.=s:GetModeColour()
-	let l:statusline.=s:GetModeText()
+	if s:GetShowMode()
+		let l:statusline.=s:GetModeColour()
+		let l:statusline.=s:GetModeText()
+	endif
 	let l:statusline.="%#VisualNOS#"															" set highlight group colour to VisualNOS
 	let l:statusline.=s:gitBranch																	" show the git branch
 	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr
