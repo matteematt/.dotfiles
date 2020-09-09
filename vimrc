@@ -30,16 +30,22 @@ elseif g:os == "Linux"
 endif
 
 " Colour scheme
-" https://github.com/joshdick/onedark.vim README explains setting termguicolors, need extra check for tmux or nvim
 if (has("termguicolors"))
 	set termguicolors
 endif
-let g:onedark_hide_endofbuffer=1	" hide end of buffer lines
-colorscheme onedark
+
+function! s:setup_gruvbit_colourscheme() abort
+    hi Comment gui=italic cterm=italic
+    hi Statement gui=bold cterm=bold
+endfunc
+augroup colorscheme_change | au!
+    au ColorScheme * call s:setup_gruvbit_colourscheme()
+augroup END
+colorscheme gruvbit
 
 " various settings
 set autoindent                 " Minimal automatic indenting for any filetype.
-set smartindent 		" smart indent for better indenting
+set smartindent 		            " smart indent for better indenting
 set backspace=indent,eol,start " Proper backspace behavior.
 set hidden                     " Possibility to have more than one unsaved buffers.
 set incsearch                  " Incremental search, hit `<CR>` to stop.

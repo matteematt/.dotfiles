@@ -143,7 +143,34 @@ git clone https://github.com/joshdick/onedark.vim.git $TMPDIR/onedark
 cp -r $TMPDIR/onedark/{autoload,colors} ~/.vim
 ```
 
+To enable
+```
+" README explains setting termguicolors, need extra check for tmux or nvim
+colorscheme onedark
+```
+
 Use the readme in the repo to set up the colour scheme. The vimrc in this repo sets up to use 256 colours and italics.
 A fallback option can be set in case the terminal in use does not support 256 colours.  Italics can be disabled if the
 terminal doesn't support it. iTerm2 can be set [following the instructions
 here](https://alexpearce.me/2014/05/italics-in-iterm2-vim-tmux/)
+
+#### GruvBit Colour Scheme
+
+[This great colourscheme](https://github.com/habamax/vim-gruvbit) is based on gruvbox-hard, but with syntax groups that
+I prefer.
+```
+git clone https://github.com/habamax/vim-gruvbit $TMPDIR/vim-gruvbit
+cp -r $TMPDIR/vim-gruvbit/colors/gruvbit.vim ~/.vim/colors/
+```
+
+To enable with bold and italics
+```
+function! s:setup_gruvbit_colourscheme() abort
+    hi Comment gui=italic cterm=italic
+    hi Statement gui=bold cterm=bold
+endfunc
+augroup colorscheme_change | au!
+    au ColorScheme * call s:setup_gruvbit_colourscheme()
+augroup END
+colorscheme gruvbit
+```
