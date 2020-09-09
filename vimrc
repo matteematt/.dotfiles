@@ -37,6 +37,7 @@ endif
 function! s:setup_gruvbit_colourscheme() abort
     hi Comment gui=italic cterm=italic
     hi Statement gui=bold cterm=bold
+    hi VertSplit guibg=NONE ctermbg=NONE
 endfunc
 augroup colorscheme_change | au!
     au ColorScheme * call s:setup_gruvbit_colourscheme()
@@ -79,7 +80,7 @@ set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
 if has('persistent_undo')      "check if your vim version supports it
   set undodir=$HOME/.vim/undo  "directory where the undo files will be stored
   set undofile                 "turn on the feature
-  :silent call system('mkdir -p ' . &undodir)
+  silent call system('mkdir -p ' . &undodir)
 endif
 
 " Turn off comments automatically continuing onto the next line

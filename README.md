@@ -163,11 +163,12 @@ git clone https://github.com/habamax/vim-gruvbit $TMPDIR/vim-gruvbit
 cp -r $TMPDIR/vim-gruvbit/colors/gruvbit.vim ~/.vim/colors/
 ```
 
-To enable with bold and italics
+To enable with bold, italics, and a small vertical split
 ```
 function! s:setup_gruvbit_colourscheme() abort
     hi Comment gui=italic cterm=italic
     hi Statement gui=bold cterm=bold
+    hi VertSplit guibg=NONE ctermbg=NONE
 endfunc
 augroup colorscheme_change | au!
     au ColorScheme * call s:setup_gruvbit_colourscheme()
