@@ -25,7 +25,7 @@ brew tap homebrew/cask-fonts
 # Perform the symlinks here
 ln -s ~/dotfiles/.vimrc ~/.vimrc
 ln -s ~/dotfiles/vim_functions/coc-settings.json ~/.vim/
-ln -s ~/dotfiles/.ctags ~/.ctags
+ln -s ~/dotfiles/.ctags.d ~/.ctags.d
 ln -s ~/dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/arch/.xinitrc ~/.xinitrc
 ln -s ~/dotfiles/arch/.Xresources ~/.Xresources
