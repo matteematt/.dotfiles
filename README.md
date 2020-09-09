@@ -17,6 +17,13 @@ A fuzzy file picker with a syntax highlighted preview window if all dependencies
 <leader>o - Open the fuzzy file picker
 ```
 
+### Tags
+
+An asynchronous wrapper to call ctags to generate a tags file.
+```
+<leader>t - Generate tags file
+```
+
 ### StatusBar
 
 A custom status bar at the bottom. Shows the current mode, filename, and other useful info. If in a git project it shows
@@ -87,6 +94,9 @@ Current non-bundled dependencies are `rg` and `fzf` binaries. Additionally the `
 viewed file in the fuzzy file picker if installed. These can all be installed via brew and linuxbrew.  `fzf` and `bat`
 are currently only used for the file picker, which while wonderful, you could manage without them. However, `rg` is
 instrumental to many of the plugins and many parts of this configuration are likely to not work without it.
+
+`universal ctags` is useful to generate `tags` file which vim supports out of the box to jump to definitions. It supports
+many languages, some such as scala are not supported but config to get it to work can be found online.
 
 ### Undo Tree
 
