@@ -21,6 +21,7 @@
 --regex-Groovy=/^\s*(def|String|File)\s+([a-zA-Z0-9_]+)\s+=/\2/f,field/
 
 --exclude=target
+--exclude=vendor
 --exclude=.git
 --exclude=.svn
 --exclude=.hg
