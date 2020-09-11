@@ -19,9 +19,17 @@ A fuzzy file picker with a syntax highlighted preview window if all dependencies
 
 ### Tags
 
-An asynchronous wrapper to call ctags to generate a tags file.
+This plugin contains two functions to work with tags. To work with tags an external application such as `universal
+ctags` is required.
+* An asynchronous wrapper to call ctags to generate a tags file.
+* If `fzf` is installed a binding to enhance tag jumping. Using the `<leader>]` binding the jump will be initialised for
+		the `<cword>`. The user will be alerted if there is no matching tag. If there is only one match it will
+		automatically be taken. If there are multiple then fzf will be used to choose via the filename. A preview window
+		will show the `ex` command which matches the tag in the file. If `bat` is installed it will be used to syntax
+		highlight the `ex` command.
 ```
 <leader>t - Generate tags file
+<leader>] - Jump to tag
 ```
 
 ### StatusBar
