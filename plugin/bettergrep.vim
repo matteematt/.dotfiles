@@ -1,4 +1,4 @@
-if executable('rg')
+if g:has_rg
 	function! BetterGrep(pattern)
 		cgetexpr system("rg --vimgrep " . a:pattern)
 	endfunction

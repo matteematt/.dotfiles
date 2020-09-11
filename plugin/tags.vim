@@ -1,6 +1,6 @@
-if executable("ctags")
+if g:has_ctags
 
-	if executable("fzf")
+	if g:has_fzf
 		" Jump to tag under cursor, but if there is more than one use fzf to preview
 		let s:tagFileLoc=expand("$TMPDIR/vimtagfile")
 		let s:chosenTagLoc=expand("$TMPDIR/vimchosentag")
@@ -15,7 +15,7 @@ if executable("ctags")
 				let i += 1
 			endfor
 			call writefile(writeList, s:tagFileLoc)
-			let l:previewCmd = executable("bat") ? " | bat --theme=\"OneHalfDark\" --color always -p -l " . &filetype . "'" : "'"
+			let l:previewCmd = g:has_bat ? " | bat --theme=\"OneHalfDark\" --color always -p -l " . &filetype . "'" : "'"
 			execute "silent !" . s:fzfCmd . l:previewCmd . " > " . s:chosenTagLoc
 			redraw!
 			if v:shell_error

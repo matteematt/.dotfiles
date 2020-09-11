@@ -1,5 +1,5 @@
 let s:gitBranch=""
-if executable("git")
+if g:has_git
 	" get the git major and minor version number
 	" getting branch name on older versions (2.21 >=) was causing slowdown
 	let s:gitversion = system("git --version | cut -d' ' -f 3  | cut -d '.' -f 1-2")

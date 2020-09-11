@@ -3,7 +3,7 @@
 
 " sets the path to the enclosing git directory if possible
 " or the current directory if not
-if executable('git')
+if g:has_git
 	let gitDir = system("git rev-parse --show-toplevel")
 	if !empty(gitDir)
 		let newPath = gitDir[:-2] . "/**"

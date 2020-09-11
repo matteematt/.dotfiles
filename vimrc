@@ -114,6 +114,13 @@ nnoremap <leader><leader> :buffer<space>
 " Open the undotree buffer
 nnoremap <leader>u :UndotreeToggle<CR>
 
+" Check what binaries are installed
+let g:has_rg = executable("rg")
+let g:has_git = executable("git")
+let g:has_bat = executable("bat")
+let g:has_ctags = executable("ctags")
+let g:has_fzf = executable("fzf")
+
 " Use these and then call :profile pause to find out why slowdown occurs
 "profile start profile.log
 "profile func *

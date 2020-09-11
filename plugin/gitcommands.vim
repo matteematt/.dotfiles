@@ -1,6 +1,6 @@
 " My set of plugins to work with git
 
-if executable("git")
+if g:has_git
 	function GitDiffFile(...)
 		let l:branchToCompare = (a:0 == 1) ? a:1 : "master"
 		let l:compareFileLoc = "$TMPDIR/vimcomparefile"
