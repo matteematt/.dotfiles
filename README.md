@@ -17,6 +17,13 @@ A fuzzy file picker with a syntax highlighted preview window if all dependencies
 <leader>o - Open the fuzzy file picker
 ```
 
+### RegEx Search
+
+Use `rg` to search for a pattern and fill the quickfix window
+```
+<leader>f - Find
+```
+
 ### Tags
 
 This plugin contains two functions to work with tags. To work with tags an external application such as `universal
