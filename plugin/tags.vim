@@ -6,6 +6,11 @@ if g:has_ctags
 		let s:chosenTagLoc=expand("$TMPDIR/vimchosentag")
 		let s:fzfCmd = "fzf --with-nth 2 < " . s:tagFileLoc . " --preview 'echo {} | cut -d\" \" -f3-"
 
+		" Need to escape certain characters like "[" which are used as groups in regex
+		function! tags#EscapeJumpCmd(cmd)
+			return substitute(a:cmd, "\\(\\[\\|\\]\\)", "\\\\\\1", "g")
+		endfunction
+
 		function! tags#FuzzyTagPicker(tags)
 			execute "silent !rm " . s:tagFileLoc . " " . s:chosenTagLoc
 			let i = 0
@@ -24,9 +29,12 @@ if g:has_ctags
 				if filereadable(s:chosenTagLoc)
 					let contents = readfile(s:chosenTagLoc, '', 1)
 					if !empty(contents)
+						echomsg "Got here"
 						let splitString = split(contents[0], " ")
+						let rawCmd = join(splitString[2:])
+						let escapedCmd = tags#EscapeJumpCmd(rawCmd)
 						execute "edit " . splitString[1]
-						execute join(splitString[2:])
+						execute escapedCmd
 					endif
 				else
 					echoerr "Unable to read a valid file at ".expandedFilePath
@@ -42,7 +50,7 @@ if g:has_ctags
 				echo "Tag '" . l:tag . "' not in tag file"
 			elseif len(l:tags) == 1
 				execute "edit " . l:tags[0]["filename"]
-				execute l:tags[0]["cmd"]
+				execute tags#EscapeJumpCmd(l:tags[0]["cmd"])
 			else
 				" Multiple tags to choose from, so need to use fuzzy picker
 				call tags#FuzzyTagPicker(l:tags)
