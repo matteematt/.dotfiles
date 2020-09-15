@@ -75,6 +75,7 @@ set spelllang=en
 set foldmethod=indent
 set foldlevelstart=2
 set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
+set fillchars=vert:│,fold:·     " char between panels
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
