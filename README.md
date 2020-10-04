@@ -63,6 +63,7 @@ Supported types of commenting are:
 * C-Style: such as `C`, `C++`, `Java`, `Javscript`
 * Shell-Style: such as `Bash` and `Python`
 * Vim: for `vimscript`
+* Haskell: for `haskell`
 
 ### Linting
 
