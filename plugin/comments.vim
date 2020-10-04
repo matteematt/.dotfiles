@@ -10,6 +10,11 @@ function comments#CommentCheckCStyle(checkLine)
 	return (l:matchIndex == -1) ? 0 : 1
 endfunction
 
+function comments#CommentCheckHaskellStyle(checkLine)
+	let l:matchIndex = match(a:checkLine, '^\s*--')
+	return (l:matchIndex == -1) ? 0 : 1
+endfunction
+
 function comments#CommentCheckShellStyle(checkLine)
 	let l:matchIndex = match(a:checkLine, '^\s*#')
 	return (l:matchIndex == -1) ? 0 : 1
@@ -18,6 +23,7 @@ endfunction
 let s:commentCommands = {
 	\"vim": {"cmd": "comments#CommentCheckVimscript", "add":'0I f"2xhx', "del": 'I" '},
 	\"cstyle": {"cmd": "comments#CommentCheckCStyle", "add":'0I f/3xhx', "del": 'I// '},
+	\"haskellstyle": {"cmd": "comments#CommentCheckHaskellStyle", "add":'0I f-3xhx', "del": 'I-- '},
 	\"shellstyle": {"cmd": "comments#CommentCheckShellStyle", "add":'0I f#2xhx', "del": 'I# '}
 	\}
 
@@ -35,6 +41,7 @@ let s:filetypesMap = {
 	\"python":"shellstyle",
 	\"yaml":"shellstyle",
 	\"dockerfile":"shellstyle",
+	\"haskell":"haskellstyle",
 	\}
 
 function s:ToggleComments() range
