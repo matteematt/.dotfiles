@@ -53,8 +53,9 @@ endfunction
 
 " Only show the mode for the statusline of the current window
 " Only works on version vim > 8.1.1372
+" Default to show mode
 function! s:GetShowMode()
-	return g:statusline_winid == win_getid(winnr())
+	return !exists("g:statusline_winid") || g:statusline_winid == win_getid(winnr())
 endfunction
 
 function! CreateStatusLine()
