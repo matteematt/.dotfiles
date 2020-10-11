@@ -10,6 +10,41 @@ Linux and MacOS.  I am a novice at vimscript so I imagine a lot of my scripts co
 A description of the vim plugins found in the `plugin/` directory. Keybindings are included, but note there are more
 keybindings that this, such as from the `vimrc` file.
 
+### ColJumper
+
+This command moves the insert mode cursor in line with the next non-whitespace character in any of the above lines, or
+keeps it in place if that is not possible. An example where this is useful could be to line up the cursor column in line
+with an inline comment on the above line without having to press space or tab multiple times:
+```
+Cursor position signified by "@"
+.....
+let example = "great example"               " this is a great example
+let x = 23@
+.....
+<C-j>
+NB: In this particular example <C-j> needed to be pressed multiple times as there are multiple matching patterns for the
+initial cursor position.
+.....
+let example = "great example"               " this is a great example
+let x = 23                                  @
+```
+Other examples include lining up `<-` or `=` in Haskell.
+```
+<C-j> - Jump the insert mode cursor
+```
+
+### Comments Toggle
+
+A simple plugin to toggle a range of lines as commented or uncommented.
+```
+<leader>cc - Toggle the comment status of the selected range of lines
+```
+Supported types of commenting are:
+* C-Style: such as `C`, `C++`, `Java`, `Javscript`
+* Shell-Style: such as `Bash` and `Python`
+* Vim: for `vimscript`
+* Haskell: for `haskell`
+
 ### Fuzzy File Picker
 
 A fuzzy file picker with a syntax highlighted preview window if all dependencies are installed.
@@ -17,12 +52,39 @@ A fuzzy file picker with a syntax highlighted preview window if all dependencies
 <leader>o - Open the fuzzy file picker
 ```
 
+### GitCommands
+
+A list of functions for working with git projects.
+```
+GitDiffFile(branch_name) - show a vertical split with the changes from the current file and the current file on the
+specified branch. The branch_name defaults to master if not specified
+MergeConflictList() - populate all locations with a merge conflict in the quickfix window
+```
+
+### Linting
+
+I have written an synchronous linter wrapper for some programming languages I use. The script is found at
+`plugin/linting.vim`. Info about the required dependencies can be found further down the readme.
+```
+<leader>ll - Run the linter and errors are shown in the quickfix window
+<leader>lf - Run the linter to automatically fix linting errors and update the buffer
+```
+Currently supported linting is:
+* ESLint for Javscript, JavscriptReact, and Json. Supports Linting errors and automatically fixing of some linting
+		errors
+* Scalastyle for Scala. Only supports linting errors
+
 ### RegEx Search
 
 Use `rg` to search for a pattern and fill the quickfix window
 ```
 <leader>f - Find
 ```
+
+### StatusBar
+
+A custom status bar at the bottom. Shows the current mode, filename, and other useful info. If in a git project it shows
+the current branch name, updated every time a buffer is read.
 
 ### Tags
 
@@ -38,45 +100,6 @@ ctags` is required.
 <leader>t - Generate tags file
 <leader>] - Jump to tag
 ```
-
-### StatusBar
-
-A custom status bar at the bottom. Shows the current mode, filename, and other useful info. If in a git project it shows
-the current branch name, updated every time a buffer is read.
-
-### GitCommands
-
-A list of functions for working with git projects.
-```
-GitDiffFile(branch_name) - show a vertical split with the changes from the current file and the current file on the
-specified branch. The branch_name defaults to master if not specified
-MergeConflictList() - populate all locations with a merge conflict in the quickfix window
-```
-
-### Comments Toggle
-
-A simple plugin to toggle a range of lines as commented or uncommented.
-```
-<leader>cc - Toggle the comment status of the selected range of lines
-```
-Supported types of commenting are:
-* C-Style: such as `C`, `C++`, `Java`, `Javscript`
-* Shell-Style: such as `Bash` and `Python`
-* Vim: for `vimscript`
-* Haskell: for `haskell`
-
-### Linting
-
-I have written an synchronous linter wrapper for some programming languages I use. The script is found at
-`plugin/linting.vim`. Info about the required dependencies can be found further down the readme.
-```
-<leader>ll - Run the linter and errors are shown in the quickfix window
-<leader>lf - Run the linter to automatically fix linting errors and update the buffer
-```
-Currently supported linting is:
-* ESLint for Javscript, JavscriptReact, and Json. Supports Linting errors and automatically fixing of some linting
-		errors
-* Scalastyle for Scala. Only supports linting errors
 
 ### Misc
 
