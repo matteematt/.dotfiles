@@ -38,7 +38,7 @@ bitsToInt bits = sum (map (\x -> 2^(snd x)) trueLocations)
    where size = length bits
 @indices = [size-1,size-2 .. 0]
 .....
-<C-p>
+<C-k>
 NB: In this example the command is requested twice, once to line up with "where" and then next with "size"
 .....
 bitsToInt bits = sum (map (\x -> 2^(snd x)) trueLocations)
@@ -48,7 +48,7 @@ bitsToInt bits = sum (map (\x -> 2^(snd x)) trueLocations)
 Other examples include lining up `<-` or `=` in Haskell.
 ```
 <C-j> - Jump the insert mode cursor
-<C-p> - Push the insert mode cursor
+<C-k> - Push the insert mode cursor
 ```
 
 ### Comments Toggle

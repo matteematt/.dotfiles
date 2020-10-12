@@ -54,5 +54,5 @@ if has("syntax") && has("virtualedit")
   let PushCursorCallbackRef = function("s:PushCursorCallback")
 
   inoremap <C-j> :call <SID>ColJumper(JumpcursorCallbackRef)<CR>a
-  inoremap <C-p> :call <SID>ColJumper(PushCursorCallbackRef)<CR>wi
+  inoremap <C-k> :call <SID>ColJumper(PushCursorCallbackRef)<CR>wi
 endif
