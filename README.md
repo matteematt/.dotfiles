@@ -12,7 +12,8 @@ keybindings that this, such as from the `vimrc` file.
 
 ### ColJumper
 
-This command moves the insert mode cursor in line with the next non-whitespace character in any of the above lines, or
+This script adds two new insert mode commands which helps with lining up text.
+The jumper command moves the insert mode cursor in line with the next non-whitespace character in any of the above lines, or
 keeps it in place if that is not possible. An example where this is useful could be to line up the cursor column in line
 with an inline comment on the above line without having to press space or tab multiple times:
 ```
@@ -28,9 +29,26 @@ initial cursor position.
 let example = "great example"               " this is a great example
 let x = 23                                  @
 ```
+The pusher commands pushes the insert mode cursor in line with the next non-whitespace character in any of the above
+lines, moving subsequent text after the cursor too. This is useful to lining up text that is already present:
+```
+Cursor position signified by "@"
+.....
+bitsToInt bits = sum (map (\x -> 2^(snd x)) trueLocations)
+   where size = length bits
+@indices = [size-1,size-2 .. 0]
+.....
+<C-p>
+NB: In this example the command is requested twice, once to line up with "where" and then next with "size"
+.....
+bitsToInt bits = sum (map (\x -> 2^(snd x)) trueLocations)
+   where size = length bits
+         indices = [size-1,size-2 .. 0]
+```
 Other examples include lining up `<-` or `=` in Haskell.
 ```
 <C-j> - Jump the insert mode cursor
+<C-p> - Push the insert mode cursor
 ```
 
 ### Comments Toggle
