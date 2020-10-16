@@ -50,3 +50,6 @@ RHS
 subElements/!
 fn
 whitespace
+cartesian
+Semigroup
+Monoid
