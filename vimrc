@@ -77,6 +77,13 @@ set foldlevelstart=2
 set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
 set fillchars=vert:│,fold:·     " char between panels
 
+if has("autocmd") && exists("+omnifunc")
+autocmd Filetype *
+      \	if &omnifunc == "" |
+      \		setlocal omnifunc=syntaxcomplete#Complete |
+      \	endif
+endif
+
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
   set undodir=$HOME/.vim/undo  "directory where the undo files will be stored
