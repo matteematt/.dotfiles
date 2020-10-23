@@ -99,6 +99,15 @@ Use `rg` to search for a pattern and fill the quickfix window
 <leader>f - Find
 ```
 
+### StartScreen
+
+A custom start screen that is shown when vim is loaded without any filename or args etc. Entering insert mode via `i`
+`o` or `e` will open a new empty buffer like vim would. Currently shows a section with the most recently opened files,
+and a section showing the most recently opened files in this project (using the current working directory).
+```
+g:startup_section_len = x   " sets the max number of lines to show per section to x, default 5
+```
+
 ### StatusBar
 
 A custom status bar at the bottom. Shows the current mode, filename, and other useful info. If in a git project it shows

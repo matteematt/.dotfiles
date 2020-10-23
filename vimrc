@@ -77,6 +77,8 @@ set foldlevelstart=2
 set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
 set fillchars=vert:│,fold:·     " char between panels
 
+let g:startup_section_len = 10
+
 if has("autocmd") && exists("+omnifunc")
 autocmd Filetype *
       \	if &omnifunc == "" |
