@@ -94,6 +94,8 @@ function! s:InitStartupBuffer()
 				\ norelativenumber
 				\ nospell
 
+	set filetype=startup
+
 	call s:StartupScreen()
 
 	" No modifications to this buffer
