@@ -55,6 +55,7 @@ set ruler                      " Shows the current line number at the bottom-rig
 set wildmenu                   " Great command-line completion, use `<Tab>` to move
 set wildmode=longest:full,full
                                " around and `<CR>` to validate
+set wildcharm=<C-z>
 set relativenumber             " add relative numbers
 set number	                   " shows the absolute number for the current line
 set shiftwidth=2								" sets the shift tab and indent width to 2
@@ -119,7 +120,7 @@ nnoremap <Up> :cprev<CR>
  nnoremap gV `[v`]`
 
 " Open wildmenu with open buffers
-nnoremap <leader><leader> :buffer<space>
+" nnoremap <leader><leader> :buffer<space>
 
 " Open the undotree buffer
 nnoremap <leader>u :UndotreeToggle<CR>

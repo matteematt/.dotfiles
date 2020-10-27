@@ -63,6 +63,16 @@ Supported types of commenting are:
 * Vim: for `vimscript`
 * Haskell: for `haskell`
 
+### Fuzzy Buffer Picker
+
+When vim has `*matchfuzzy`, this is used to populate the wildmenu with buffers that match the currently input search
+term. Without `*matchfuzzy` the wildmenu is simply populated with all open buffers. When the command is invoked with no
+argument it simply switches to the alternative buffer (buffer `#`).
+```
+<leader><leader> - Open the fuzzy buffer switcher
+```
+
+
 ### Fuzzy File Picker
 
 A fuzzy file picker with a syntax highlighted preview window if all dependencies are installed.

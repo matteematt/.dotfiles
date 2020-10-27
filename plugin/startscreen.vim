@@ -32,10 +32,10 @@ function! s:ShowRecentProjectFilesBlock()
 	let currDir = getcwd()
 	let i = 0
 	for item in v:oldfiles
-		let i += 1
 		if expand(item) =~ currDir
 			call add(chooseList, '['.i.'] ' . item)
 		endif
+		let i += 1
 	endfor
 
 	call append('$', "  ### PROJECT FILES")
@@ -53,8 +53,8 @@ function! s:ShowOldfilesBlock()
 	let chooseList = []
 	let i = 0
 	for item in v:oldfiles[0:s:sectionsLen-1]
-		let i += 1
 		call add(chooseList, '['.i.'] ' . item)
+		let i += 1
 	endfor
 
 	call append('$', "  ### RECENT FILES")
