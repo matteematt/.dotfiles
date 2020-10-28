@@ -1,6 +1,7 @@
 function! Test(A,L,P) abort
 	let buffText = []
 	for bufIndex in range(1, bufnr('$'))
+		" filter buffers with non-blank buftype, such as help or terminal buffers
 		if bufexists(bufIndex) && getbufvar(bufIndex, '&buftype', 'error') == ''
 			call add(buffText, bufname(bufIndex))
 		endif
@@ -17,5 +18,6 @@ function! SwitchToBuffer(args) abort
 	execute ":buffer " . changeTo
 endfunction
 
+" <C-z> is my wildcharm
 command! -nargs=? -bar -complete=customlist,Test FuzzyBuffer call SwitchToBuffer(<q-args>)
 nnoremap <leader><leader> :FuzzyBuffer<space><C-z>
