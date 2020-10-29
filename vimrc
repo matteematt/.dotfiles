@@ -77,15 +77,27 @@ set foldmethod=indent
 set foldlevelstart=2
 set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
 set fillchars=vert:│,fold:·     " char between panels
+set completeopt=longest,menuone,preview
+
+" Allows the enter key to select an item form the <C-N> menu
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" Keeps the <C-N> menu open by simulating a down key press as it is opened
+inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
 
 let g:startup_section_len = 10
 
-if has("autocmd") && exists("+omnifunc")
-autocmd Filetype *
-      \	if &omnifunc == "" |
-      \		setlocal omnifunc=syntaxcomplete#Complete |
-      \	endif
-endif
+function! TryLoadLanguageDict() abort
+  let fp = expand($HOME . "/.vim/resources/syntaxdictionaries/" . &filetype . ".txt")
+  if filereadable(fp)
+    execute "setlocal complete+=k/" . fp
+    setlocal iskeyword+=-
+  endif
+endfunction
+augroup loaddict
+  au!
+  autocmd Filetype * :call TryLoadLanguageDict()
+augroup END
+
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
