@@ -77,12 +77,14 @@ set foldmethod=indent
 set foldlevelstart=2
 set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
 set fillchars=vert:│,fold:·     " char between panels
-set completeopt=longest,menuone,preview
 
-" Allows the enter key to select an item form the <C-N> menu
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-" Keeps the <C-N> menu open by simulating a down key press as it is opened
-inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+" I think I actually prefer the normal behaviour so commenting out for now
+" set completeopt=noinsert,menuone,preview
+"
+" " Allows the enter key to select an item form the <C-N> menu
+" inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "<CR>"
+" " Keeps the <C-N> menu open by simulating a down key press as it is opened
+" inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>\<lt>Up>" : ""<CR>'
 
 let g:startup_section_len = 10
 
