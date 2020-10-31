@@ -7,6 +7,7 @@
 " remove tokens that are only numeric characters
 %g/^[0-9].$/norm dd
 " remove lines that are three or less characters
+" (easy enough to type three characters, removes a lot of noise)
 %g/^.\{,4\}$/norm dd
 " remove any blank lines
 %g/^$/norm dd
