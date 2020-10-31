@@ -80,7 +80,6 @@ set fillchars=vert:│,fold:·     " char between panels
 
 " I think I actually prefer the normal behaviour so commenting out for now
 " set completeopt=noinsert,menuone,preview
-"
 " " Allows the enter key to select an item form the <C-N> menu
 " inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "<CR>"
 " " Keeps the <C-N> menu open by simulating a down key press as it is opened
@@ -91,7 +90,7 @@ let g:startup_section_len = 10
 function! TryLoadLanguageDict() abort
   let fp = expand($HOME . "/.vim/resources/syntaxdictionaries/" . &filetype . ".txt")
   if filereadable(fp)
-    execute "setlocal complete+=k/" . fp
+    execute "setlocal complete+=k" . fp
     setlocal iskeyword+=-
   endif
 endfunction
