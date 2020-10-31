@@ -6,8 +6,8 @@
 %s/\s\+//
 " remove tokens that are only numeric characters
 %g/^[0-9].$/norm dd
-" remove lines that are only one character
-%g/^.$/norm dd
+" remove lines that are three or less characters
+%g/^.\{,4\}$/norm dd
 " remove any blank lines
 %g/^$/norm dd
 " sort and remove duplicates
