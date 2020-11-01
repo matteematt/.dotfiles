@@ -138,6 +138,9 @@ nnoremap <Up> :cprev<CR>
 " Open the undotree buffer
 nnoremap <leader>u :UndotreeToggle<CR>
 
+" :s// on visual selection
+vnoremap <C-r> :s/\%V
+
 " Check what binaries are installed
 let g:has_rg = executable("rg")
 let g:has_git = executable("git")
