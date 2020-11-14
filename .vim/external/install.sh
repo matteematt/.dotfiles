@@ -4,7 +4,7 @@ shopt -s extglob
 
 for D in ./undotree-master/*; do
 	if [ -d "${D}" ]; then
-		cp -r "${D}/"* "$HOME/.vim/${D##*/}/"
+		cp -r "${D}/"* "$HOME/.dotfiles/.vim/${D##*/}/"
 	fi
 done
 
