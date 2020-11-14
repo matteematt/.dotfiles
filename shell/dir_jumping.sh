@@ -8,7 +8,7 @@ function changeDirShortcut {
 # Saves the current directory in a history file, ordered by last access time,
 # removes duplicates, and keeps the previous 1000
 # TODO: Does not work properly on filepaths with a space in
-function pushChangedDirToListSave {
+function __pushchangeddirToListSave {
   cdhistory="$HOME/.dotfiles/data/cdhistory"
   touch "$cdhistory"
   echo "`pwd` `date +'%s'`" >> "$cdhistory"
@@ -18,7 +18,7 @@ function pushChangedDirToListSave {
 # After a normal 'cd' calls function to save dir in the background
 function pushChangedDirToList {
   cd $1
-	(pushChangedDirToListSave &) &>/dev/null
+	(__pushchangeddirToListSave &) &>/dev/null
 }
 
 # Use fzf to choose a dir to jump to from the history
