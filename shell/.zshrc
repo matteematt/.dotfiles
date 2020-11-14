@@ -1,5 +1,6 @@
-# Contains misc shell add-ons
-# Grouped shell scripts are in the /shell directory
+# Source this file to source all applicable shell configuration in this directory
+# Cross platform for OS
+
 # Docker alias
 alias dcup="docker-compose up -V"
 
@@ -31,9 +32,9 @@ alias rgf="rg -uu --files | rg --invert-match \.git | rg"
 
 # Includes from /shell and their aliases
 
-source ~/dotfiles/shell/$(uname -s)_includes.sh
-source ~/dotfiles/shell/git_extras.sh
-source ~/dotfiles/shell/dir_jumping.sh
+source ~/.dotfiles/shell/$(uname -s)_includes.sh
+source ~/.dotfiles/shell/git_extras.sh
+source ~/.dotfiles/shell/dir_jumping.sh
 
 #git diff list
 alias gdl="getDiffByList"

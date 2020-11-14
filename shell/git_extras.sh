@@ -34,7 +34,7 @@ function __formatGitStatus {
 # selecting an option automatically calls 'git add' on it
 function gitViewAndStage {
   chosen_file=`__formatGitStatus | fzf --with-nth 2 --preview \
-    '~/dotfiles/shell/view_git_unstaged_file.sh {} | bat --theme="OneHalfDark" --style=numbers --color always'`
+    '~/.dotfiles/shell/view_git_unstaged_file.sh {} | bat --theme="OneHalfDark" --style=numbers --color always'`
   if [ -z "$chosen_file" ]; then
     return
   else
@@ -49,7 +49,7 @@ function getDiffByList {
     return
   fi
   file_path=`echo "$chosen_file" | cut -d" " -f2`
-  ~/dotfiles/shell/view_git_unstaged_file.sh "$chosen_file"
+  ~/.dotfiles/shell/view_git_unstaged_file.sh "$chosen_file"
   unset chosen_file
 }
 

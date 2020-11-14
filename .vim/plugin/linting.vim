@@ -68,7 +68,7 @@ else
 				\ "javascript": s:javascriptLikeErr,
 				\ "javascriptreact": s:javascriptLikeErr,
 				\ "json": s:javascriptLikeErr,
-				\ "scala": $HOME . "/.vim/bin/scalalinter.sh"
+				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh"
 				\}
 
 	function linting#LinterErrSuccessCallback(channel)
@@ -125,7 +125,7 @@ else
 				\ "javascript": s:javascriptLikeInit,
 				\ "javascriptreact": s:javascriptLikeInit,
 				\ "json": s:javascriptLikeInit,
-				\ "scala": $HOME . "/.vim/bin/scalalinter.sh"
+				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh"
 				\}
 	let s:hasInitFiletype = {}
 

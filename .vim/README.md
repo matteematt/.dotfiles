@@ -199,7 +199,7 @@ if git is installed.	arzg/vim-colors-xcode is licensed under the ISC License.
 
 ```
 git clone https://github.com/arzg/vim-colors-xcode.git $TMPDIR/vim-colors-xcode
-cp -r $TMPDIR/vim-colors-xcode/{autoload,colors,doc} ~/.vim
+cp -r $TMPDIR/vim-colors-xcode/{autoload,colors,doc} ~/.dotfiles/.vim
 ```
 
 To enable and with italics
@@ -219,7 +219,7 @@ The original [can be found here](https://github.com/joshdick/onedark.vim.git).
 This colour scheme is licensed under the MIT Licence.
 ```
 git clone https://github.com/joshdick/onedark.vim.git $TMPDIR/onedark
-cp -r $TMPDIR/onedark/{autoload,colors} ~/.vim
+cp -r $TMPDIR/onedark/{autoload,colors} ~/.dotfiles/.vim
 ```
 
 To enable
@@ -239,7 +239,7 @@ here](https://alexpearce.me/2014/05/italics-in-iterm2-vim-tmux/)
 I prefer.
 ```
 git clone https://github.com/habamax/vim-gruvbit $TMPDIR/vim-gruvbit
-cp -r $TMPDIR/vim-gruvbit/colors/gruvbit.vim ~/.vim/colors/
+cp -r $TMPDIR/vim-gruvbit/colors/gruvbit.vim ~/.dotfiles/.vim/colors/
 ```
 
 To enable with bold, italics, and a small vertical split
