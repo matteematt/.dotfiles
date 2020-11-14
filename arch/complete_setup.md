@@ -189,7 +189,7 @@ This covers the i3 gaps window manager and other items for the graphical environ
 
 #### Fonts
 
-Over the next steps we are going to start working with a graphical environment so its a ghood time to get some fonts. You can get some useful fonts from google using `pacman -S noto-fonts`. To install the nerd front from the dotfiles `cp ~/dotfiles/Monaco Nerd Font Complete Mono.otf /usr/share/fonts/<create a folder>/` and then run `fc-cache` to refresh the fonts cache. The nerd font should now be installed for use.
+Over the next steps we are going to start working with a graphical environment so its a ghood time to get some fonts. You can get some useful fonts from google using `pacman -S noto-fonts`. To install the nerd front from the dotfiles `cp ~/.dotfiles/Monaco Nerd Font Complete Mono.otf /usr/share/fonts/<create a folder>/` and then run `fc-cache` to refresh the fonts cache. The nerd font should now be installed for use.
 
 #### Install the display server
 

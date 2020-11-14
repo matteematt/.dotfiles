@@ -5,8 +5,8 @@ Require vundle to install the vim plugins, `$ git clone https://github.com/Vundl
 
 Symlink files, assuming dotfiles cloned into home dir
 
-- `$ ln -s ~/dotfiles/.vimrc ~/.vimrc`
-- `$ ln -s ~/dotfiles/snippets ~/.vim/snippets`
+- `$ ln -s ~/.dotfiles/.vimrc ~/.vimrc`
+- `$ ln -s ~/.dotfiles/snippets ~/.vim/snippets`
 
 Some plugins require additional installation
 
