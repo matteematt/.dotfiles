@@ -20,7 +20,7 @@ case "$status_code" in
     echo "New Dir $file_path\n\n`ls $file_path`"
     ;;
   "M")
-    git diff $file_path | bat
+    git diff $file_path
     ;;
   "R")
     echo "File '$file_path' deleted or renamed"
