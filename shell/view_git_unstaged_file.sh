@@ -7,7 +7,7 @@
 
 # Expected input examples
 # M ~/test.txt
-# 'D ~/banana.txt'
+# 'R ~/banana.txt'
 
 input=`echo "$1" | tr -d \'`
 status_code=`echo "$input" | cut -d" " -f1`
@@ -16,10 +16,13 @@ case "$status_code" in
   "U")
     bat $file_path
     ;;
+  "D")
+    echo "New Dir $file_path\n\n`ls $file_path`"
+    ;;
   "M")
     git diff $file_path | bat
     ;;
-  "D")
+  "R")
     echo "File '$file_path' deleted or renamed"
     ;;
   *)

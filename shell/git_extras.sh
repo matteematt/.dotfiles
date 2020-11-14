@@ -9,8 +9,9 @@
 # is checked in and the "deleted" file is checked in
 # If in a git directory returns git status formatted with
 # M x - for file x modified
-# D x - for file x deleted
+# R x - for file x deleted
 # U x - for untracked file x
+# D x - for untracked directory x
 # for all *unstaged* files
 # returns exit code 1 if this is not a git directory
 function __formatGitStatus {
@@ -18,11 +19,12 @@ function __formatGitStatus {
   formatted=`git status | awk 'BEGIN {parseMode=0} \
   { \
     if (parseMode==1) { \
-      if (match($0,/^\s+deleted:\s*(.+)/)) {print "D " $2}; \
+      if (match($0,/^\s+deleted:\s*(.+)/)) {print "R " $2}; \
       if (match($0,/^\s+modified:\s*(.+)/)) {print "M " $2}; \
     }; \
     if (parseMode==2) { \
-      if (match($0,/^\s+(.)/)) {print "U " $1}; \
+      if (match($0,/^\s+(.)\//)) {print "D " $1;} \
+      else if (match($0,/^\s+(.)/)) {print "U " $1;} \
     }; \
     if ($0 ~ /Changes not staged for commit/) {parseMode=1}; \
     if ($0 ~ /to include in what will be committed/) {parseMode=2}; \
