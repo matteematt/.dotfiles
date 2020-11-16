@@ -41,7 +41,7 @@ are in the `.gitignore`
 The following fonts I have included into this repository that I use for my terminal and text editors. They are fonts
 freely downloadable on the internet that I have patched with the [Nerd fonts patching tool](https://www.nerdfonts.com).
 * Monaco Nerd Font Complete Mono.otf
-* Sauce Code Pro Nerd Font Complete Mono.ttf
+* Source Code Pro Nerd Font Complete Mono.ttf
 
 ### Install Script
 
@@ -92,5 +92,5 @@ The exceptions are the files which are included from other places on the interne
 that they are under. These files include:
 
 * Monaco Nerd Font Complete Mono.otf - [© 1990-91 Apple Computer Inc. © 1990-91 Type Solutions Inc. © 1990-91 The Font Bureau Inc.](https://www.cufonfonts.com/font/monaco). If you believe that this font is in violation of copyright and isn't legal, please let me know in order for the font to be removed or revised.
-* Sauce Code Pro Nerd Font Complete Mono.ttf = [These fonts are licensed under the Open Font License. You can use them freely in your products & projects - print or digital, commercial or otherwise. However, you can't sell the fonts on their own.](https://fonts.google.com/specimen/Source+Code+Pro#standard-styles)
+* Source Code Pro Nerd Font Complete Mono.ttf = [These fonts are licensed under the Open Font License. You can use them freely in your products & projects - print or digital, commercial or otherwise. However, you can't sell the fonts on their own.](https://fonts.google.com/specimen/Source+Code+Pro#standard-styles)
 * External vim plugins, more info on that in `.vim/README.md`
