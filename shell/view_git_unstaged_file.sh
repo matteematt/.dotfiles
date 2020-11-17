@@ -13,8 +13,12 @@ input=`echo "$1" | tr -d \'`
 status_code=`echo "$input" | cut -d" " -f1`
 file_path=`echo "$input" | cut -d" " -f2`
 case "$status_code" in
-  "U"|"M")
-    bat --theme="OneHalfDark" --style=numbers,changes --color always $file_path
+  "U")
+    bat --theme="OneHalfDark" --style=numbers,changes --color always "$file_path"
+    ;;
+  "M")
+    first_change=`git diff "$file_path" | awk '{if (match($0,/^@+\s+-?([0-9]+).+@+/,m)) {print m[1];exit 0}}'`
+    bat --theme="OneHalfDark" --style=numbers,changes --color always $file_path | tail -n+$first_change
     ;;
   "D")
     echo "New Dir $file_path\n\n`ls $file_path`"

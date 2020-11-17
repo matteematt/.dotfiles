@@ -35,8 +35,7 @@ function __formatGitStatus {
 # Similar to getDiffByList but views the output in bat inline and
 # selecting an option automatically calls 'git add' on it
 function gitViewAndStage {
-  chosen_file=`__formatGitStatus | fzf --with-nth 2 --preview \
-    '~/.dotfiles/shell/view_git_unstaged_file.sh {}'`
+  chosen_file=`__formatGitStatus | fzf --with-nth 2 --preview '~/.dotfiles/shell/view_git_unstaged_file.sh {}'`
   if [ -z "$chosen_file" ]; then
     return
   else
