@@ -13,14 +13,11 @@ input=`echo "$1" | tr -d \'`
 status_code=`echo "$input" | cut -d" " -f1`
 file_path=`echo "$input" | cut -d" " -f2`
 case "$status_code" in
-  "U")
-    bat $file_path
+  "U"|"M")
+    bat --theme="OneHalfDark" --style=numbers,changes --color always $file_path
     ;;
   "D")
     echo "New Dir $file_path\n\n`ls $file_path`"
-    ;;
-  "M")
-    git diff $file_path
     ;;
   "R")
     echo "File '$file_path' deleted or renamed"
