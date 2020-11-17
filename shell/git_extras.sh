@@ -70,6 +70,7 @@ function addLastDiffFile {
 # is behind master, but with rebase instead
 function getUpdateWithRebase {
   branch=$(git rev-parse --abbrev-ref HEAD)
+  git pull
   git checkout master
   git pull
   git checkout $branch
