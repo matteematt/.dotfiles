@@ -26,6 +26,6 @@ function changeDirFromHistory {
   cdhistory="$HOME/.dotfiles/data/cdhistory"
   chosen_dir=`rev "$cdhistory" | cut -d" " -f 2- | rev | fzf --tac`
   if [[ -d "$chosen_dir" ]]; then
-    cd "$chosen_dir"
+    pushChangedDirToList "$chosen_dir"
   fi
 }
