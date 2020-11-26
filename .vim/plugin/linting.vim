@@ -144,7 +144,7 @@ else
 
 	function s:RunLinterInit()
 		let l:fileType=&filetype
-		if &filetype == "" | echoerr "Unable to detect filetype for setting up linting" | endif
+		if &filetype == "" | echomsg "Unable to detect filetype for setting up linting" | endif
 		if !has_key(s:initCmdMappings, l:fileType) || has_key(s:hasInitFiletype, l:fileType)
 			return
 		endif
