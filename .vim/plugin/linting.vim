@@ -134,7 +134,7 @@ else
 		let l:initJobInfo = job_info(l:initJob)
 		let l:jobExitCode = str2nr(l:initJobInfo["exitval"])
 		if l:jobExitCode != 0
-			echoerr "Error sending up linter using cmd : '" . join(l:initJobInfo["cmd"]) . "'"
+			echoerr "Error setting up linter using cmd : '" . join(l:initJobInfo["cmd"]) . "'"
 			let s:hasInitFiletype[&filetype] = 0
 		else
 			echo "Linter initialised for filetype: " . &filetype
@@ -144,6 +144,7 @@ else
 
 	function s:RunLinterInit()
 		let l:fileType=&filetype
+		if &filetype == "" | echoerr "Unable to detect filetype for setting up linting" | endif
 		if !has_key(s:initCmdMappings, l:fileType) || has_key(s:hasInitFiletype, l:fileType)
 			return
 		endif
@@ -151,7 +152,7 @@ else
 	endfunction
 
 	augroup InitLinter
-		au!
-		autocmd BufReadPost *.js,*.json,*.jsx,*.scala	call <SID>RunLinterInit()
+    autocmd!
+    autocmd FileType javascript,json,javascriptreact,scala call <SID>RunLinterInit()
 	augroup END
 endif
