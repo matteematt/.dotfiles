@@ -10472,6 +10472,8 @@ quartile
 quaternary
 quaternaryClbk
 query
+querySelector
+querySelectorAll
 querying
 quest
 question
