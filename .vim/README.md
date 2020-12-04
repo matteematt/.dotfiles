@@ -1,6 +1,3 @@
-# .dotfiles
-Personal dotfiles repo
-=======
 # VIM
 
 This is my vim configuration that aims to be fairly portable and lightweight, while doing everything I personally like.
@@ -146,6 +143,11 @@ ctags` is required.
 #### Whitespace stripper
 
 Autocommand which strips whitespace at the end of lines just before a buffer is written to disk.
+
+### Custom Commands
+
+Some custom commands are listed in the `commands.md` document. Commands are moved to this separate document if they are
+more niche, such as commands that only work on one filetype.
 
 ## Dependencies
 
