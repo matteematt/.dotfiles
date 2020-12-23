@@ -38,6 +38,9 @@ The `view_git_unstaged_file.sh` script outputs a file name in a certain way depe
 * Deleted files print a message saying the file has been deleted or renamed
 * Unknown file status prints error message
 
+The `switch_branch.sh` script is one of the fzf examples, and uses the core utils with fzf and git to make switching to
+available branches easy.
+
 ## Other Files
 
 ### Extra Platform Specific
