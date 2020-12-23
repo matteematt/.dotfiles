@@ -59,6 +59,11 @@ The disk is now ready to be used, but we need to mount it into the filesystem so
 
 ### Install packages
 
+#### Set the Mirrors
+TODO: set the mirror servers (check arch wiki)
+
+#### Install Arch Linux
+
 Install arch linux into the root partition using `pacstrap`. There are lots of choices of packages to install, I am going to install all of the packages in the following list. A lot of these are optional, but are all recomended.
 
 * base and base-devel (base is arch, base-devel has useful packages such as cmake)
@@ -107,17 +112,17 @@ Run `passwd` to set the root password.
 
 ### Boot loader
 
-For this I will be using the systemd bootloader, arch already uses systemd. You could also use GRUB which I think has more features, but this is not covered here.
+#### systemd bootloader
 
-#### Install Bootloader
+##### Install Bootloader
 
 Run `bootctl --path=/boot install`
 
-#### Configure the loader.conf
+##### Configure the loader.conf
 
 `cd /boot/loader` and edit `loader.conf`. Change the large string before `-*` to arch, so it reads `default arch-*` on the third line.
 
-#### Configure the entries
+##### Configure the entries
 
 `cd` into the entries dir and create `arch.conf`. The file should look like below. If you have a Intel CPU and installed `intel-ucode` earlier then substitute that instead of the `amd-ucdoe`.
 
@@ -130,6 +135,10 @@ options root=UUID=<boot UUID> rw
 ```
 
 To get the UUID of the root partition in the terminal run `blkid` and find the UUID from the line with `/dev/sdX3`. If you use vim you can `:r! blkid` to read the data into your buffer and cut the UUID from there.
+
+#### GRUB bootloader
+
+TODO
 
 ### Finished core install
 
