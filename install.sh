@@ -5,9 +5,10 @@ platform='unknown'
 unamestr=`uname`
 if [[ "$unamestr" == 'Linux' ]]; then
   platform='linux'
-  cp Monaco\ Nerd\ Font\ Complete\ Mono.otf ~/.local/share/fonts
+  cp ~/.dotfiles/Monaco\ Nerd\ Font\ Complete\ Mono.otf ~/.local/share/fonts
   sudo fc-cache -fv
-  gsettings set org.gnome.desktop.interface monospace-font-name "Monaco Nerd Font Mono 11"
+  ln -s ~/.dotfiles/arch/.zshrc ~/.zshrc
+  # gsettings set org.gnome.desktop.interface monospace-font-name "Monaco Nerd Font Mono 11"
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
 fi
@@ -24,6 +25,7 @@ brew tap homebrew/cask-fonts
 
 # Perform the symlinks here
 ln -s ~/.dotfiles/.vim/ ~/.vim
+ln -s ~/.dotfiles/.alacritty.yml ~/.alacritty.yml
 ln -s ~/.dotfiles/.ctags.d ~/.ctags.d
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/arch/.xinitrc ~/.xinitrc
@@ -37,8 +39,8 @@ ln -s ~/.dotfiles/arch/terminator/config ~/.config/terminator
 # Other
 
 # ZSH plugins
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+#git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+#git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
 # Set the global gitignore
 git config --global core.excludesfile ~/.dotfiles/.gitignore_global
