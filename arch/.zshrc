@@ -29,6 +29,9 @@ export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
 # Set the system for the interactive tldr man pages
 export TLDR_OS=linux
 
+# Used for setting the TMP directory the same way as MacOS for vim scripts
+export TMPDIR="/tmp/"
+
 # Adding directories to PATH:
 export PATH=$PATH:/home/matt/installs/misc/emsdk
 export PATH=$PATH:/home/matt/installs/misc/emsdk/upstream/emscripten
