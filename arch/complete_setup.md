@@ -10,7 +10,7 @@ This document only covers installing for the exact process I have used before. F
 
 Download Arch Linux 2019 and write the ISO to a USB stick
 
-Use `lsblk` to view the block devices currently seen by the operating system. Find the USB drive (it helps to look at the size) and the drive should be called `sdX` where `X` is another letter. Partitions on each block device are listed as `sdX(1,2...n)`. To write the arch linux iso run `dd if=/path/to/archlinux.iso of=/dev/sdX status="progres"` where `X` is the letter of the USB drive. Once this has done and reported with no errors, restart the computer and boot into the USB drive.
+Use `lsblk` to view the block devices currently seen by the operating system. Find the USB drive (it helps to look at the size) and the drive should be called `sdX` where `X` is another letter. Partitions on each block device are listed as `sdX(1,2...n)`. To write the arch linux iso run `dd if=/path/to/archlinux.iso of=/dev/sdX status="progress"` where `X` is the letter of the USB drive. Once this has done and reported with no errors, restart the computer and boot into the USB drive.
 Once the computer has booted onto the USB stick you should see a plain shell that is running from the USB stick. To install arch linux you run commands from the booted USB.
 
 
