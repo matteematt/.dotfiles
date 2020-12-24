@@ -48,3 +48,5 @@ alias cd="pushChangedDirToList"
 alias cdd="changeDirFromHistory"
 alias cdf="changeDirShortcut"
 alias fcb="~/.dotfiles/shell/switch_branch.sh"
+
+alias gc="git commit"
