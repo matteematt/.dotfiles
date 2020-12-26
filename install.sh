@@ -1,6 +1,7 @@
 #!/bin/bash
 
 mkdir -p ~/.cache
+mkdir -p ~/.config
 
 # Install dependancies such as fzf here, consider the OS!
 platform='unknown'
@@ -10,7 +11,9 @@ if [[ "$unamestr" == 'Linux' ]]; then
   cp ~/.dotfiles/Monaco\ Nerd\ Font\ Complete\ Mono.otf ~/.local/share/fonts
   sudo fc-cache -fv
   ln -s ~/.dotfiles/arch/.zshrc ~/.zshrc
-  # gsettings set org.gnome.desktop.interface monospace-font-name "Monaco Nerd Font Mono 11"
+  mkdir -p ~/.config/{i3,terminator,redshift}
+  systemctl --user enable redshift.service
+  ln -s ~/.dotfiles/arch/.config/redshift.conf ~/.config/redshift/redshift.conf
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
 fi
@@ -35,8 +38,6 @@ ln -s ~/.dotfiles/arch/.Xresources ~/.Xresources
 ln -s ~/.dotfiles/arch/i3/config ~/.config/i3
 ln -s ~/.dotfiles/arch/i3/i3blocks.conf ~/.config/i3
 ln -s ~/.dotfiles/arch/terminator/config ~/.config/terminator
-
-# Check that vim snippets are added to ~/.vim/snippets but it looks like that is done automatically
 
 # Other
 
