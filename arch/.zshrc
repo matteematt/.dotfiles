@@ -72,6 +72,7 @@ PROMPT+=' %# '
 ########################################
 
 alias update="sudo informant check && sudo pacman -Syu"
+alias ls="ls --color=auto"
 # Contains cross platform required aliases
 source ~/.dotfiles/shell/.zshrc
 
