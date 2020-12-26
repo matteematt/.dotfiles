@@ -48,6 +48,11 @@ font:
 
   size: 12
 
+window:
+  padding:
+    x: 2
+    y: 2
+
 
 # Example config file:
 
