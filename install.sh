@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p ~/.cache
+
 # Install dependancies such as fzf here, consider the OS!
 platform='unknown'
 unamestr=`uname`

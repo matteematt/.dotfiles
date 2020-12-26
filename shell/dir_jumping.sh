@@ -9,7 +9,7 @@ function changeDirShortcut {
 # removes duplicates, and keeps the previous 1000
 # TODO: Does not work properly on filepaths with a space in
 function __pushchangeddirToListSave {
-  cdhistory="$HOME/.dotfiles/data/cdhistory"
+  cdhistory="$HOME/.cache/cdhistory"
   touch "$cdhistory"
   echo "`pwd` `date +'%s'`" >> "$cdhistory"
   sort -r "$cdhistory" | sort -k1,1 --unique | sort -k 2,2 | tail -n 1000 > "$cdhistory.tmp"
@@ -23,7 +23,7 @@ function pushChangedDirToList {
 
 # Use fzf to choose a dir to jump to from the history
 function changeDirFromHistory {
-  cdhistory="$HOME/.dotfiles/data/cdhistory"
+  cdhistory="$HOME/.cache/cdhistory"
   chosen_dir=`rev "$cdhistory" | cut -d" " -f 2- | rev | fzf --tac`
   if [[ -d "$chosen_dir" ]]; then
     pushChangedDirToList "$chosen_dir"

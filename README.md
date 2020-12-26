@@ -32,9 +32,8 @@ directory.
 
 ### Data
 
-Any scripts or commands that require to save data to the filesystem save the data to the `data/` directory. An example
-of a data file is the history list of `cd` commands for the history jumper command. All files in the `data/` directory
-are in the `.gitignore`
+Any scripts or commands that require to save data to the filesystem save the data to the `.cache/` directory. An example
+of a data file is the history list of `cd` commands for the history jumper command.
 
 ### Fonts
 
