@@ -96,6 +96,7 @@ export EMSDK_NODE=/home/matt/installs/misc/emsdk/node/12.9.1_64bit/bin/node
 
 
 # Setup fzf
+# Requires fzf from linuxbrew
 # ---------
 if [[ ! "$PATH" == */home/linuxbrew/.linuxbrew/opt/fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}/home/linuxbrew/.linuxbrew/opt/fzf/bin"
@@ -106,3 +107,12 @@ fi
 # Key bindings
 # ------------
 source "/home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.zsh"
+
+# Setup zsh-syntax-highlighting
+# Requires cloning git repo
+source ~/installs/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Setup zsh-syntax-highlighting
+# Requires installing via pacman or AUR
+# Sourcing this must be at the end of the .zshrc
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
