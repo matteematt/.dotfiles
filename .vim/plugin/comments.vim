@@ -41,6 +41,7 @@ let s:filetypesMap = {
 	\"python":"shellstyle",
 	\"yaml":"shellstyle",
 	\"dockerfile":"shellstyle",
+	\"zsh":"shellstyle",
 	\"haskell":"haskellstyle",
 	\}
 
