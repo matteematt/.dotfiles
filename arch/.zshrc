@@ -13,11 +13,11 @@ setopt INC_APPEND_HISTORY
 setopt EXTENDED_HISTORY
 setopt HIST_IGNORE_DUPS
 
-autoload -Uz compinit && compinit 
+autoload -Uz compinit && compinit
 # case insensitive path-completion 
-zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
 # partial completion suggestions
-zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix 
+zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
 
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
@@ -39,6 +39,8 @@ function precmd() {
         print ""
     fi
 }
+
+PROMPT='%(?.%F{green}√.%F{red}?%?)%f %B%1~%f%b %# '
 
 # Add the current time to the right hand side of the prompt
 RPROMPT="%*"
