@@ -32,7 +32,6 @@ alias rgf="rg -uu --files | rg --invert-match \.git | rg"
 
 # Includes from /shell and their aliases
 
-source ~/.dotfiles/shell/$(uname -s)_includes.sh
 source ~/.dotfiles/shell/git_extras.sh
 source ~/.dotfiles/shell/dir_jumping.sh
 
@@ -48,5 +47,4 @@ alias cd="pushChangedDirToList"
 alias cdd="changeDirFromHistory"
 alias cdf="changeDirShortcut"
 alias fcb="~/.dotfiles/shell/switch_branch.sh"
-
 alias gc="git commit"

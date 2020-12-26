@@ -1,9 +1,6 @@
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
-alias cadence="ssh -X mtw30@eesv-cadence-t.bath.ac.uk"
-alias xampp="sudo /opt/lampp/manager-linux-x64.run"
-alias skillbranch="ssh sb17ab@160.153.162.140 -p 22"
-alias matlab="/usr/local/MATLAB/R2018b/bin/matlab -softwareopengl"
+alias update="sudo informant check && sudo pacman -Syu"
 
 function precmd() {
     # Print a newline before the prompt, unless it's the
