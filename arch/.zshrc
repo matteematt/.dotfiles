@@ -112,6 +112,7 @@ source "/home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.zsh"
 # Setup zsh-syntax-highlighting
 # Requires cloning git repo
 source ~/installs/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 
 # Setup zsh-syntax-highlighting
 # Requires installing via pacman or AUR
