@@ -40,10 +40,32 @@ function precmd() {
     fi
 }
 
-PROMPT='%(?.%F{green}√.%F{red}?%?)%f %B%1~%f%b %# '
-
 # Add the current time to the right hand side of the prompt
 RPROMPT="%*"
+
+# Main prompt
+# Green tick or ? with error code
+# Current directory name
+PROMPT='%(?.%F{green}✓.%F{red}?%?)%f %B%1~%f%b'
+
+# If in a git repo then show the branch name
+# and indicate unstaged and staged changes
+autoload -Uz vcs_info
+precmd_vcs_info() { vcs_info }
+precmd_functions+=( precmd_vcs_info )
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:*' get-revision true
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' stagedstr '✚ '
+zstyle ':vcs_info:*' unstagedstr '● '
+zstyle ':vcs_info:*' formats ' %F{blue}(%u%c%b)%f'
+zstyle ':vcs_info:*' actionformats ' %F{red}(%u%c%b)%f'
+vcs_info
+PROMPT+=\$vcs_info_msg_0_
+setopt prompt_subst
+
+# Show % or # depending whether the prompt has privileged access
+PROMPT+=' %# '
 
 ########################################
 # ALIAS
