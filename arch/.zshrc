@@ -48,8 +48,8 @@ RPROMPT="%*"
 # Current directory name
 PROMPT='%(?.%F{green}✓.%F{red}?%?)%f %B%1~%f%b'
 
-# If in a git repo then show the branch name
-# and indicate unstaged and staged changes
+# If in a git repo then show the branch name [1]
+# and indicate unstaged, staged, and untracked change
 autoload -Uz vcs_info
 precmd_vcs_info() { vcs_info }
 precmd_functions+=( precmd_vcs_info )
@@ -58,11 +58,21 @@ zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' stagedstr '✚ '
 zstyle ':vcs_info:*' unstagedstr '● '
-zstyle ':vcs_info:*' formats ' %F{blue}(%u%c%b)%f'
-zstyle ':vcs_info:*' actionformats ' %F{red}(%u%c%b)%f'
+zstyle ':vcs_info:*' formats ' %F{blue}(%m%u%c%b)%f'
+zstyle ':vcs_info:*' actionformats ' %F{%mred}(%m%u%c%b)%f'
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
 vcs_info
 PROMPT+=\$vcs_info_msg_0_
 setopt prompt_subst
+
++vi-git-untracked() {
+    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+        git status --porcelain | grep -m 1 '^??' &>/dev/null
+    then
+        hook_com[misc]='? '
+    fi
+}
+
 
 # Show % or # depending whether the prompt has privileged access
 PROMPT+=' %# '
@@ -118,3 +128,9 @@ export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 # Requires installing via pacman or AUR
 # Sourcing this must be at the end of the .zshrc
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# [1]
+# http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#Version-Control-Information
+# https://scriptingosx.com/2019/07/moving-to-zsh-06-customizing-the-zsh-prompt/
+# https://github.com/zsh-users/zsh/blob/f9e9dce5443f323b340303596406f9d3ce11d23a/Misc/vcs_info-examples#L155-L170
+# https://stackoverflow.com/questions/49744179/zsh-vcs-info-how-to-indicate-if-there-are-untracked-files-in-git
