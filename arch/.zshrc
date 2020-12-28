@@ -26,6 +26,28 @@ export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
 # Used for setting the TMP directory the same way as MacOS for vim scripts
 export TMPDIR="/tmp/"
 
+# Vim keybindings
+bindkey -v
+
+# Change the cursor shape depending on the current vim mode [1]
+function zle-keymap-select zle-line-init
+{
+    case $KEYMAP in
+        vicmd)      print -n -- "\E]50;CursorShape=0\C-G";;  # block cursor
+        viins|main) print -n -- "\E]50;CursorShape=1\C-G";;  # line cursor
+    esac
+
+    zle reset-prompt
+    zle -R
+}
+function zle-line-finish
+{
+    print -n -- "\E]50;CursorShape=0\C-G"  # block cursor
+}
+zle -N zle-line-init
+zle -N zle-line-finish
+zle -N zle-keymap-select
+
 ########################################
 # PROMPT
 ########################################
@@ -48,7 +70,7 @@ RPROMPT="%*"
 # Current directory name
 PROMPT='%(?.%F{green}✓.%F{red}?%?)%f %B%1~%f%b'
 
-# If in a git repo then show the branch name [1]
+# If in a git repo then show the branch name [2]
 # and indicate unstaged, staged, and untracked change
 autoload -Uz vcs_info
 precmd_vcs_info() { vcs_info }
@@ -130,6 +152,9 @@ export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # [1]
+# https://unix.stackexchange.com/a/344028
+
+# [2]
 # http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#Version-Control-Information
 # https://scriptingosx.com/2019/07/moving-to-zsh-06-customizing-the-zsh-prompt/
 # https://github.com/zsh-users/zsh/blob/f9e9dce5443f323b340303596406f9d3ce11d23a/Misc/vcs_info-examples#L155-L170
