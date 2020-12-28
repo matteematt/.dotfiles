@@ -13,7 +13,7 @@ if [[ "$unamestr" == 'Linux' ]]; then
   ln -s ~/.dotfiles/arch/.zshrc ~/.zshrc
   mkdir -p ~/.config/{i3,redshift}
   systemctl --user enable redshift.service
-  ln -s ~/.dotfiles/arch/.config/redshift.conf ~/.config/redshift/redshift.conf
+  ln -s ~/.dotfiles/arch/redshift/redshift.conf ~/.config/redshift/redshift.conf
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
 fi
