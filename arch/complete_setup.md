@@ -275,7 +275,14 @@ If your Windows install is on another drive you can set up the dual booting with
 Arch wiki has an explanation of how to set up a build hook to automate the update process of systemd-book for either
 secure or normal boot. Using secure boot you can get the hook to resign the kernel.
 
-### pacman mirror list
+### pacman config
+
+#### Config
+
+As well as using hooks, `pacman` can be configured using `/etc/pacman.conf`. One configuration I like is to un-comment
+the `Color` option to get coloured output when using `-Q` query commands.
+
+#### pacman mirror list
 
 The mirror list that pacman uses can be found at `/etc/pacman.d/mirrorlist`. You can follow these steps to update this
 file with the fastest mirrors for your region
