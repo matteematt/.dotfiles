@@ -4,6 +4,7 @@
 
 setopt NO_CASE_GLOB
 
+# Set up zsh history
 export HISTFILE="$HOME/.cache/.zsh_history"
 export SAVEHIST=10000
 export HISTSIZE=10000
@@ -13,23 +14,31 @@ setopt INC_APPEND_HISTORY
 setopt EXTENDED_HISTORY
 setopt HIST_IGNORE_DUPS
 
+# Autocompletion behaviour when pressing tab
 autoload -Uz compinit && compinit
 # case insensitive path-completion 
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
 # partial completion suggestions
 zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
 
+# Shell settings
 export SSH_KEY_PATH="~/.ssh/rsa_id"
-
 export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
-
 # Used for setting the TMP directory the same way as MacOS for vim scripts
 export TMPDIR="/tmp/"
+export EDITOR="vim"
 
+##############################
+# Open prompt in editor [1]
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+
+##############################
 # Vim keybindings
 bindkey -v
 
-# Change the cursor shape depending on the current vim mode [1]
+# Change the cursor shape depending on the current vim mode [2]
 function zle-keymap-select zle-line-init
 {
     case $KEYMAP in
@@ -70,7 +79,7 @@ RPROMPT="%*"
 # Current directory name
 PROMPT='%(?.%F{green}✓.%F{red}?%?)%f %B%1~%f%b'
 
-# If in a git repo then show the branch name [2]
+# If in a git repo then show the branch name [3]
 # and indicate unstaged, staged, and untracked change
 autoload -Uz vcs_info
 precmd_vcs_info() { vcs_info }
@@ -152,9 +161,12 @@ export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # [1]
-# https://unix.stackexchange.com/a/344028
+# https://unix.stackexchange.com/questions/6620/how-to-edit-command-line-in-full-screen-editor-in-zsh
 
 # [2]
+# https://unix.stackexchange.com/a/344028
+
+# [3]
 # http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#Version-Control-Information
 # https://scriptingosx.com/2019/07/moving-to-zsh-06-customizing-the-zsh-prompt/
 # https://github.com/zsh-users/zsh/blob/f9e9dce5443f323b340303596406f9d3ce11d23a/Misc/vcs_info-examples#L155-L170
