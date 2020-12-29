@@ -89,8 +89,8 @@ zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' stagedstr '✚ '
 zstyle ':vcs_info:*' unstagedstr '● '
-zstyle ':vcs_info:*' formats ' %F{blue}(%m%u%c%b)%f'
-zstyle ':vcs_info:*' actionformats ' %F{%mred}(%m%u%c%b)%f'
+zstyle ':vcs_info:*' formats '%F{blue}(%m%u%c%b)%f'
+zstyle ':vcs_info:*' actionformats '%F{%mred}(%m%u%c%b)%f'
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
 vcs_info
 PROMPT+=\$vcs_info_msg_0_
