@@ -11,7 +11,7 @@ else
 	function FuzzyFilePicker()
 		let chosenFileLoc="$TMPDIR/vimpickfile"
 		silent !clear
-		execute "silent !rm ".chosenFileLoc
+		execute "silent !rm -f ".chosenFileLoc
 		execute "silent !".s:fileCmd."fzf".s:fzfPreview." > ".chosenFileLoc
 		redraw!
 		if v:shell_error

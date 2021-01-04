@@ -1,0 +1,16 @@
+# Example systemd service file for starting redshift
+# Needed to add the Environment line and the RestartSec line on top of what
+# is provided in the base service file
+[Unit]
+Description=Redshift display colour temperature adjustment
+Documentation=http://jonls.dk/redshift/
+After=display-manager.service
+
+[Service]
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/redshift
+Restart=always
+RestartSec=20
+
+[Install]
+WantedBy=default.target
