@@ -146,6 +146,7 @@ alias cdd="changeDirFromHistory"
 alias cdf="changeDirShortcut"
 alias fcb="~/.dotfiles/shell/switch_branch.sh"
 alias gc="git commit"
+alias gcm="git checkout master"
 
 # [1]
 # https://unix.stackexchange.com/questions/6620/how-to-edit-command-line-in-full-screen-editor-in-zsh
