@@ -141,6 +141,9 @@ nnoremap <leader>u :UndotreeToggle<CR>
 " :s// on visual selection
 vnoremap <C-r> :s/\%V
 
+" Open the current file location in netrw
+nnoremap <leader>e :edit %:p:h<CR>
+
 " Check what binaries are installed
 let g:has_rg = executable("rg")
 let g:has_git = executable("git")
