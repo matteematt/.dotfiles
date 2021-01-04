@@ -64,7 +64,7 @@ RPROMPT="%*"
 # Main prompt
 # Green tick or ? with error code
 # Current directory name
-PROMPT='%(?.%F{green}✓.%F{red}?%?)%f %B%1~%f%b'
+PROMPT='%(?.%F{green}✓.%F{red}?%?)%f %B%F{cyan}%1~%f%b'
 
 # If in a git repo then show the branch name [3]
 # and indicate unstaged, staged, and untracked change
@@ -76,7 +76,7 @@ zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' stagedstr '✚ '
 zstyle ':vcs_info:*' unstagedstr '● '
-zstyle ':vcs_info:*' formats ' %F{cyan}git:(%f%F{red}%B%m%u%c%b%f%F{cyan})%f'
+zstyle ':vcs_info:*' formats ' %F{blue}git:(%f%F{167}%m%u%c%b%f%F{blue})%f'
 zstyle ':vcs_info:*' actionformats ' %F{red}git:(%f%F{red}%B%m%u%c%b%f%F{red})%f'
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
 vcs_info
