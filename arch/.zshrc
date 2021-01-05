@@ -25,7 +25,7 @@ function precmd() {
 ########################################
 
 alias update="sudo informant check && sudo pacman -Syu"
-alias ls="ls --color=auto"
+alias ls="ls --color=auto --human-readable"
 alias windows="systemctl reboot --boot-loader-entry=auto-windows"
 # Contains cross platform required aliases
 
