@@ -79,15 +79,8 @@ set foldmethod=indent
 set foldlevelstart=2
 set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
 set fillchars=vert:│,fold:·     " char between panels
-
-" I think I actually prefer the normal behaviour so commenting out for now
-" set completeopt=noinsert,menuone,preview
-" " Allows the enter key to select an item form the <C-N> menu
-" inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "<CR>"
-" " Keeps the <C-N> menu open by simulating a down key press as it is opened
-" inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>\<lt>Up>" : ""<CR>'
-
-let g:startup_section_len = 10
+set matchpairs+=<:>             " add <> for matching pairs with %
+let g:startup_section_len = 10     " set the number of recent items to show on my custom startup screen
 
 function! TryLoadLanguageDict() abort
   let fp = expand($HOME . "/.dotfiles/.vim/resources/syntaxdictionaries/" . &filetype . ".txt")
@@ -157,6 +150,3 @@ let g:has_fzf = executable("fzf")
 "profile start profile.log
 "profile func *
 "profile file *
-
-" let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-" let &t_8b = "\<Esc>[48:2;%lu;%lu;%lum"
