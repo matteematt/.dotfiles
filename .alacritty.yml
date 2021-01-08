@@ -31,19 +31,19 @@ colors:
 
 font:
   normal:
-    family: Monaco Nerd Font Mono
+    family: Monego
     style: Regular
 
   bold:
-    family: Monaco Nerd Font Mono
+    family: Monego
     style: Bold
 
   italic:
-    family: Monaco Nerd Font Mono
+    family: Monego
     style: Italic
 
   bold_italic:
-    family: Monaco Nerd Font Mono
+    family: Monego
     style: Bold Italic
 
   size: 12
