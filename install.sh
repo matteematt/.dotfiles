@@ -9,7 +9,7 @@ platform='unknown'
 unamestr=`uname`
 if [[ "$unamestr" == 'Linux' ]]; then
   platform='linux'
-  cp ~/.dotfiles/Monaco\ Nerd\ Font\ Complete\ Mono.otf ~/.local/share/fonts
+  cp ~/.dotfiles/data/font/Monaco\ Nerd\ Font\ Complete\ Mono.otf ~/.local/share/fonts
   sudo fc-cache -fv
   ln -s ~/.dotfiles/arch/.zshrc ~/.zshrc
   mkdir -p ~/.config/{i3,redshift}
