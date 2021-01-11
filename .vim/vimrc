@@ -23,10 +23,16 @@ if g:os == "Darwin"
   let &t_SI.="\e[5 q" "SI = INSERT mode
   let &t_SR.="\e[4 q" "SR = REPLACE mode
   let &t_EI.="\e[1 q" "EI = NORMAL mode (ELSE)
+  # Copy to and from system clipboard
+  vnoremap <leader>yy :w !pbcopy<CR>
+  nnoremap <leader>yp :r !pbpaste<CR>
 elseif g:os == "Linux"
   let &t_SI = "\<Esc>[6 q"
   let &t_SR = "\<Esc>[4 q"
   let &t_EI = "\<Esc>[2 q"
+  # Copy to and from system clipboard
+  vnoremap <leader>yy :w !xclip -i -sel c<CR>
+  nnoremap <leader>yp :r !xclip -o -sel -c<CR>
 endif
 
 " Colour scheme
