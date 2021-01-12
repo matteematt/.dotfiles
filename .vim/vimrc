@@ -3,6 +3,9 @@
 filetype plugin indent on
 syntax on
 
+" keybindings
+let mapleader="\<Space>"
+
 " `matchit.vim` is built-in so let's enable it!
 " Hit `%` on `if` to jump to `else`.
 runtime macros/matchit.vim
@@ -117,8 +120,6 @@ autocmd QuickFixCmdPost [^l]* cwindow
 " Filetype detect
 autocmd BufNewFile,BufRead *.scala  setfiletype scala
 
-" keybindings
-let mapleader="\<Space>"
 
 " Open split and get focus, remap the window movement keys
 nnoremap <leader>w <C-w>v<C-w>l
