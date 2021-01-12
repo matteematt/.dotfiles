@@ -26,8 +26,8 @@ function precmd() {
 
 alias update="sudo informant check && sudo pacman -Syu"
 alias ls="ls --color=auto --human-readable"
+alias icloud="firefox -P default https://www.icloud.com/notes"
 alias windows="systemctl reboot --boot-loader-entry=auto-windows"
-# Contains cross platform required aliases
 
 ########################################
 # PROGRAM CONFIG
