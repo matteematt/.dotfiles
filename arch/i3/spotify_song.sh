@@ -4,22 +4,30 @@ args=(--print-reply \
   --session \
   --dest=org.mpris.MediaPlayer2.spotify \
   /org/mpris/MediaPlayer2 \
-  org.freedesktop.DBus.Properties.Get \
+  org.freedesktop.DBus.Properties.GetAll \
   string:'org.mpris.MediaPlayer2.Player')
 
-artist_loc=27
-song_loc=40
+readarray -t data < <(dbus-send "${args[@]}" 2> /dev/null)
 
-if [[ $(eval "dbus-send ${args[@]} string:'PlaybackStatus' 2> /dev/null") =~ "Playing" ]];then
-  readarray metadata < <(eval "dbus-send ${args[@]} string:'Metadata'")
-  artist=${metadata[$artist_loc]#*\"}
+if [[ ${#data[@]} -ne 0 ]];then
+  for i in "${!data[@]}"; do
+    case "${data[i]}" in
+      *'string "xesam:artist"') artist="${data[i+2]}";;
+      *'string "xesam:title"') title="${data[i+1]}";;
+      *'string "PlaybackStatus"') [[ "${data[i+1]}" =~ "Playing" ]] \
+        && playing=1 || exit 0;;
+      *) continue ;;
+    esac
+    if [[ -n $artist ]] && [[ -n $title ]] && [[ -n $playing ]];then
+      break
+    fi
+  done
+  artist=${artist#*\"}
   artist=${artist%\"*}
 
-  song=${metadata[$song_loc]#*\"}
-  song=${song%\"*}
-
+  title=${title#*\"}
+  title=${title%\"*}
   # full text, short text (colour and bg colour omitted)
-  echo "♫ $song/$artist"
-  echo "$song"
+  echo "♫ $title/$artist"
+  echo "$title"
 fi
-
