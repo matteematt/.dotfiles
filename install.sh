@@ -3,6 +3,7 @@
 mkdir -p ~/.cache
 mkdir -p ~/.config
 mkdir -p ~/.ghc
+mkdir -p ~/.sbt/1.0/
 
 # Install dependancies such as fzf here, consider the OS!
 platform='unknown'
@@ -40,6 +41,7 @@ ln -s ~/.dotfiles/arch/.Xresources ~/.Xresources
 ln -s ~/.dotfiles/arch/i3/config ~/.config/i3
 ln -s ~/.dotfiles/arch/i3/i3blocks.conf ~/.config/i3
 ln -s ~/.dotfiles/config/ghci.conf ~/.ghc/ghci.conf
+ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
 
 # Set the global gitignore
 git config --global core.excludesfile ~/.dotfiles/.gitignore_global
