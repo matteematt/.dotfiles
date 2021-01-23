@@ -13,10 +13,15 @@ if [[ "$unamestr" == 'Linux' ]]; then
   mkdir ~/.local/share/fonts
   cp ~/.dotfiles/data/font/* ~/.local/share/fonts/
   sudo fc-cache -fv
-  ln -s ~/.dotfiles/arch/.zshrc ~/.zshrc
   mkdir -p ~/.config/{i3,redshift}
-  systemctl --user enable redshift.service
+
+  ln -s ~/.dotfiles/arch/.zshrc ~/.zshrc
   ln -s ~/.dotfiles/arch/redshift/redshift.conf ~/.config/redshift/redshift.conf
+  ln -s ~/.dotfiles/arch/.xinitrc ~/.xinitrc
+  ln -s ~/.dotfiles/arch/.Xresources ~/.Xresources
+  ln -s ~/.dotfiles/arch/i3/config ~/.config/i3
+  ln -s ~/.dotfiles/arch/i3/i3blocks.conf ~/.config/i3
+  systemctl --user enable redshift.service
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
 fi
@@ -31,16 +36,13 @@ brew install isacikgoz/taps/tldr
 brew tap homebrew/cask-fonts
 # Get the liberation mono nerd font
 
-# Perform the symlinks here
+# Perform the general symlinks here
 ln -s ~/.dotfiles/.vim/ ~/.vim
 ln -s ~/.dotfiles/.alacritty.yml ~/.alacritty.yml
 ln -s ~/.dotfiles/.ctags.d ~/.ctags.d
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
-ln -s ~/.dotfiles/arch/.xinitrc ~/.xinitrc
-ln -s ~/.dotfiles/arch/.Xresources ~/.Xresources
-ln -s ~/.dotfiles/arch/i3/config ~/.config/i3
-ln -s ~/.dotfiles/arch/i3/i3blocks.conf ~/.config/i3
-ln -s ~/.dotfiles/config/ghci.conf ~/.ghc/ghci.conf
+ln -s ~/.dotfiles/config/haskell/ghci.conf ~/.ghc/ghci.conf
+ln -s ~/.dotfiles/config/haskell/haskeline ~/.haskeline
 ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
 
 # Set the global gitignore
