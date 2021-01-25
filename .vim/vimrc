@@ -106,7 +106,7 @@ augroup END
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
-  set undodir=$HOME/.dotfiles/.vim/undo  "directory where the undo files will be stored
+  set undodir=$HOME/.cache/vim/undo/  "directory where the undo files will be stored
   set undofile                 "turn on the feature
   silent call system('mkdir -p ' . &undodir)
 endif
