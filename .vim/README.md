@@ -242,6 +242,11 @@ I prefer.
 ```
 git clone https://github.com/habamax/vim-gruvbit $TMPDIR/vim-gruvbit
 cp -r $TMPDIR/vim-gruvbit/colors/gruvbit.vim ~/.dotfiles/.vim/colors/
+# The MatchParen HL group colours don't work well on alacritty, so I find
+# swapping it to be better. Change the following line
+hi MatchParen guifg=#1d2021 guibg=#fe8019 gui=NONE cterm=NONE
+# to
+hi MatchParen guifg=#fe8019 guibg=#1d2021 gui=NONE cterm=NONE
 ```
 
 To enable with bold, italics, and a small vertical split
