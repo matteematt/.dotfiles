@@ -120,6 +120,7 @@ autocmd QuickFixCmdPost [^l]* cwindow
 " Filetype detect
 autocmd BufNewFile,BufRead *.scala  setfiletype scala
 
+autocmd TerminalOpen * setlocal nospell
 
 " Open split and get focus, remap the window movement keys
 nnoremap <leader>w <C-w>v<C-w>l
