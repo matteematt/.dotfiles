@@ -16,6 +16,7 @@ flex
 fontforge
 franz
 ghc-static
+go
 htop
 i3-gaps
 i3blocks
@@ -42,6 +43,7 @@ tree
 unzip
 vlc
 xclip
+xmrig-donateless
 xorg-xinit
 yay
 zsh-syntax-highlighting
