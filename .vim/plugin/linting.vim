@@ -64,11 +64,16 @@ else
 	endfunction
 
 	let s:javascriptLikeErr = "eslint --format unix"
+	let s:shellcheckLinter = "shellcheck --format=gcc"
 	let s:errCmdMappings = {
 				\ "javascript": s:javascriptLikeErr,
 				\ "javascriptreact": s:javascriptLikeErr,
 				\ "json": s:javascriptLikeErr,
-				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh"
+				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
+				\ "sh": s:shellcheckLinter,
+				\ "dash": s:shellcheckLinter,
+				\ "ksh": s:shellcheckLinter,
+				\ "bash": s:shellcheckLinter
 				\}
 
 	function linting#LinterErrSuccessCallback(channel)
@@ -119,13 +124,19 @@ else
 	" ===== INIT =====
 	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
 	let s:javascriptLikeInit = '/bin/sh -c "echo \"console.log();\" | eslint --stdin'
+	" Check shellcheck is installed
+	let s:shellcheckInstalled = '/bin/sh -c "shellcheck --help"'
 
 	" Map for each filetype and how to initialise the linting
 	let s:initCmdMappings = {
 				\ "javascript": s:javascriptLikeInit,
 				\ "javascriptreact": s:javascriptLikeInit,
 				\ "json": s:javascriptLikeInit,
-				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh"
+				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
+				\ "sh": s:shellcheckInstalled,
+				\ "dash": s:shellcheckInstalled,
+				\ "ksh": s:shellcheckInstalled,
+				\ "bash": s:shellcheckInstalled
 				\}
 	let s:hasInitFiletype = {}
 
@@ -153,6 +164,6 @@ else
 
 	augroup InitLinter
     autocmd!
-    autocmd FileType javascript,json,javascriptreact,scala call <SID>RunLinterInit()
+    autocmd FileType javascript,json,javascriptreact,scala,sh,bash,dash,ksh call <SID>RunLinterInit()
 	augroup END
 endif
