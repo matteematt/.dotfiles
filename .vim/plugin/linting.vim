@@ -63,18 +63,12 @@ else
 			\})
 	endfunction
 
-	let s:javascriptLikeErr = "eslint --format unix"
-	let s:shellcheckLinter = "shellcheck --format=gcc"
 	let s:errCmdMappings = {
-				\ "javascript": s:javascriptLikeErr,
-				\ "javascriptreact": s:javascriptLikeErr,
-				\ "json": s:javascriptLikeErr,
 				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
-				\ "sh": s:shellcheckLinter,
-				\ "dash": s:shellcheckLinter,
-				\ "ksh": s:shellcheckLinter,
-				\ "bash": s:shellcheckLinter
 				\}
+	for ft in ["javascript","javascriptreact","json"] | let s:errCmdMappings[ft] = "eslint --format unix" | endfor
+	for ft in ["sh","dash","ksh","bash"] | let s:errCmdMappings[ft] = "shellcheck --format=gcc" | endfor
+	unlet ft
 
 	function linting#LinterErrSuccessCallback(channel)
 		if filereadable(g:linterErrFile)
@@ -122,22 +116,18 @@ else
 	map <leader>ll :call <SID>RunLinterErrors()<CR>
 
 	" ===== INIT =====
-	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
-	let s:javascriptLikeInit = '/bin/sh -c "echo \"console.log();\" | eslint --stdin'
-	" Check shellcheck is installed
-	let s:shellcheckInstalled = '/bin/sh -c "shellcheck --help"'
 
 	" Map for each filetype and how to initialise the linting
 	let s:initCmdMappings = {
-				\ "javascript": s:javascriptLikeInit,
-				\ "javascriptreact": s:javascriptLikeInit,
-				\ "json": s:javascriptLikeInit,
 				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
-				\ "sh": s:shellcheckInstalled,
-				\ "dash": s:shellcheckInstalled,
-				\ "ksh": s:shellcheckInstalled,
-				\ "bash": s:shellcheckInstalled
 				\}
+	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
+	for ft in ["javascript","javascriptreact","json"] |
+				\ let s:initCmdMappings[ft] = '/bin/sh -c "echo \"console.log();\" | eslint --stdin' | endfor
+	" Check shellcheck is installed
+	for ft in ["sh","dash","ksh","bash"] |
+				\ let s:initCmdMappings[ft] = '/bin/sh -c "shellcheck --help"' | endfor
+	unlet ft
 	let s:hasInitFiletype = {}
 
 	function linting#LinterInitCallback(channel)
