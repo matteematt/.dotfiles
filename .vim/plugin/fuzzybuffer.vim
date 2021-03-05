@@ -1,8 +1,10 @@
 function! Test(A,L,P) abort
 	let buffText = []
 	for bufIndex in range(1, bufnr('$'))
-		" filter buffers with non-blank buftype, such as help or terminal buffers
-		if bufexists(bufIndex) && getbufvar(bufIndex, '&buftype', 'error') == ''
+		" filter buffers with non-blank buftype, such as help
+		if bufexists(bufIndex) &&
+					\ (getbufvar(bufIndex, '&buftype', 'error') == '' ||
+					\ getbufvar(bufIndex, '&buftype', 'error') == 'terminal')
 			call add(buffText, bufname(bufIndex))
 		endif
 	endfor
