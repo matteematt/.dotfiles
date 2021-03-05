@@ -67,8 +67,6 @@ function! CreateStatusLine()
 		let l:statusline.=s:gitBranch																" show the git branch
 	endif
 	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr
-	echomsg strlen(expand('%p'))
-	echomsg winwidth('%')
 	if strlen(expand('%p')) * 1.25 > winwidth('%')                " if the full file path is more than half of win width
 		let l:statusline.=" %t"																			" file name
 	else
