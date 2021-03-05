@@ -61,13 +61,19 @@ endfunction
 function! CreateStatusLine()
 	let l:statusline=""
 	if s:GetShowMode()
-		let l:statusline.=s:GetModeColour()
-		let l:statusline.=s:GetModeText()
+		let l:statusline.=s:GetModeColour()													" colour of the VIM mode highlight
+		let l:statusline.=s:GetModeText()                           " text of the VIM mode
+		let l:statusline.="%#VisualNOS#"														" set highlight group colour to VisualNOS
+		let l:statusline.=s:gitBranch																" show the git branch
 	endif
-	let l:statusline.="%#VisualNOS#"															" set highlight group colour to VisualNOS
-	let l:statusline.=s:gitBranch																	" show the git branch
 	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr
-	let l:statusline.=" %f"																				" path to the file in the buffer
+	echomsg strlen(expand('%p'))
+	echomsg winwidth('%')
+	if strlen(expand('%p')) * 1.25 > winwidth('%')                " if the full file path is more than half of win width
+		let l:statusline.=" %t"																			" file name
+	else
+		let l:statusline.=" %f"																			" path to the file in the buffer
+	endif
 	let l:statusline.="%m"																				" modified flag for the file in the buffer
 	let l:statusline.="%="																				" separation point between right and left aligned items
 	let l:statusline.="%#CursorColumn#"														" set highlight group colour to the cursor column
