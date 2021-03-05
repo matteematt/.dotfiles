@@ -98,9 +98,12 @@ I have written an synchronous linter wrapper for some programming languages I us
 <leader>lf - Run the linter to automatically fix linting errors and update the buffer
 ```
 Currently supported linting is:
-* ESLint for Javscript, JavscriptReact, and Json. Supports Linting errors and automatically fixing of some linting
+* `eslint` for Javscript, JavscriptReact, and Json. Supports Linting errors and automatically fixing of some linting
 		errors
-* Scalastyle for Scala. Only supports linting errors
+* `scalastyle` for Scala. Only supports linting errors.
+* `shellcheck` for bash, dash, sh, and ksh. Only supports linting errors.
+
+> The vim polyglot scala plugin breaks the scala linting, you must delete the line "compiler sbt" from the scala.vim file
 
 ### RegEx Search
 
