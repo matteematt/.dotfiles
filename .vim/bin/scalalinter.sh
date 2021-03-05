@@ -1,6 +1,6 @@
 #!/bin/sh
 
-config_file="$HOME/dotfiles/linting/scalastyle_config.xml"
+config_file="$HOME/.dotfiles/config/linting/scalastyle_config.xml"
 
 if [[ $# == 0 ]]; then
 	# Checking that scalastyle is executable and config file is accessible
