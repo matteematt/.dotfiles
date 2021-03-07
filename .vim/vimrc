@@ -67,7 +67,6 @@ set wildmenu                   " Great command-line completion, use `<Tab>` to m
 set wildmode=longest:full,full
                                " around and `<CR>` to validate
 set wildcharm=<C-z>
-set relativenumber             " add relative numbers
 set number	                   " shows the absolute number for the current line
 set shiftwidth=2								" sets the shift tab and indent width to 2
 set tabstop=2
@@ -91,6 +90,12 @@ set fillchars=vert:│,fold:·     " char between panels
 set matchpairs+=<:>             " add <> for matching pairs with %
 let g:startup_section_len = 10     " set the number of recent items to show on my custom startup screen
 
+" Create a new autogroup for all vimrc autocmds
+augroup vimrc
+  autocmd!
+augroup END
+
+" Can specify a bunch of keywords per language to add to the autocomplete menu
 function! TryLoadLanguageDict() abort
   let fp = expand($HOME . "/.dotfiles/.vim/resources/syntaxdictionaries/" . &filetype . ".txt")
   if filereadable(fp)
@@ -98,11 +103,7 @@ function! TryLoadLanguageDict() abort
     setlocal iskeyword+=-
   endif
 endfunction
-augroup loaddict
-  au!
-  autocmd Filetype * :call TryLoadLanguageDict()
-augroup END
-
+autocmd vimrc Filetype * :call TryLoadLanguageDict()
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
@@ -112,31 +113,26 @@ if has('persistent_undo')      "check if your vim version supports it
 endif
 
 " Turn off comments automatically continuing onto the next line
-autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+autocmd vimrc FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " This autocommand tells Vim to open the quickfix window whenever a quickfix command is executed
 " AND there are valid errors to display.
-autocmd QuickFixCmdPost [^l]* cwindow
+autocmd vimrc QuickFixCmdPost [^l]* cwindow
 
 " Filetype detect
-autocmd BufNewFile,BufRead *.scala  setfiletype scala
+autocmd vimrc BufNewFile,BufRead *.scala  setfiletype scala
 
-autocmd TerminalOpen * setlocal nospell
+" Don't show spelling errors or line numbers when in terminal normal mode
+autocmd vimrc TerminalOpen * setlocal nospell
+autocmd vimrc TerminalOpen * setlocal nonumber
 
 " Open split and get focus, remap the window movement keys
 nnoremap <leader>w <C-w>v<C-w>l
-" nnoremap <C-h> <C-w>h
-" nnoremap <C-j> <C-w>j
-" nnoremap <C-k> <C-w>k
-" nnoremap <C-l> <C-w>l
 
 nnoremap <Down> :cnext<CR>
 nnoremap <Up> :cprev<CR>
 
- " Highlight the last inserted text
- nnoremap gV `[v`]`
-
-" Open wildmenu with open buffers
-" nnoremap <leader><leader> :buffer<space>
+" Highlight the last inserted text
+nnoremap gV `[v`]`
 
 " Open the undotree buffer
 nnoremap <leader>u :UndotreeToggle<CR>
