@@ -78,8 +78,7 @@ function! CreateStatusLine()
 	let l:statusline.=" %y"																				" type of file e.g [vim]
 	let l:statusline.=" %{&fileencoding?&fileencoding:&encoding}"	" show file encoding e.g. utf-8
 	let l:statusline.="\[%{&fileformat}\]"												" show file format e.g. [unix]
-	let l:statusline.=" %p%%"																			" the percentage down the file the cursor is on, and add % symbol
-	let l:statusline.=" %l:%c "																		" the line and column position of the cursor
+	let l:statusline.=" %l/%L"																		" show the curr line number and total lines in buffer
 	return	l:statusline
 endfunction
 
