@@ -40,6 +40,7 @@ let s:filetypesMap = {
 	\"sh":"shellstyle",
 	\"python":"shellstyle",
 	\"yaml":"shellstyle",
+	\"yaml.docker-compose":"shellstyle",
 	\"dockerfile":"shellstyle",
 	\"zsh":"shellstyle",
 	\"haskell":"haskellstyle",
