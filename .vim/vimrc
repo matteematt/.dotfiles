@@ -114,9 +114,12 @@ endif
 
 " Turn off comments automatically continuing onto the next line
 autocmd vimrc FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
 " This autocommand tells Vim to open the quickfix window whenever a quickfix command is executed
 " AND there are valid errors to display.
 autocmd vimrc QuickFixCmdPost [^l]* cwindow
+" Don't show spelling errors in the quickfix window
+autocmd vimrc FileType qf setlocal nospell
 
 " Filetype detect
 autocmd vimrc BufNewFile,BufRead *.scala  setfiletype scala
@@ -128,8 +131,8 @@ autocmd vimrc TerminalOpen * setlocal nonumber
 " Open split and get focus, remap the window movement keys
 nnoremap <leader>w <C-w>v<C-w>l
 
-nnoremap <Down> :cnext<CR>
-nnoremap <Up> :cprev<CR>
+nnoremap <Down> :cnext<CR>zz
+nnoremap <Up> :cprev<CR>zz
 
 " Highlight the last inserted text
 nnoremap gV `[v`]`

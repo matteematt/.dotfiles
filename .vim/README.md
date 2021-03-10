@@ -102,6 +102,8 @@ Currently supported linting is:
 		errors
 * `scalastyle` for Scala. Only supports linting errors.
 * `shellcheck` for bash, dash, sh, and ksh. Only supports linting errors.
+* `hlint` for haskell. `hlint` supports fixing linting, but this is not yet implemented in my vim
+    script.
 
 > The vim polyglot scala plugin breaks the scala linting, you must delete the line "compiler sbt" from the scala.vim file
 
