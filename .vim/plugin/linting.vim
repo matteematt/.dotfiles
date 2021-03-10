@@ -65,6 +65,7 @@ else
 
 	let s:errCmdMappings = {
 				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
+				\ "haskell": $HOME . "/.dotfiles/.vim/bin/haskelllinter.sh",
 				\}
 	for ft in ["javascript","javascriptreact","json"] | let s:errCmdMappings[ft] = "eslint --format unix" | endfor
 	for ft in ["sh","dash","ksh","bash"] | let s:errCmdMappings[ft] = "shellcheck --format=gcc" | endfor
@@ -73,6 +74,11 @@ else
 	function linting#LinterErrSuccessCallback(channel)
 		if filereadable(g:linterErrFile)
 			execute "cfile! " . g:linterErrFile
+			" if match(readfile(g:linterErrFile),":") == -1
+				" echomsg "No linting errors"
+			" else readfile(g:linterErrFile),""
+				" echomsg "There was a match for :"
+			" endif
 		else
 			echoerr "Unable to read a valid file at ".g:linterErrFile
 		endif
@@ -120,6 +126,7 @@ else
 	" Map for each filetype and how to initialise the linting
 	let s:initCmdMappings = {
 				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
+				\ "haskell": $HOME . "/.dotfiles/.vim/bin/haskelllinter.sh",
 				\}
 	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
 	for ft in ["javascript","javascriptreact","json"] |
@@ -154,6 +161,6 @@ else
 
 	augroup InitLinter
     autocmd!
-    autocmd FileType javascript,json,javascriptreact,scala,sh,bash,dash,ksh call <SID>RunLinterInit()
+    autocmd FileType javascript,json,javascriptreact,scala,sh,bash,dash,ksh,haskell call <SID>RunLinterInit()
 	augroup END
 endif
