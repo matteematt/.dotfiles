@@ -66,6 +66,7 @@ else
 	let s:errCmdMappings = {
 				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
 				\ "haskell": $HOME . "/.dotfiles/.vim/bin/haskelllinter.sh",
+				\ "python": "pylint",
 				\}
 	for ft in ["javascript","javascriptreact","json"] | let s:errCmdMappings[ft] = "eslint --format unix" | endfor
 	for ft in ["sh","dash","ksh","bash"] | let s:errCmdMappings[ft] = "shellcheck --format=gcc" | endfor
@@ -125,6 +126,7 @@ else
 	let s:initCmdMappings = {
 				\ "scala": $HOME . "/.dotfiles/.vim/bin/scalalinter.sh",
 				\ "haskell": $HOME . "/.dotfiles/.vim/bin/haskelllinter.sh",
+				\ "python": '/bin/sh -c "pylint --help"',
 				\}
 	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
 	for ft in ["javascript","javascriptreact","json"] |
@@ -159,6 +161,7 @@ else
 
 	augroup InitLinter
     autocmd!
-    autocmd FileType javascript,json,javascriptreact,scala,sh,bash,dash,ksh,haskell call <SID>RunLinterInit()
+    autocmd FileType javascript,json,javascriptreact,scala,sh,bash,dash,ksh,haskell,python
+					\ call <SID>RunLinterInit()
 	augroup END
 endif
