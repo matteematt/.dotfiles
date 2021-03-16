@@ -74,11 +74,9 @@ else
 	function linting#LinterErrSuccessCallback(channel)
 		if filereadable(g:linterErrFile)
 			execute "cfile! " . g:linterErrFile
-			" if match(readfile(g:linterErrFile),":") == -1
-				" echomsg "No linting errors"
-			" else readfile(g:linterErrFile),""
-				" echomsg "There was a match for :"
-			" endif
+			if getfsize(g:linterErrFile) < 1
+				echomsg "No linting errors"
+			endif
 		else
 			echoerr "Unable to read a valid file at ".g:linterErrFile
 		endif
