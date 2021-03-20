@@ -74,7 +74,7 @@ else
 
 	function linting#LinterErrSuccessCallback(channel)
 		if filereadable(g:linterErrFile)
-			execute "cfile! " . g:linterErrFile
+			execute "lfile! " . g:linterErrFile
 			if getfsize(g:linterErrFile) < 1
 				echomsg "No linting errors"
 			endif
