@@ -116,9 +116,11 @@ endif
 autocmd vimrc FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 " This autocommand tells Vim to open the quickfix window whenever a quickfix command is executed
-" AND there are valid errors to display.
+" AND there are valid errors to display. And the list should close once it is empty
 autocmd vimrc QuickFixCmdPost [^l]* cwindow
-" Don't show spelling errors in the quickfix window
+" Do same for location list
+autocmd vimrc QuickFixCmdPost    l* lwindow
+" Don't show spelling errors in the quickfix window (and location list)
 autocmd vimrc FileType qf setlocal nospell
 
 " Filetype detect
@@ -131,8 +133,11 @@ autocmd vimrc TerminalOpen * setlocal nonumber
 " Open split and get focus, remap the window movement keys
 nnoremap <leader>w <C-w>v<C-w>l
 
+" Use arrow keys for moving through the location and quickfix windows
 nnoremap <Down> :cnext<CR>zz
 nnoremap <Up> :cprev<CR>zz
+nnoremap <Left> :lprev<CR>zz
+nnoremap <Right> :lnext<CR>zz
 
 " Highlight the last inserted text
 nnoremap gV `[v`]`
