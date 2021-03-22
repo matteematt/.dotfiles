@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ $# == 0 ]]; then
 	# Checking that hlint is executable and config file is accessible
