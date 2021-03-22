@@ -11,7 +11,7 @@ if !has("job") || version < 800
 else
 	" ===== LINTING WRAPPERS =====
 	" TODO: The error stuff does not currently work, so need to manually check if not working
-	let s:javascriptLikeFix = "eslint --fix"
+	let s:javascriptLikeFix = $HOME . "/.dotfiles/.vim/bin/javascriptlinter.sh --fix"
 	let s:fixCmdMappings = {
 				\ "javascript": s:javascriptLikeFix,
 				\ "javascriptreact": s:javascriptLikeFix,
@@ -68,7 +68,8 @@ else
 				\ "haskell": $HOME . "/.dotfiles/.vim/bin/haskelllinter.sh",
 				\ "python": "pylint",
 				\}
-	for ft in ["javascript","javascriptreact","json"] | let s:errCmdMappings[ft] = "eslint --format unix" | endfor
+	for ft in ["javascript","javascriptreact","json"] | let s:errCmdMappings[ft] =
+				\ $HOME . "/.dotfiles/.vim/bin/javascriptlinter.sh" | endfor
 	for ft in ["sh","dash","ksh","bash"] | let s:errCmdMappings[ft] = "shellcheck --format=gcc" | endfor
 	unlet ft
 
@@ -130,7 +131,7 @@ else
 				\}
 	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
 	for ft in ["javascript","javascriptreact","json"] |
-				\ let s:initCmdMappings[ft] = '/bin/sh -c "echo \"console.log();\" | eslint --stdin' | endfor
+				\ let s:initCmdMappings[ft] = $HOME . "/.dotfiles/.vim/bin/javascriptlinter.sh" | endfor
 	" Check shellcheck is installed
 	for ft in ["sh","dash","ksh","bash"] |
 				\ let s:initCmdMappings[ft] = '/bin/sh -c "shellcheck --help"' | endfor
