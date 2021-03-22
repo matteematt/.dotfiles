@@ -21,7 +21,7 @@ else
 	function linting#LinterFixSuccessCallback(channel)
 		let cursorPos = getcurpos()
 		normal ggdG
-		execute "0read " . g:linterCurrentFile
+		execute "keepalt 0read " . g:linterCurrentFile
 		normal Gdd
 		call setpos('.', cursorPos)
 		execute "silent !rm " . g:linterCurrentFile
@@ -58,7 +58,7 @@ else
 		endif
 
 		" TODO: Handle things like errors etc
-		call job_start(s:fixCmdMappings[l:fileType]." ".g:linterCurrentFile, {
+		call job_start(s:fixCmdMappings[l:fileType] . " " . g:linterCurrentFile, {
 			\"close_cb": "linting#LinterFixSuccessCallback",
 			\})
 	endfunction
