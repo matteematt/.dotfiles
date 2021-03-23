@@ -22,10 +22,10 @@ case $# in
 		;;
 	1)
 		# Run the linter in error reporting mode, filename is $1
-		eslint --format unix "$1"
+		eslint --format unix -c "$config_file_path" "$1"
 		;;
 	2)
 		# Run linter in fix mode, filename is $2
-		eslint --fix "$2"
+		eslint --fix -c "$config_file_path"  "$2"
 		;;
 esac
