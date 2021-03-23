@@ -24,6 +24,7 @@ if [[ "$unamestr" == 'Linux' ]]; then
   systemctl --user enable redshift.service
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
+  brew install coreutils
 fi
 
 brew install fzf

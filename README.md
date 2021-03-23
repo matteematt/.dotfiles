@@ -9,7 +9,8 @@ directories.
 It is likely stating the obvious but many of these scripts and configurations contained in this repository require the
 [GNU Core Utils](https://www.gnu.org/software/coreutils/) installed. For MacOS this may require specific core utils to
 have the GNU versions specifically downloaded, such as `gawk` so the `match` function can be used, which is not included
-in the BSD-like version of `awk` that MacOS ships with.
+in the BSD-like version of `awk` that MacOS ships with. Using homebrew you can get coreutils on
+MacOS using `brew install coreutils` (which is part of `install.sh`).
 
 This repository additionally makes heavy use of some of the "replacement" core util packages. Eventually I might get
 around to writing the scripts to fall back on the original core utils if the "replacement" versions are not installed.
