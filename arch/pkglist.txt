@@ -10,6 +10,7 @@ bison
 bitwarden-bin
 cabal-install
 cmake
+eslint
 firefox
 flameshot
 flex
@@ -17,6 +18,7 @@ fontforge
 franz
 ghc-static
 go
+hlint-static-git
 htop
 i3-gaps
 i3blocks
@@ -31,9 +33,13 @@ nvidia
 pacman-contrib
 patch
 pkgconf
+python-pylint
+ranger
 redshift
 sbt
 scala
+scalastyle
+shellcheck
 signal-desktop
 spotify
 spotifyd
@@ -43,7 +49,8 @@ tree
 unzip
 vlc
 xclip
-xmrig-donateless
+xmrig-cuda
 xorg-xinit
 yay
+youtube-dl-git
 zsh-syntax-highlighting
