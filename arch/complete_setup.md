@@ -303,3 +303,12 @@ script should symlink the `conf`.
 To get the service to run at startup you can use systemd, but its a user service so you invoke it with `systemctl --user
 enable redshift.service` (notice no `sudo` and the `--user` flag). I had issues with the provided service file that
 comes with the install - an example file with included modifications can be found at `arch/.config/redshift.service`.
+
+### Updating System Time
+
+When the clocks change the system time may not sync with this. Run the following command to sync the
+system time with the new time for the region:
+```
+timedatectl set-ntp true
+```
+This requires the root user's password.
