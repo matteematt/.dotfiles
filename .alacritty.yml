@@ -3,7 +3,7 @@ colors:
   # Default colors
   primary:
     # hard contrast: background = '#1d2021'
-    backgroiup: '#1d2021'
+    background: '#1d2021'
     # soft contrast: background = '#32302f'
     foreground: '#ebdbb2'
 
@@ -46,7 +46,7 @@ font:
     family: Monego
     style: Bold Italic
 
-  size: 12
+  size: 16
 
 window:
   padding:
