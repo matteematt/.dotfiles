@@ -25,6 +25,8 @@ if [[ "$unamestr" == 'Linux' ]]; then
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
   brew install coreutils
+  brew install rust
+  cargo install zellij
 fi
 
 brew install fzf
