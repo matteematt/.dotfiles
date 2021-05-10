@@ -27,6 +27,7 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
   brew install coreutils
   brew install rust
   cargo install zellij
+  ln -s ~/.dotfiles/config/zellij.yml ~/.config/zellij
 fi
 
 brew install fzf

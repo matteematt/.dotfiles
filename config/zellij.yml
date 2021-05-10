@@ -1,0 +1,5 @@
+keybinds:
+  normal:
+    - action: [GoToTab: 1]
+      key: [Alt: 1]
+
