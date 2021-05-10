@@ -1,5 +1,7 @@
 source ~/.dotfiles/shell/.zshrc
 
+export PATH="$PATH:/Users/mwa75/.cargo/bin"
+
 alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
 alias ls="ls -G"
 
