@@ -15,7 +15,6 @@ firefox
 flameshot
 flex
 fontforge
-franz
 ghc-static
 go
 hlint-static-git
@@ -52,5 +51,4 @@ xclip
 xmrig-cuda
 xorg-xinit
 yay
-youtube-dl-git
 zsh-syntax-highlighting
