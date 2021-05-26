@@ -15,6 +15,8 @@ else
 	let s:fixCmdMappings = {
 				\ "javascript": s:javascriptLikeFix,
 				\ "javascriptreact": s:javascriptLikeFix,
+				\ "typescript": s:javascriptLikeFix,
+				\ "typescriptreact": s:javascriptLikeFix,
 				\ "json": s:javascriptLikeFix
 				\}
 
@@ -68,7 +70,8 @@ else
 				\ "haskell": $HOME . "/.dotfiles/.vim/bin/haskelllinter.sh",
 				\ "python": "pylint",
 				\}
-	for ft in ["javascript","javascriptreact","json"] | let s:errCmdMappings[ft] =
+	for ft in ["javascript","javascriptreact","json","typescript","typescriptreact"]
+				\ | let s:errCmdMappings[ft] =
 				\ $HOME . "/.dotfiles/.vim/bin/javascriptlinter.sh" | endfor
 	for ft in ["sh","dash","ksh","bash"] | let s:errCmdMappings[ft] = "shellcheck --format=gcc" | endfor
 	unlet ft
@@ -76,6 +79,7 @@ else
 	function linting#LinterErrSuccessCallback(channel)
 		if filereadable(g:linterErrFile)
 			execute "lfile! " . g:linterErrFile
+			echomsg g:linterErrFile
 			if getfsize(g:linterErrFile) < 1
 				echomsg "No linting errors"
 			endif
@@ -130,7 +134,7 @@ else
 				\ "python": '/bin/sh -c "pylint --help"',
 				\}
 	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
-	for ft in ["javascript","javascriptreact","json"] |
+	for ft in ["javascript","javascriptreact","json","typescript","typescriptreact"] |
 				\ let s:initCmdMappings[ft] = $HOME . "/.dotfiles/.vim/bin/javascriptlinter.sh" | endfor
 	" Check shellcheck is installed
 	for ft in ["sh","dash","ksh","bash"] |
@@ -162,7 +166,7 @@ else
 
 	augroup InitLinter
     autocmd!
-    autocmd FileType javascript,json,javascriptreact,scala,sh,bash,dash,ksh,haskell,python
+    autocmd FileType javascript,json,javascriptreact,scala,sh,bash,dash,ksh,haskell,python,typescript,typescriptreact
 					\ call <SID>RunLinterInit()
 	augroup END
 endif
