@@ -48,7 +48,7 @@ tree
 unzip
 vlc
 xclip
-xmrig-cuda
+xmrig-donateless
 xorg-xinit
 yay
 zsh-syntax-highlighting
