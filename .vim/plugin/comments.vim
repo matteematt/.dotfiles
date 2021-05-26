@@ -32,6 +32,8 @@ let s:filetypesMap = {
 	\"vim":"vim",
 	\"javascript":"cstyle",
 	\"javascriptreact":"cstyle",
+	\"typescript":"cstyle",
+	\"typescriptreact":"cstyle",
 	\"scala":"cstyle",
 	\"java":"cstyle",
 	\"groovy":"cstyle",
