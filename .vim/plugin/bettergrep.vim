@@ -7,6 +7,9 @@
 " RipGrep '[Ff]unction'
 " The same, but only search through markdown files
 " RipGrep '[Ff]unction' **/*.md
+" To search for something with quotes in it, wrap in quotes and escape them:
+" "lint": "eslint
+" RigGrep "\"lint\": \"eslint
 if g:has_rg
 	function! BetterGrep(pattern)
 		cgetexpr system("rg --vimgrep -- " . a:pattern)
