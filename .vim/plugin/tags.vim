@@ -29,7 +29,6 @@ if g:has_ctags
 				if filereadable(s:chosenTagLoc)
 					let contents = readfile(s:chosenTagLoc, '', 1)
 					if !empty(contents)
-						echomsg "Got here"
 						let splitString = split(contents[0], " ")
 						let rawCmd = join(splitString[2:])
 						let escapedCmd = tags#EscapeJumpCmd(rawCmd)
