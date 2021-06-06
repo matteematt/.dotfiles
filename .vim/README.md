@@ -135,6 +135,8 @@ the current branch name, updated every time a buffer is read.
 This plugin contains two functions to work with tags. To work with tags an external application such as `universal
 ctags` is required.
 * An asynchronous wrapper to call ctags to generate a tags file.
+** Vim will check for a file `.ctagsignore` and if present will use it to ignore files and
+directories when generating the tags list.
 * If `fzf` is installed a binding to enhance tag jumping. Using the `<leader>]` binding the jump will be initialised for
 		the `<cword>`. The user will be alerted if there is no matching tag. If there is only one match it will
 		automatically be taken. If there are multiple then fzf will be used to choose via the filename. A preview window

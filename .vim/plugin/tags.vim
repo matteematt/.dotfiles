@@ -69,7 +69,8 @@ if g:has_ctags
 	endfunction
 
 	function! s:runAsyncTagsGeneration()
-		call job_start("ctags -R .", {"close_cb":"tags#runAsyncTagsCallback"})
+		call job_start("[ -f '.ctagsignore' ] && ctags -R --exclude=@.ctagsignore . || ctags -R .",
+					\	{"close_cb":"tags#runAsyncTagsCallback"})
 	endfunction
 
 	nnoremap <leader>t :call <SID>runAsyncTagsGeneration()<CR>
