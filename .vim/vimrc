@@ -86,7 +86,7 @@ set spelllang=en
 set foldmethod=indent
 set foldlevelstart=2
 set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#
-set fillchars=vert:│,fold:·     " char between panels
+set fillchars=fold:\ ,vert:│    " char between panels
 set matchpairs+=<:>             " add <> for matching pairs with %
 let g:startup_section_len = 10     " set the number of recent items to show on my custom startup screen
 let g:markdown_fenced_languages = ["html","python","vim","scala"]
@@ -112,6 +112,14 @@ if has('persistent_undo')      "check if your vim version supports it
   set undofile                 "turn on the feature
   silent call system('mkdir -p ' . &undodir)
 endif
+
+" Set custom fold line text
+function! MyFoldText()
+    let line = getline(v:foldstart)
+    let foldedlinecount = v:foldend - v:foldstart + 1
+    return ' * '. foldedlinecount . line
+endfunction
+set foldtext=MyFoldText()
 
 " Turn off comments automatically continuing onto the next line
 autocmd vimrc FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
