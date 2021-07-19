@@ -90,6 +90,7 @@ set fillchars=fold:\ ,vert:│    " char between panels
 set matchpairs+=<:>             " add <> for matching pairs with %
 let g:startup_section_len = 10     " set the number of recent items to show on my custom startup screen
 let g:markdown_fenced_languages = ["html","python","vim","scala"]
+let g:netrw_fastbrowse = 0      " keeping fastbrowse on sometimes makes the netrw buffers not close
 
 " Create a new autogroup for all vimrc autocmds
 augroup vimrc
