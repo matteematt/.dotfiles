@@ -147,6 +147,25 @@ directories when generating the tags list.
 <leader>] - Jump to tag
 ```
 
+### Snippets
+
+This is not a plugin on its own, but some languages have support for snippets. This can be achieved
+in two ways
+1) Using the abbreviation function of vim
+2) Creating a marco to write in the snippet
+
+The first one is natural as vim will automatically insert the abbreviation into the text as you
+type. The macro has to be manually activated via a command, however, it comes with the flexibility
+to move the cursor as part of the snippet.
+
+#### Currently implemented snippets:
+
+Abbreviations:
+* `haskell` - `modulem` inserts the module decleration and main method decleration and signiture
+
+Macros:
+* `typescript` - `<leader>sd` inserts a describe block and puts the cursor inside of the text param
+
 ### Misc
 
 #### Whitespace stripper
