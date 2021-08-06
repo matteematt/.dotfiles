@@ -161,6 +161,10 @@ vnoremap <C-r> :s/\%V
 " Open the current file location in netrw
 nnoremap <leader>e :edit %:p:h<CR>
 
+" Make search jumps go to the middle of the screen and open any folds
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
 " Check what binaries are installed
 let g:has_rg = executable("rg")
 let g:has_git = executable("git")
