@@ -48,6 +48,7 @@ ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/config/haskell/ghci.conf ~/.ghc/ghci.conf
 ln -s ~/.dotfiles/config/haskell/haskeline ~/.haskeline
 ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
+ln -s ~/.dotfiles/config/nvim ~/.config
 
 # Set the global gitignore
 git config --global core.excludesfile ~/.dotfiles/.gitignore_global
