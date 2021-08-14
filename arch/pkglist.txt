@@ -10,7 +10,6 @@ bison
 bitwarden-bin
 cabal-install
 cmake
-ctags-git
 eslint
 firefox
 flameshot
@@ -29,6 +28,7 @@ libreoffice-still-uk
 make
 man-db
 man-pages
+neovim
 netctl
 nodejs-nativefier
 numlockx
@@ -37,6 +37,7 @@ pacman-contrib
 patch
 pkgconf
 postman-bin
+ptags-git
 python-pylint
 ranger
 redshift
@@ -52,7 +53,6 @@ ticktick-nativefier
 todoist-electron
 tree
 vlc
-xclip
 xmrig-donateless
 xorg-xinit
 yay
