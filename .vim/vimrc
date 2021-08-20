@@ -145,10 +145,10 @@ autocmd vimrc TerminalOpen * setlocal nonumber
 nnoremap <leader>w <C-w>v<C-w>l
 
 " Use arrow keys for moving through the location and quickfix windows
-nnoremap <Down> :cnext<CR>zz
-nnoremap <Up> :cprev<CR>zz
-nnoremap <Left> :lprev<CR>zz
-nnoremap <Right> :lnext<CR>zz
+nnoremap <Down> :cnext<CR>zzzv
+nnoremap <Up> :cprev<CR>zzzv
+nnoremap <Left> :lprev<CR>zzzv
+nnoremap <Right> :lnext<CR>zzzv
 
 " Highlight the last inserted text
 nnoremap gV `[v`]`
