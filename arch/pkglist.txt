@@ -25,6 +25,7 @@ i3blocks
 inetutils
 informant
 libreoffice-still-uk
+lsdvd
 make
 man-db
 man-pages
@@ -49,10 +50,12 @@ signal-desktop
 spotify
 spotifyd
 stack
+thunderbird
 ticktick-nativefier
 todoist-electron
 tree
 vlc
+whatsapp-nativefier
 xmrig-donateless
 xorg-xinit
 yay
