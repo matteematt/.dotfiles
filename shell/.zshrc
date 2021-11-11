@@ -68,6 +68,9 @@ zle -N zle-line-init
 zle -N zle-line-finish
 zle -N zle-keymap-select
 
+# Allows you to usebackspace like normal (same as set backspace=indent eol start in vim)
+bindkey "^H" backward-delete-char
+bindkey "^?" backward-delete-char
 
 ########################################
 # PROMPT
