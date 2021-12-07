@@ -9,7 +9,10 @@ bc
 bison
 bitwarden-bin
 cabal-install
+chromium
 cmake
+docker
+docker-compose
 eslint
 firefox
 flameshot
