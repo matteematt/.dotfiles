@@ -1,6 +1,7 @@
 " Used to generate the dictionary lists at resources/syntaxdictionaries/
 
 " remove non-alphanumeric characters
+" can add - to leave that
 %s/[^a-zA-Z0-9]/ /
 " move each token onto a separate line
 %s/\s\+//
