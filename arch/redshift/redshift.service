@@ -1,6 +1,8 @@
 # Example systemd service file for starting redshift
 # Needed to add the Environment line and the RestartSec line on top of what
 # is provided in the base service file
+# the file is
+# /home/matt/.config/systemd/user/default.target.wants/redshift.service
 [Unit]
 Description=Redshift display colour temperature adjustment
 Documentation=http://jonls.dk/redshift/
