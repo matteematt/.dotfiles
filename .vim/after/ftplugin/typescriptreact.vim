@@ -1,0 +1,1 @@
+set foldlevelstart=6
