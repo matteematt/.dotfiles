@@ -46,6 +46,9 @@ bindsym $mod+Return exec alacritty
 # kill focused window
 bindsym $mod+q kill
 
+# open the clipboard manager in dmenu (needs clipmenu)
+bindsym $mod+c exec clipmenu -i -fn Terminus:size=11 -nb '#002b36' -nf '#839496' -sb '#073642' -sf '#93a1a1'
+
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
 # There also is the (new) i3-dmenu-desktop which only displays applications

@@ -21,7 +21,12 @@ if [[ "$unamestr" == 'Linux' ]]; then
   ln -s ~/.dotfiles/arch/.Xresources ~/.Xresources
   ln -s ~/.dotfiles/arch/i3/config ~/.config/i3
   ln -s ~/.dotfiles/arch/i3/i3blocks.conf ~/.config/i3
-  systemctl --user enable redshift.service
+
+  echo "Need to install the systemd service files for redshift and clipmenud"
+  echo "These will go somewhere in ~/.config/systemd/user"
+  echo "Once you have installed them you need to enable the servies"
+  echo "systemctl --user enable redshift.service"
+  echo "systemctl --user enable clipmenud.service"
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
   brew install coreutils

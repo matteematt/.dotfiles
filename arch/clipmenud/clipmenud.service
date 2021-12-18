@@ -1,0 +1,23 @@
+# ~/.config/systemd/user/default.target.wants/clipmenud.service
+[Unit]
+Description=Clipmenu daemon
+
+[Service]
+ExecStart=/usr/bin/clipmenud
+Restart=always
+RestartSec=5s
+Environment=CM_IGNORE_WINDOW=Bitwarden
+
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+RestrictAddressFamilies=
+RestrictRealtime=yes
+
+# We don't need to do any clean up, so if something hangs (borked xclip, etc),
+# it's going to stay that way. Just forcefully kill and get it over with.
+TimeoutStopSec=2
+
+[Install]
+WantedBy=default.target
