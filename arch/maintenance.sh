@@ -43,3 +43,6 @@ fi
 # Check for orphaned packages, either remove these or mark as explicit
 echo "Orphaned packages:"
 pacman -Qtd
+
+# Clean up systemd logs as they can grown very large
+sudo journalctl --vacuum-time=12weeks
