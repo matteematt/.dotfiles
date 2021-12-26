@@ -167,7 +167,7 @@ nnoremap n nzzzv
 nnoremap N Nzzzv
 
 " Auto close tag (like in html or jsx)
-inoremap <C-s> mt?<wyiw`ta</pa>
+inoremap <C-s> mt?<wyiw`ta</pa>`ta
 
 " Check what binaries are installed
 let g:has_rg = executable("rg")
