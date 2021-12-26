@@ -166,6 +166,9 @@ nnoremap <leader>e :edit %:p:h<CR>
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
+" Auto close tag (like in html or jsx)
+inoremap <C-s> mt?<wyiw`ta</pa>
+
 " Check what binaries are installed
 let g:has_rg = executable("rg")
 let g:has_git = executable("git")
