@@ -33,6 +33,7 @@ lsdvd
 make
 man-db
 man-pages
+minify
 neovim
 netctl
 nodejs-http-server
