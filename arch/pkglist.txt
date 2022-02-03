@@ -7,7 +7,7 @@ automake
 base
 bc
 bison
-bitwarden-bin
+bitwarden
 cabal-install
 chromium
 clipmenu-git
@@ -33,11 +33,14 @@ lsdvd
 make
 man-db
 man-pages
+minify
 neovim
 netctl
+nodejs-http-server
 nodejs-nativefier
 numlockx
 nvidia
+p3x-onenote
 pacman-contrib
 patch
 pkgconf
