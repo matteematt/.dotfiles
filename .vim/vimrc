@@ -176,6 +176,9 @@ nnoremap N Nzzzv
 " Auto close tag (like in html or jsx)
 inoremap <C-s> mt?<wyiw`ta</pa>`ta
 
+" C-^ is getting caught be tmux so have this as an option
+nnoremap <leader>a <C-^>
+
 " Check what binaries are installed
 let g:has_rg = executable("rg")
 let g:has_git = executable("git")
