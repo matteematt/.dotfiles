@@ -52,6 +52,7 @@ window:
   padding:
     x: 8
     y: 8
+  decorations: transparent
 
 # Get alt to work as expected in MacOS
 key_bindings:
@@ -71,3 +72,4 @@ key_bindings:
   - { key: 7, mods: Alt, chars: "\x1b7"}
   - { key: 8, mods: Alt, chars: "\x1b8"}
   - { key: 9, mods: Alt, chars: "\x1b9"}
+

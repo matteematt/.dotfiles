@@ -55,6 +55,13 @@ augroup colorscheme_change | au!
 augroup END
 colorscheme gruvbit
 
+" If we are running in alacritty we can set the terminal background, so we
+" let that background pass through rather than use vim. We do this because
+" otherwise the background doesn't look right when using tmux
+if !has('gui_running') && &term =~ '^\%(alacritty\)'
+  hi Normal guibg=NONE ctermbg=NONE
+endif
+
 " various settings
 set autoindent                 " Minimal automatic indenting for any filetype.
 set smartindent 		            " smart indent for better indenting

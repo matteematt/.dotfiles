@@ -49,11 +49,11 @@ brew tap homebrew/cask-fonts
 ln -s ~/.dotfiles/.vim/ ~/.vim
 ln -s ~/.dotfiles/.alacritty.yml ~/.alacritty.yml
 ln -s ~/.dotfiles/.ctags.d ~/.ctags.d
-ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/config/haskell/ghci.conf ~/.ghc/ghci.conf
 ln -s ~/.dotfiles/config/haskell/haskeline ~/.haskeline
 ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
 ln -s ~/.dotfiles/config/nvim ~/.config
+ln -s ~/.dotfiles/config/tmux/ ~/.config
 
 # Set the global gitignore
 git config --global core.excludesfile ~/.dotfiles/.gitignore_global
