@@ -56,5 +56,5 @@ ln -s ~/.dotfiles/config/nvim ~/.config
 ln -s ~/.dotfiles/config/tmux/ ~/.config
 
 # Set the global gitignore
-git config --global core.excludesfile ~/.dotfiles/.gitignore_global
+git config --global core.excludesfile ~/.dotfiles/config/git/.gitignore_global
 git config --global core.editor vim
