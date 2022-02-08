@@ -55,6 +55,7 @@ ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
 ln -s ~/.dotfiles/config/nvim ~/.config
 ln -s ~/.dotfiles/config/tmux/ ~/.config
 
-# Set the global gitignore
+# Set up global git commands
 git config --global core.excludesfile ~/.dotfiles/config/git/.gitignore_global
+git config --global core.hooksPath ~/.dotfiles/config/git/hooks
 git config --global core.editor vim

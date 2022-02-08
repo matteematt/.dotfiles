@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# call with a prompt string or use a default
+confirm() {
+		# Because git hooks don't use standard input we need to manually direct tty
+		# into read here
+    read -r -p "${1:-Are you sure? [y/N]} " response < /dev/tty
+    case "$response" in
+        [yY][eE][sS]|[yY])
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+git_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [[ "$git_branch" == "master" ]] || [[ "$git_branch" == "main" ]]; then
+	confirm "Are you sure that you want to commit to the master/main branch? [y/N]" || exit 1;
+fi
+
+if [[ -f "$(pwd)/.git/hooks/pre-commit" ]]; then
+	source "$(pwd)/.git/hooks/pre-commit"
+fi
+
