@@ -18,7 +18,7 @@ confirm() {
 git_branch="$(git rev-parse --abbrev-ref HEAD)"
 
 if [[ "$git_branch" == "master" ]] || [[ "$git_branch" == "main" ]]; then
-	confirm "Are you sure that you want to commit to the master/main branch? [y/N]" || exit 1;
+	confirm "Are you sure that you want to commit to the $git_branch branch? [y/N]" || exit 1;
 fi
 
 if [[ -f "$(pwd)/.git/hooks/pre-commit" ]]; then
