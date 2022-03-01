@@ -1,3 +1,11 @@
 Nop
 keymaps
 netrw
+nvim
+github
+config
+augroup
+autocmd
+PackerSync
+lua
+popup
