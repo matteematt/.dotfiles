@@ -1,4 +1,15 @@
 -- Set the colour scheme (taken from vimrc)
+--
+
+local colourscheme = "gruvbit"
+
+local status_ok, _ = pcall(vim.cmd, "colorscheme " .. colourscheme)
+
+if not status_ok then
+	vim.notify("Colour scheme " .. colourscheme .. " not found!")
+	return
+end
+
 vim.cmd [[
 	if (has("termguicolors"))
 		set termguicolors
