@@ -1,3 +1,6 @@
+
+vim.cmd [[ let g:has_git = executable("git") ]]
+
 require "user.options"
 require "user.keymaps"
 require "user.plugins"

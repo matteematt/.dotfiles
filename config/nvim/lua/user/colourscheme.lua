@@ -33,4 +33,8 @@ vim.cmd [[
 	"if !has('gui_running') && &term =~ '^\%(alacritty\)'
 		hi Normal guibg=NONE ctermbg=NONE
 	"endif
+
+	" Set the highlight line back to the underline
+	" hi clear CursorLine
+	" hi CursorLine gui=underline cterm=underline
 ]]
