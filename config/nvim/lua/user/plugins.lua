@@ -56,6 +56,9 @@ return require('packer').startup(function(use)
 	use "neovim/nvim-lspconfig"
 	use "williamboman/nvim-lsp-installer" -- language server installer
 
+	-- telescope <C-q> to add to quickfix list
+	use "nvim-telescope/telescope.nvim"
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if packer_bootstrap then

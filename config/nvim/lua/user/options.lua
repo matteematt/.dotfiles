@@ -3,7 +3,7 @@ local options = {
 	smartindent=true,
 	backspace="indent,eol,start",
 	hidden= true,
-	incsearch=true,
+	-- incsearch=true,
 	ruler= true,
 	wildmenu= true,
 	wildmode="longest:full,full",
@@ -42,6 +42,7 @@ augroup vimrc
   autocmd!
 augroup END
 
+set nohlsearch
 set matchpairs+=<:>
 set wildcharm=<C-z>
 set formatoptions-=cro
