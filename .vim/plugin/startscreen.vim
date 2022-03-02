@@ -38,7 +38,7 @@ function! s:ShowTitle()
 endfunction
 
 function! s:ShowRecentProjectFilesBlock()
-	if !has("viminfo") | return | endif
+	if !has("viminfo") && !has("shada") | return | endif
 	let chooseList = []
 	let currDir = getcwd()
 	let i = 0
@@ -60,7 +60,7 @@ function! s:ShowRecentProjectFilesBlock()
 endfunction
 
 function! s:ShowOldfilesBlock()
-	if !has("viminfo") | return | endif
+	if !has("viminfo") && !has("shada") | return | endif
 	let chooseList = []
 	let i = 0
 	for item in v:oldfiles[0:s:sectionsLen-1]
