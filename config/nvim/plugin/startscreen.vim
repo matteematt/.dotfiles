@@ -1,1 +1,0 @@
-/Users/mwa75/.dotfiles/.vim/plugin/startscreen.vim

@@ -22,6 +22,7 @@ local options = {
 	foldmethod="indent",
 	foldlevelstart=2,
 	cursorline= true,
+	signcolumn="yes"
 }
 
 -- g:startup_section_len = 10     -- set the number of recent items to show on my custom startup screen
