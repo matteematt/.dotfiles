@@ -77,4 +77,10 @@ autocmd vimrc QuickFixCmdPost [^l]* cwindow
 autocmd vimrc QuickFixCmdPost    l* lwindow
 " Don't show spelling errors in the quickfix window (and location list)
 autocmd vimrc FileType qf setlocal nospell
+
+augroup vimrc-incsearch-highlight
+	autocmd!
+	autocmd CmdlineEnter /,\? :set hlsearch
+	autocmd CmdlineLeave /,\? :set nohlsearch
+augroup END
 ]]
