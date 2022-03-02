@@ -45,10 +45,15 @@ return require('packer').startup(function(use)
 	use "hrsh7th/cmp-path"
 	use "hrsh7th/cmp-cmdline"
 	use "saadparwaiz1/cmp_luasnip"
+	use "hrsh7th/cmp-nvim-lsp"
 
 	-- snippets
 	use "L3MON4D3/LuaSnip" -- snippet engine
 	use "rafamadriz/friendly-snippets" -- a bunch of snippets
+
+	-- plugins
+	use "neovim/nvim-lspconfig"
+	use "williamboman/nvim-lsp-installer" -- language server installer
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
