@@ -36,8 +36,8 @@ return require('packer').startup(function(use)
 	use 'wbthomason/packer.nvim'
 
 	-- Required for other plugins
-	use 'nvim-lua/popup.nvim'				
-	use 'nvim-lua/plenary.nvim'				
+	use 'nvim-lua/popup.nvim'
+	use 'nvim-lua/plenary.nvim'
 
 	-- cmp plugins
 	use "hrsh7th/nvim-cmp"
@@ -46,6 +46,7 @@ return require('packer').startup(function(use)
 	use "hrsh7th/cmp-cmdline"
 	use "saadparwaiz1/cmp_luasnip"
 	use "hrsh7th/cmp-nvim-lsp"
+	use "hrsh7th/cmp-nvim-lua"
 
 	-- snippets
 	use "L3MON4D3/LuaSnip" -- snippet engine

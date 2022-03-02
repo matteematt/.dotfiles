@@ -16,3 +16,9 @@ kmap('n', 'N', 'Nzzzv', opts)
 
 -- Open the current file location in netrw
 kmap('n','<leader>e', ':edit %:p:h<CR>', opts)
+
+-- Use arrow keys for moving through the location and quickfix windows
+kmap('n', '<Down>', ':cnext<CR>zzzv', opts)
+kmap('n', '<Up>', ':cprev<CR>zzzv', opts)
+kmap('n', '<Left>', ':lnext<CR>zzzv', opts)
+kmap('n', '<Right>', ':lprev<CR>zzzv', opts)

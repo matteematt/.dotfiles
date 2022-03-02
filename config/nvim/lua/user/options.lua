@@ -3,7 +3,7 @@ local options = {
 	smartindent=true,
 	backspace="indent,eol,start",
 	hidden= true,
-	incsearch= true,
+	incsearch=true,
 	ruler= true,
 	wildmenu= true,
 	wildmode="longest:full,full",
@@ -35,9 +35,46 @@ for k,v in pairs(options) do
 end
 
 vim.opt.shortmess:append "a"
-vim.cmd "set fillchars=fold:\\ ,vert:│"
-vim.cmd "set matchpairs+=<:>"
-vim.cmd "set wildcharm=<C-z>"
-vim.cmd "set formatoptions-=cro"
-vim.cmd "let g:startup_section_len = 10"
-vim.cmd "set shada='50,<1000,s100,:1000,n~/nvim/shada"
+
+vim.cmd [[
+" Create a new autogroup for all vimrc autocmds
+augroup vimrc
+  autocmd!
+augroup END
+
+set matchpairs+=<:>
+set wildcharm=<C-z>
+set formatoptions-=cro
+let g:startup_section_len = 10
+set shada='50,<1000,s100,:1000,n~/nvim/shada
+
+" Get the OS
+if !exists("g:os")
+  if has("win64") || has("win32") || has("win16")
+    let g:os = "Windows"
+  else
+    let g:os = substitute(system('uname'), '\n', '', '')
+  endif
+endif
+
+" Set different cursors for different modes
+if g:os == "Darwin"
+  " MacOS
+  "Mode Settings
+  " Copy to and from system clipboard
+  vnoremap <leader>yy :w !pbcopy<CR>
+  nnoremap <leader>yp :r !pbpaste<CR>
+elseif g:os == "Linux"
+  " Copy to and from system clipboard
+  vnoremap <leader>yy :w !xclip -i -sel c<CR>
+  nnoremap <leader>yp :r !xclip -o -sel -c<CR>
+endif
+
+" This autocommand tells Vim to open the quickfix window whenever a quickfix command is executed
+" AND there are valid errors to display. And the list should close once it is empty
+autocmd vimrc QuickFixCmdPost [^l]* cwindow
+" Do same for location list
+autocmd vimrc QuickFixCmdPost    l* lwindow
+" Don't show spelling errors in the quickfix window (and location list)
+autocmd vimrc FileType qf setlocal nospell
+]]

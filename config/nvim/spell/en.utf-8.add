@@ -9,3 +9,4 @@ autocmd
 PackerSync
 lua
 popup
+LSP
