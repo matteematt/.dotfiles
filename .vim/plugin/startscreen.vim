@@ -12,7 +12,16 @@ function! s:StartupScreen()
 endfunction
 
 function! s:ShowTitle()
-	let title = [
+	let titleNvim = [
+				\ '________   ___      ___ ___  _____ ______        ',
+				\ '|\   ___  \|\  \    /  /|\  \|\   _ \  _   \     ',
+				\ '\ \  \\ \  \ \  \  /  / | \  \ \  \\\__\ \  \    ',
+				\ ' \ \  \\ \  \ \  \/  / / \ \  \ \  \\|__| \  \   ',
+				\ '  \ \  \\ \  \ \    / /   \ \  \ \  \    \ \  \  ',
+				\ '   \ \__\\ \__\ \__/ /     \ \__\ \__\    \ \__\ ',
+				\ '    \|__| \|__|\|__|/       \|__|\|__|     \|__| ']
+
+	let titleVim = [
 				\ ' ___      ___  ___      _____ ______       ',
 				\ '|\  \    /  /||\  \    |\   _ \  _   \     ',
 				\ '\ \  \  /  / /\ \  \   \ \  \\\__\ \  \    ',
@@ -21,13 +30,15 @@ function! s:ShowTitle()
 				\ '   \ \__/ /      \ \__\   \ \__\    \ \__\ ',
 				\ '    \|__|/        \|__|    \|__|     \|__| ']
 
+	let title = has('nvim') ? l:titleNvim : l:titleVim
+
 	for line in l:title
 		call append('$', ' ' . line)
 	endfor
 endfunction
 
 function! s:ShowRecentProjectFilesBlock()
-	if !has("viminfo") | return | endif
+	if !has("viminfo") && !has("shada") | return | endif
 	let chooseList = []
 	let currDir = getcwd()
 	let i = 0
@@ -49,7 +60,7 @@ function! s:ShowRecentProjectFilesBlock()
 endfunction
 
 function! s:ShowOldfilesBlock()
-	if !has("viminfo") | return | endif
+	if !has("viminfo") && !has("shada") | return | endif
 	let chooseList = []
 	let i = 0
 	for item in v:oldfiles[0:s:sectionsLen-1]

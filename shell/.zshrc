@@ -15,8 +15,8 @@ setopt NO_CASE_GLOB
 
 # Set up zsh history
 export HISTFILE="$HOME/.cache/.zsh_history"
-export SAVEHIST=10000
-export HISTSIZE=10000
+export SAVEHIST=20000
+export HISTSIZE=20000
 setopt SHARE_HISTORY
 setopt APPEND_HISTORY
 setopt INC_APPEND_HISTORY

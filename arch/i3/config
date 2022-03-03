@@ -209,7 +209,7 @@ focus_follows_mouse no
 bar {
   status_command i3blocks -c ~/.config/i3/i3blocks.conf
   position top
-  font pango:Monego 10
+  font pango:BitstreamVeraSansMono Nerd Font Mono 10
     colors {
       background $bg-color
         separator #757575

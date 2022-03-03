@@ -46,6 +46,7 @@ let s:filetypesMap = {
 	\"dockerfile":"shellstyle",
 	\"zsh":"shellstyle",
 	\"haskell":"haskellstyle",
+	\"lua":"haskellstyle",
 	\}
 
 function s:ToggleComments() range
