@@ -34,7 +34,6 @@ for k,v in pairs(options) do
 	vim.opt[k] = v
 end
 
-vim.opt.shortmess:append "a"
 
 vim.cmd [[
 " Create a new autogroup for all vimrc autocmds
@@ -48,6 +47,7 @@ set wildcharm=<C-z>
 set formatoptions-=cro
 let g:startup_section_len = 10
 set shada='50,<1000,s100,:1000,n~/nvim/shada
+set shortmess+=A
 
 " Get the OS
 if !exists("g:os")
