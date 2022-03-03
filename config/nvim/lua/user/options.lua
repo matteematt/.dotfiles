@@ -84,4 +84,11 @@ augroup vimrc-incsearch-highlight
 	autocmd CmdlineEnter /,\? :set hlsearch
 	autocmd CmdlineLeave /,\? :set nohlsearch
 augroup END
+
+" You must create the dir set, it will not do it for you!
+if has('persistent_undo')      "check if your vim version supports it
+  set undodir=$HOME/.cache/vim/undo/  "directory where the undo files will be stored
+  set undofile                 "turn on the feature
+  silent call system('mkdir -p ' . &undodir)
+endif
 ]]
