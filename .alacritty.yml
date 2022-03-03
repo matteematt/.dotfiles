@@ -31,20 +31,20 @@ colors:
 
 font:
   normal:
-    family: Monego
-    style: Regular
+    family: BitstreamVeraSansMono Nerd Font Mono
+    style: Roman
 
   bold:
-    family: Monego
+    family: BitstreamVeraSansMono Nerd Font Mono
     style: Bold
 
   italic:
-    family: Monego
-    style: Italic
+    family: BitstreamVeraSansMono Nerd Font Mono
+    style: Oblique
 
   bold_italic:
-    family: Monego
-    style: Bold Italic
+    family: BitstreamVeraSansMono Nerd Font Mono
+    style: Bold Oblique
 
   size: 12
 
