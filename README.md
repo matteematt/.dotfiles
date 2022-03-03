@@ -42,6 +42,7 @@ The following fonts I have included into this repository that I use for my termi
 freely downloadable on the internet that I have patched with the [Nerd fonts patching tool](https://www.nerdfonts.com).
 * Monaco Nerd Font Complete Mono.otf
 * Source Code Pro Nerd Font Complete Mono.ttf
+* BitstreamVeraSansMono Nerd Font Mono
 
 ### Install Script
 
