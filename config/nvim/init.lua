@@ -1,4 +1,3 @@
-
 vim.cmd [[ let g:has_git = executable("git") ]]
 
 require "user.options"
@@ -9,4 +8,4 @@ require "user.cmp"
 require "user.lsp"
 require "user.treesitter"
 require "user.autopairs"
-
+require "user.gitsigns"
