@@ -10,3 +10,10 @@ PackerSync
 lua
 popup
 LSP
+NEOVIM
+neovim
+vimscript
+tmux
+gruvbit
+lsp
+autocommand
