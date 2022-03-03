@@ -114,6 +114,11 @@ _G.packer_plugins = {
     path = "/Users/mwa75/.local/share/nvim/site/pack/packer/start/gitsigns.nvim",
     url = "https://github.com/lewis6991/gitsigns.nvim"
   },
+  ["null-ls.nvim"] = {
+    loaded = true,
+    path = "/Users/mwa75/.local/share/nvim/site/pack/packer/start/null-ls.nvim",
+    url = "https://github.com/jose-elias-alvarez/null-ls.nvim"
+  },
   ["nvim-autopairs"] = {
     loaded = true,
     path = "/Users/mwa75/.local/share/nvim/site/pack/packer/start/nvim-autopairs",

@@ -84,8 +84,10 @@ local function lsp_keymaps(bufnr)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 end
 
+-- Hook that is ran when we initialise each language server
 M.on_attach = function(client, bufnr)
   if client.name == "tsserver" then
+		-- Turn off document formatting so we can use prettier
     client.resolved_capabilities.document_formatting = false
   end
   lsp_keymaps(bufnr)

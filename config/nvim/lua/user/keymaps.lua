@@ -29,3 +29,6 @@ kmap('n', '<leader>f', ':Telescope live_grep<CR>', opts)
 
 -- Undotree
 kmap('n', '<leader>u', ':UndotreeToggle<CR>', opts)
+
+-- Formatting
+kmap('n', '<leader>l', ':lua vim.lsp.buf.formatting_sync()<CR>',opts)

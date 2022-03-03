@@ -52,9 +52,10 @@ return require('packer').startup(function(use)
 	use "L3MON4D3/LuaSnip" -- snippet engine
 	use "rafamadriz/friendly-snippets" -- a bunch of snippets
 
-	-- plugins
+	-- lsp
 	use "neovim/nvim-lspconfig"
 	use "williamboman/nvim-lsp-installer" -- language server installer
+	use "jose-elias-alvarez/null-ls.nvim" -- linter
 
 	-- telescope <C-q> to add to quickfix list
 	use "nvim-telescope/telescope.nvim"
