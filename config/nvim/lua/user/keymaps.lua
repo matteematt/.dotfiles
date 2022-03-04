@@ -32,3 +32,10 @@ kmap('n', '<leader>u', ':UndotreeToggle<CR>', opts)
 
 -- Formatting
 kmap('n', '<leader>l', ':lua vim.lsp.buf.formatting_sync()<CR>',opts)
+
+-- Terminal (make match standard vim)
+kmap('t', '<C-w>N', '<C-\\><C-n>', opts)
+kmap('t', '<C-w>l', '<C-\\><C-N><C-w>l', opts)
+kmap('t', '<C-w>k', '<C-\\><C-N><C-w>k', opts)
+kmap('t', '<C-w>j', '<C-\\><C-N><C-w>j', opts)
+kmap('t', '<C-w>h', '<C-\\><C-N><C-w>h', opts)

@@ -85,6 +85,11 @@ augroup vimrc-incsearch-highlight
 	autocmd CmdlineLeave /,\? :set nohlsearch
 augroup END
 
+" Don't show spelling errors or line numbers when in terminal normal mode
+autocmd vimrc TermOpen * setlocal nospell
+autocmd vimrc TermOpen * setlocal nonumber
+autocmd vimrc TermOpen * setlocal signcolumn=no
+
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
   set undodir=$HOME/.cache/nvim/undo/  "directory where the undo files will be stored
