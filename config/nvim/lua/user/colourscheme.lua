@@ -1,6 +1,8 @@
 -- Set the colour scheme (taken from vimrc)
 local colourscheme = "onedarkpro"
 
+--Because this actually loads the colour scheme on success it messes
+--with colourschemes that with to set options such as onedarkpro
 -- local status_ok, _ = pcall(vim.cmd, "colorscheme " .. colourscheme)
 --
 -- if not status_ok then
