@@ -1,16 +1,66 @@
 -- Set the colour scheme (taken from vimrc)
+local colourscheme = "onedarkpro"
+
+--Because this actually loads the colour scheme on success it messes
+--with colourschemes that with to set options such as onedarkpro
+-- local status_ok, _ = pcall(vim.cmd, "colorscheme " .. colourscheme)
 --
+-- if not status_ok then
+	-- vim.notify("Colour scheme " .. colourscheme .. " not found!")
+	-- return
+-- end
 
-local colourscheme = "gruvbit"
-
-local status_ok, _ = pcall(vim.cmd, "colorscheme " .. colourscheme)
-
-if not status_ok then
-	vim.notify("Colour scheme " .. colourscheme .. " not found!")
-	return
-end
-
-vim.cmd [[
+if colourscheme == "onedarkpro" then
+	vim.o.termguicolors = true
+	vim.o.background = "dark" -- to load onedark
+	local onedark_config = {
+		-- Theme can be overwritten with 'onedark' or 'onelight' as a string
+		theme = function()
+			if vim.o.background == "dark" then
+				return "onedark"
+			else
+				return "onelight"
+			end
+		end,
+		colors = {
+			onedark = {
+				-- Vivid colors from https://github.com/Binaryify/OneDark-Pro
+				red = "#ef596f",
+				green = "#89ca78",
+				cyan = "#2bbac5",
+				purple = "#d55fde",
+			},
+		}, -- Override default colors by specifying colors for 'onelight' or 'onedark' themes
+		hlgroups = {}, -- Override default highlight groups
+		filetype_hlgroups = {}, -- Override default highlight groups for specific filetypes
+		plugins = { -- Override which plugins highlight groups are loaded
+			native_lsp = true,
+			polygot = true,
+			treesitter = true,
+			-- NOTE: Other plugins have been omitted for brevity
+		},
+		styles = {
+			strings = "NONE", -- Style that is applied to strings
+			comments = "italic", -- Style that is applied to comments
+			keywords = "bold", -- Style that is applied to keywords
+			functions = "bold", -- Style that is applied to functions
+			variables = "NONE", -- Style that is applied to variables
+		},
+		options = {
+			bold = true, -- Use the themes opinionated bold styles?
+			italic = true, -- Use the themes opinionated italic styles?
+			underline = true, -- Use the themes opinionated underline styles?
+			undercurl = true, -- Use the themes opinionated undercurl styles?
+			cursorline = true, -- Use cursorline highlighting?
+			transparency = true, -- Use a transparent background?
+			terminal_colors = true, -- Use the theme's colors for Neovim's :terminal?
+			window_unfocussed_color = false, -- When the window is out of focus, change the normal background?
+		},
+	}
+	local onedarkpro = require("onedarkpro")
+	onedarkpro.load(onedarkpro.setup(onedark_config))
+elseif colourscheme == "gruvbit" then
+	vim.cmd([[
 	if (has("termguicolors"))
 		set termguicolors
 		let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
@@ -37,4 +87,5 @@ vim.cmd [[
 	" Set the highlight line back to the underline
 	" hi clear CursorLine
 	" hi CursorLine gui=underline cterm=underline
-]]
+]])
+end

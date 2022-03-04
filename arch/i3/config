@@ -189,7 +189,9 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-set $bg-color 	         #1d2021
+# Gruvbit dark
+# set $bg-color 	         #1d2021
+set $bg-color 	         #282c34
 set $inactive-bg-color   #2f343f
 set $text-color          #f3f4f5
 set $inactive-text-color #676E7D
