@@ -41,5 +41,5 @@ kmap('t', '<C-w>j', '<C-\\><C-N><C-w>j', opts)
 kmap('t', '<C-w>h', '<C-\\><C-N><C-w>h', opts)
 
 -- Yank to clipboard
-kmap('v', '<leader>yy', '"*yy', opts)
-kmap('n', '<leader>yp', '"*p', opts)
+kmap('v', '<leader>yy', '"+y', opts)
+kmap('n', '<leader>yp', '"+p', opts)
