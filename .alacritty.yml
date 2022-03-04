@@ -52,7 +52,7 @@ window:
   padding:
     x: 8
     y: 8
-  decorations: None
+  decorations: transparent
 
 # Get alt to work as expected in MacOS
 key_bindings:
