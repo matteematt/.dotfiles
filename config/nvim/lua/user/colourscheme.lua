@@ -11,7 +11,7 @@ local colourscheme = "onedarkpro"
 if colourscheme == "onedarkpro" then
 	vim.o.termguicolors = true
 	vim.o.background = "dark" -- to load onedark
-	onedark_config = {
+	local onedark_config = {
 		-- Theme can be overwritten with 'onedark' or 'onelight' as a string
 		theme = function()
 			if vim.o.background == "dark" then
@@ -40,7 +40,7 @@ if colourscheme == "onedarkpro" then
 		styles = {
 			strings = "NONE", -- Style that is applied to strings
 			comments = "italic", -- Style that is applied to comments
-			keywords = "bold,italic", -- Style that is applied to keywords
+			keywords = "bold", -- Style that is applied to keywords
 			functions = "bold", -- Style that is applied to functions
 			variables = "NONE", -- Style that is applied to variables
 		},
@@ -55,7 +55,7 @@ if colourscheme == "onedarkpro" then
 			window_unfocussed_color = false, -- When the window is out of focus, change the normal background?
 		},
 	}
-	onedarkpro = require("onedarkpro")
+	local onedarkpro = require("onedarkpro")
 	onedarkpro.load(onedarkpro.setup(onedark_config))
 elseif colourscheme == "gruvbit" then
 	vim.cmd([[
