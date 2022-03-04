@@ -39,3 +39,7 @@ kmap('t', '<C-w>l', '<C-\\><C-N><C-w>l', opts)
 kmap('t', '<C-w>k', '<C-\\><C-N><C-w>k', opts)
 kmap('t', '<C-w>j', '<C-\\><C-N><C-w>j', opts)
 kmap('t', '<C-w>h', '<C-\\><C-N><C-w>h', opts)
+
+-- Yank to clipboard
+kmap('v', '<leader>yy', '"*yy', opts)
+kmap('n', '<leader>yp', '"*p', opts)

@@ -60,15 +60,10 @@ endif
 
 " Set different cursors for different modes
 if g:os == "Darwin"
+	echo "Darwin"
   " MacOS
-  "Mode Settings
-  " Copy to and from system clipboard
-  vnoremap <leader>yy :w !pbcopy<CR>
-  nnoremap <leader>yp :r !pbpaste<CR>
 elseif g:os == "Linux"
-  " Copy to and from system clipboard
-  vnoremap <leader>yy :w !xclip -i -sel c<CR>
-  nnoremap <leader>yp :r !xclip -o -sel -c<CR>
+	echo "Linux"
 endif
 
 " This autocommand tells Vim to open the quickfix window whenever a quickfix command is executed
