@@ -7,8 +7,8 @@ if has("syntax") && has("virtualedit")
     " keep searching until found candidate or top of file
     while 1
       norm k
-      let findLine = search("\\s\\ze\\S", 'nz', line('.'))
-      if findLine | return findLine | endif
+      let findLine = search("\\s\\ze\\S", 'nz', line('.'))		" test
+      if findLine | return findLine | endif                   " another test
       if getcurpos()[1] == 1 | return 0 | endif
     endwhile
   endfunction
@@ -37,12 +37,17 @@ if has("syntax") && has("virtualedit")
     let &virtualedit=initialVE
   endfunction
 
-  " For jumping the cursor out onto RHS whitespace
-  function! s:JumpCursorCallback(initialPosition, desiredCol)
-      call s:MoveCursorTo(a:desiredCol, a:initialPosition[1])
-      exec "norm i "
-  endfunction
-  let JumpcursorCallbackRef = function("s:JumpCursorCallback")
+	" For jumping the cursor out onto RHS whitespace
+	function! s:JumpCursorCallback(initialPosition, desiredCol)
+		if &expandtab == "noexpandtab"
+			echomsg "noexpandtab"
+		else
+			" If we are using tabs instead of spaces then we can just insert space
+			call s:MoveCursorTo(a:desiredCol, a:initialPosition[1])
+			exec "norm i "
+		endif
+	endfunction
+	let JumpcursorCallbackRef = function("s:JumpCursorCallback")
 
   " For moving cursor and subsequent text in line with desired column
   function! s:PushCursorCallback(initialPosition, desiredCol)
