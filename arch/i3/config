@@ -47,10 +47,10 @@ bindsym $mod+Return exec alacritty
 bindsym $mod+q kill
 
 # open the clipboard manager in dmenu (needs clipmenu)
-bindsym $mod+c exec clipmenu -i -fn Terminus:size=13 -nb '#282c34' -nf '#839496' -sb '#073642' -sf '#93a1a1'
+bindsym $mod+c exec clipmenu -i -fn Terminus:size=13 -nb '#282c34' -nf '#839496' -sb '#073642' -sf '#93a1a1' -fn 'pango:Monego Nerd Font Fix:pixelsize=17'
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run -nb '#282c34' -nf '#839496' -sb '#073642' -sf '#93a1a1' -fn 'pango:BitstreamVeraSansMono Nerd Font Mono:pixelsize=17'
+bindsym $mod+d exec dmenu_run -nb '#282c34' -nf '#839496' -sb '#073642' -sf '#93a1a1' -fn 'pango:Monego Nerd Font Fix:pixelsize=17'
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -211,7 +211,7 @@ focus_follows_mouse no
 bar {
   status_command i3blocks -c ~/.config/i3/i3blocks.conf
   position top
-  font pango:BitstreamVeraSansMono Nerd Font Mono 10
+  font pango:Monego Nerd Font Fix 10
     colors {
       background $bg-color
         separator #757575
