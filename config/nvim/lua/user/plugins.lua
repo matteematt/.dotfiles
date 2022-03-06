@@ -82,6 +82,9 @@ return require("packer").startup(function(use)
 	-- Colourscheme
 	use("olimorris/onedarkpro.nvim")
 
+	-- Treesitter
+	use("tree-sitter/tree-sitter-haskell")
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if packer_bootstrap then

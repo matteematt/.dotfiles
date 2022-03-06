@@ -24,4 +24,10 @@ configs.setup {
 		-- termcolors = {} -- table of colour name strings
 	},
 	indent = { enable = true, disable = { "yaml" } },
+	haskell = {
+		install_info = {
+			url = "~/.local/share/nvim/site/pack/packer/start/tree-sitter-haskell/",
+			files = {"src/parser.c", "src/scanner.c"}
+		},
+	}
 }
