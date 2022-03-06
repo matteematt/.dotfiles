@@ -24,7 +24,7 @@ kmap('n', '<Left>', ':lnext<CR>zzzv', opts)
 kmap('n', '<Right>', ':lprev<CR>zzzv', opts)
 
 -- Telescope
-kmap('n', '<leader>o', ':Telescope find_files hidden=true<CR>', opts)
+kmap('n', '<leader>o', ':Telescope git_files hidden=true<CR>', opts)
 kmap('n', '<leader>f', ':Telescope live_grep<CR>', opts)
 
 -- Undotree
