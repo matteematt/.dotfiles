@@ -59,20 +59,37 @@ colors:
 
 font:
   normal:
-    family: BitstreamVeraSansMono Nerd Font Mono
-    style: Roman
+    family: Monego Nerd Font Fix
+    style: Regular
 
   bold:
-    family: BitstreamVeraSansMono Nerd Font Mono
+    family: Monego Nerd Font Fix
     style: Bold
 
   italic:
-    family: BitstreamVeraSansMono Nerd Font Mono
-    style: Oblique
+    family: Monego Nerd Font Fix
+    style: Italic
 
   bold_italic:
-    family: BitstreamVeraSansMono Nerd Font Mono
-    style: Bold Oblique
+    family: Monego Nerd Font Fix
+    style: Bold Italic
+
+      # font:
+      # normal:
+      # family: BitstreamVeraSansMono Nerd Font Mono
+      # style: Roman
+      #
+      # bold:
+      # family: BitstreamVeraSansMono Nerd Font Mono
+      # style: Bold
+      #
+      # italic:
+      # family: BitstreamVeraSansMono Nerd Font Mono
+      # style: Oblique
+      #
+      # bold_italic:
+      # family: BitstreamVeraSansMono Nerd Font Mono
+      # style: Bold Oblique
 
   size: 12
 
