@@ -60,10 +60,8 @@ endif
 
 " Set different cursors for different modes
 if g:os == "Darwin"
-	echo "Darwin"
   " MacOS
 elseif g:os == "Linux"
-	echo "Linux"
 endif
 
 " This autocommand tells Vim to open the quickfix window whenever a quickfix command is executed
@@ -84,6 +82,9 @@ augroup END
 autocmd vimrc TermOpen * setlocal nospell
 autocmd vimrc TermOpen * setlocal nonumber
 autocmd vimrc TermOpen * setlocal signcolumn=no
+
+" Set any known jsonc files to the appropriate types (they support comments)
+autocmd BufRead,BufNewFile tsconfig.json set filetype=jsonc
 
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it

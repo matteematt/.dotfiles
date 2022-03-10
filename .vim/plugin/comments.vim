@@ -28,9 +28,11 @@ let s:commentCommands = {
 	\}
 
 " TODO: javascriptreact needs to be improved for different types of comments in jsx blocks
+" jsonc should probably use /* */ syntax instead
 let s:filetypesMap = {
 	\"vim":"vim",
 	\"javascript":"cstyle",
+	\"jsonc":"cstyle",
 	\"javascriptreact":"cstyle",
 	\"typescript":"cstyle",
 	\"typescriptreact":"cstyle",
