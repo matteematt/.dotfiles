@@ -14,6 +14,7 @@ clipmenu-git
 cmake
 docker
 docker-compose
+dolphin
 eslint
 firefox
 flameshot
@@ -45,6 +46,7 @@ pacman-contrib
 patch
 pkgconf
 postman-bin
+prettier
 ptags-git
 python-pylint
 ranger
@@ -57,11 +59,13 @@ signal-desktop
 spotify
 spotifyd
 stack
+stylua
 thunderbird
 ticktick-nativefier
 todoist-electron
 tree
 vlc
+wget
 whatsapp-nativefier
 xdotool
 xmrig-donateless
