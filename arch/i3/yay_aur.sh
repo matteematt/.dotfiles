@@ -1,6 +1,6 @@
 #!/bin/bash
 
-updates=`yay -Qu | wc -l`
+updates=$(yay -Qu | wc -l)
 
 # full test, short text, colour, (background colour, not set)
 [ "$updates" -ne "0" ] \

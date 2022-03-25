@@ -17,6 +17,7 @@ null_ls.setup {
     -- formatting.yapf,
 		formatting.prettier,
     formatting.stylua,
+		formatting.shellharden,
     -- diagnostics.flake8,
   },
 }

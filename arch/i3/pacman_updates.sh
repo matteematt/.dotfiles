@@ -1,7 +1,6 @@
 #!/bin/bash
 
-local updates
-updates=`checkupdates | wc -l`
+updates=$(checkupdates | wc -l)
 
 # full test, short text, colour, (background colour, not set)
 [ "$updates" -ne "0" ] \
