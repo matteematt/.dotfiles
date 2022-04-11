@@ -24,4 +24,4 @@ export SBT_OPTS="-Xmx4G -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -X
 # Setup zsh-syntax-highlighting
 # Requires installing via pacman or AUR
 # Sourcing this must be at the end of the .zshrc
-source /usr/local/Cellar/zsh-syntax-highlighting/0.7.1/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
