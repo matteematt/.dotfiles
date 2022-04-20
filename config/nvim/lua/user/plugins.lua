@@ -82,6 +82,9 @@ return require("packer").startup(function(use)
 	-- Colourscheme
 	use("olimorris/onedarkpro.nvim")
 
+	-- Automatically close (x)html tags
+	use("alvan/vim-closetag")
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if packer_bootstrap then
