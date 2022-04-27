@@ -34,6 +34,8 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
   cargo install zellij
   ln -s ~/.dotfiles/config/zellij.yml ~/.config/zellij
   ln -s ~/.dotfiles/mac/.zshrc ~/.zshrc
+
+	echo "Need to install cron job for ~/.dotfiles/mac/device_battery_checker.sh"
 fi
 
 brew install fzf
