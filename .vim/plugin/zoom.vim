@@ -7,7 +7,9 @@ let s:is_zoom = 0
 
 function s:RunZoom()
 	if s:is_zoom == 0
+		let cursorPos = getcurpos()
 		tabe %
+		call setpos('.', cursorPos)
 	else
 		tabc
 	endif
