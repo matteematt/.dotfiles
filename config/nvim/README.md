@@ -116,7 +116,9 @@ sources over some of my plugins from vim.
 * Statusline, gives me my custom statusline
 * Startscreen, gives me my custom startscreen
 * Misc, just some general functionality
-* Commends, my simple comments plugin for commenting and uncommenting lines
+* Comments, my simple comments plugin for commenting and uncommenting lines
+* Zoom, which allows you to quickly view a buffer in an expanded view, and
+	then retstore the previous view
 
 ### After
 

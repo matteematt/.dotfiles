@@ -166,6 +166,12 @@ Abbreviations:
 Macros:
 * `typescript` - `<leader>sd` inserts a describe block and puts the cursor inside of the text param
 
+### Zoom
+
+Leverages the inbuilt tab commands to quickly open a window in the maximum
+window size view, and then restore the view again with the same keystroke. The
+keystore that has been set is `<leader>z` (for zoom).
+
 ### Misc
 
 #### Whitespace stripper
