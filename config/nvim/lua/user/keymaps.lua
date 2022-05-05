@@ -26,6 +26,7 @@ kmap('n', '<Right>', ':lprev<CR>zzzv', opts)
 -- Telescope
 kmap('n', '<leader>o', ':Telescope find_files hidden=true<CR>', opts)
 kmap('n', '<leader>f', ':Telescope live_grep<CR>', opts)
+kmap('n', '<leader><leader>', ':Telescope buffers<CR>', opts)
 
 -- Undotree
 kmap('n', '<leader>u', ':UndotreeToggle<CR>', opts)
