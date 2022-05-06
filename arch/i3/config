@@ -152,8 +152,8 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
-workspace $ws1 output DP-2
-workspace $ws10 output DP-4
+workspace $ws1 output DP-0
+workspace $ws10 output DP-2
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -233,7 +233,7 @@ gaps outer 5
 
 #### STARTUP PROGRAMS
 # XRandR script to set monitors correctly
-exec xrandr --output HDMI-0 --off --output DP-0 --off --output DP-1 --off --output DP-2 --mode 2560x1440 --pos 0x0 --rotate normal --output DP-3 --off --output DP-4 --mode 2560x1440 --pos 2560x0 --rotate normal --output DP-5 --off
+exec xrandr --output HDMI-0 --off --output DP-0 --mode 2560x1440 --pos 0x0 --rotate normal --output DP-1 --off --output DP-2 --mode 2560x1440 --pos 2560x0 --rotate normal --output DP-3 --off --output DP-4 --off --output DP-5 --off
 # create background wallpaper
 exec_always feh --bg-scale ~/.config/wallpaper/saturn.jpg
 # start the corsair keyboard and mouse driver, but put it to the scratchpad so its not seen on launch
