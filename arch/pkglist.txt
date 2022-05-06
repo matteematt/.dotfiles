@@ -22,6 +22,7 @@ flex
 fontforge
 get_iplayer-git
 ghc-static
+gimp
 go
 hlint-static-git
 htop
@@ -29,6 +30,7 @@ i3-gaps
 i3blocks
 inetutils
 informant
+insync
 libreoffice-still-uk
 lsdvd
 make
@@ -55,6 +57,7 @@ sbt
 scala
 scalastyle
 shellcheck
+shellharden
 signal-desktop
 spotify
 spotifyd
