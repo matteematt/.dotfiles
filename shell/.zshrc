@@ -2,10 +2,11 @@
 # Cross platform for OS
 
 ########################################
-# SECRETS
+# SECRETS & Local config
 ########################################
 
 [ -f "$HOME/.secrets.sh" ] && source "$HOME/.secrets.sh"
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
 
 ########################################
 # SETTINGS & OPTIONS
