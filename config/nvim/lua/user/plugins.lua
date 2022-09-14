@@ -85,6 +85,9 @@ return require("packer").startup(function(use)
 	-- Automatically close (x)html tags
 	use("alvan/vim-closetag")
 
+	-- Syntax highlighting for csv files
+	use("mechatroner/rainbow_csv")
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if packer_bootstrap then
