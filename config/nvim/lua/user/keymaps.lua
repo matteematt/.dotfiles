@@ -47,3 +47,4 @@ kmap('n', '<leader>yp', '"+p', opts)
 
 -- use hydra
 kmap('n', '<leader>g', ":lua require('user.hydra').git_hydra:activate()<CR>", opts)
+kmap('n', '<leader>k', ":lua require('user.hydra').lsp_hydra:activate()<CR>", opts)
