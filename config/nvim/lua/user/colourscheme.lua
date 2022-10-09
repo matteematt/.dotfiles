@@ -32,7 +32,6 @@ if colourscheme == "onedarkpro" then
 			},
 		}, -- Override default colors by specifying colors for 'onelight' or 'onedark' themes
 		highlights = {}, -- Override default highlight groups
-		ft_highlights = {}, -- Override default highlight groups for specific filetypes
 		plugins = { -- Override which plugins highlight groups are loaded
 			native_lsp = true,
 			polygot = true,

@@ -44,3 +44,7 @@ kmap('t', '<C-w>h', '<C-\\><C-N><C-w>h', opts)
 -- Yank to clipboard
 kmap('v', '<leader>yy', '"+y', opts)
 kmap('n', '<leader>yp', '"+p', opts)
+
+-- use hydra
+kmap('n', '<leader>g', ":lua require('user.hydra').git_hydra:activate()<CR>", opts)
+kmap('n', '<leader>k', ":lua require('user.hydra').lsp_hydra:activate()<CR>", opts)
