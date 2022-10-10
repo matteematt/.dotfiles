@@ -76,8 +76,37 @@ local lsp_hydra = hydra({
 	},
 })
 
+-- Misc
+
+local hint_misc = [[
+^^ Miscellaneous
+^
+_r_: Reload buffers
+_s_: Source buffer vimscript/lua
+_<Esc>_: Exit
+]]
+
+local misc_hydra = hydra({
+	name = "Miscellaneous",
+	hint = hint_misc,
+	config = {
+		color = 'pink',
+		hint = {
+			border = 'rounded',
+			offset = 2,
+		},
+	},
+	heads = {
+		{'r',  "<cmd>bufdo e!<CR>", {nowait = true, desc = 'reload'}}, -- want to set this to exit once we get something else which is
+		{'s',  "<cmd>so %<CR>", {exit = true, nowait = true, desc = 'reload'}},
+
+		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
+	},
+})
+
 -- Could export more than one hydra
 return {
 	git_hydra = git_hydra,
 	lsp_hydra = lsp_hydra,
+	misc_hydra = misc_hydra
 }
