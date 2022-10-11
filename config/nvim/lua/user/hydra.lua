@@ -20,9 +20,9 @@ local git_hydra = hydra({
 	name = "Git",
 	hint = hint_git,
 	config = {
-		color = 'pink',
+		color = "pink",
 		hint = {
-			border = 'rounded',
+			border = "rounded",
 			offset = 2,
 		},
 	},
@@ -50,27 +50,34 @@ local lsp_hydra = hydra({
 	name = "LSP",
 	hint = hint_lsp,
 	config = {
-		color = 'pink',
+		color = "pink",
 		hint = {
-			border = 'rounded',
+			border = "rounded",
 			offset = 2,
 		},
 	},
 	heads = {
-		{'d',  "<cmd>lua vim.lsp.buf.definition()<CR>", {exit = true, nowait = true, desc = 'definition'}},
-		{'D',  "<cmd>lua vim.lsp.buf.declaration()<CR>", {exit = true, nowait = true, desc = 'declaration'}},
-		{'i',  "<cmd>lua vim.lsp.buf.implementation()<CR>", {exit = true, nowait = true, desc = 'implementation'}},
-		{'r',  "<cmd>lua vim.lsp.buf.references()<CR>", {exit = true, nowait = true, desc = 'references'}},
-		{'s',  "<cmd>lua vim.lsp.buf.signature_help()<CR>", {exit = true, nowait = true, desc = 'signature_help'}},
+		{ "d", "<cmd>lua vim.lsp.buf.definition()<CR>", { exit = true, nowait = true, desc = "definition" } },
+		{ "D", "<cmd>lua vim.lsp.buf.declaration()<CR>", { exit = true, nowait = true, desc = "declaration" } },
+		{ "i", "<cmd>lua vim.lsp.buf.implementation()<CR>", { exit = true, nowait = true, desc = "implementation" } },
+		{ "r", "<cmd>lua vim.lsp.buf.references()<CR>", { exit = true, nowait = true, desc = "references" } },
+		{ "s", "<cmd>lua vim.lsp.buf.signature_help()<CR>", { exit = true, nowait = true, desc = "signature_help" } },
 
+		{ "I", "<cmd>lua vim.lsp.buf.hover()<CR>", { exit = true, nowait = true, desc = "hover" } },
+		{ "R", "<cmd>lua vim.lsp.buf.rename()<CR>", { exit = true, nowait = true, desc = "rename" } },
 
-		{'I',  "<cmd>lua vim.lsp.buf.hover()<CR>", {exit = true, nowait = true, desc = 'hover'}},
-		{'R',  "<cmd>lua vim.lsp.buf.rename()<CR>", {exit = true, nowait = true, desc = 'rename'}},
-
-		{'[', '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>', {nowait = true, desc = 'diagnostic prev'}},
-		{']', '<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>', {nowait = true, desc = 'diagnostic next'}},
-		{'f', '<cmd>lua vim.diagnostic.open_float()<CR>', {nowait = true, desc = 'diagnostics float'}},
-		{'l', '<cmd>lua vim.diagnostic.setloclist()<CR>', {nowait = true, desc = 'diagnostics loclist'}},
+		{
+			"[",
+			'<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>',
+			{ nowait = true, desc = "diagnostic prev" },
+		},
+		{
+			"]",
+			'<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>',
+			{ nowait = true, desc = "diagnostic next" },
+		},
+		{ "f", "<cmd>lua vim.diagnostic.open_float()<CR>", { nowait = true, desc = "diagnostics float" } },
+		{ "l", "<cmd>lua vim.diagnostic.setloclist()<CR>", { nowait = true, desc = "diagnostics loclist" } },
 
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
@@ -90,15 +97,15 @@ local misc_hydra = hydra({
 	name = "Miscellaneous",
 	hint = hint_misc,
 	config = {
-		color = 'pink',
+		color = "pink",
 		hint = {
-			border = 'rounded',
+			border = "rounded",
 			offset = 2,
 		},
 	},
 	heads = {
-		{'r',  "<cmd>bufdo e!<CR>", {nowait = true, desc = 'reload'}}, -- want to set this to exit once we get something else which is
-		{'s',  "<cmd>so %<CR>", {exit = true, nowait = true, desc = 'reload'}},
+		{ "r", "<cmd>bufdo e!<CR>", { exit = true, nowait = true, desc = "reload" } }, -- want to set this to exit once we get something else which is
+		{ "s", "<cmd>so %<CR>", { nowait = true, desc = "reload" } },
 
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
@@ -108,5 +115,5 @@ local misc_hydra = hydra({
 return {
 	git_hydra = git_hydra,
 	lsp_hydra = lsp_hydra,
-	misc_hydra = misc_hydra
+	misc_hydra = misc_hydra,
 }
