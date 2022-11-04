@@ -7,8 +7,11 @@ kmap('', '<Space>', '<Nop>', opts)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- Open the current file location in netrw
+-- Open the current file in a RHS split
 kmap('n', '<leader>w', '<C-w>v<C-w>l', opts)
+
+-- Add another alternative file map as Ctrl-^ clashes with tmux
+kmap('n', '<leader>b', '<C-^>', opts)
 
 -- Make jumps go to the middle of the screen and open any folds
 kmap('n', 'n', 'nzzzv', opts)
