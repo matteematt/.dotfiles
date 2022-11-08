@@ -90,6 +90,8 @@ local hint_misc = [[
 ^
 _r_: Reload buffers
 _s_: Source buffer vimscript/lua
+_[_: Auto-fix prev spelling issue
+_]_: Auto-fix next spelling issue
 _<Esc>_: Exit
 ]]
 
@@ -104,8 +106,12 @@ local misc_hydra = hydra({
 		},
 	},
 	heads = {
-		{ "r", "<cmd>bufdo e!<CR>", { exit = true, nowait = true, desc = "reload" } }, -- want to set this to exit once we get something else which is
-		{ "s", "<cmd>so %<CR>", { nowait = true, desc = "reload" } },
+		{ "r", "<cmd>bufdo e!<CR>", { exit = true, nowait = true, desc = "reload" } },
+		{ "s", "<cmd>so %<CR>", { exit = true, nowait = true, desc = "source file" } },
+
+		-- can we improve with this https://stackoverflow.com/questions/5312235/how-do-i-correct-vim-spelling-mistakes-quicker
+		{ "[", "[s1z=<c-o>", { nowait = true, desc = "prev spelling error" } },
+		{ "]", "]s1z=<c-o>", { nowait = true, desc = "next spelling error" } },
 
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
