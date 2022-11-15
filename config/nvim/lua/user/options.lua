@@ -71,6 +71,9 @@ autocmd vimrc QuickFixCmdPost [^l]* cwindow
 autocmd vimrc QuickFixCmdPost    l* lwindow
 " Don't show spelling errors in the quickfix window (and location list)
 autocmd vimrc FileType qf setlocal nospell
+" Reduce CPU heavy items for very large files
+" Treesitter is also disabled for files larger than 100kb
+autocmd vimrc BufWinEnter * if line2byte(line("$") + 1) > 1000000 | syntax clear | set foldmethod=manual | set nospell | endif
 
 augroup vimrc-incsearch-highlight
 	autocmd!
