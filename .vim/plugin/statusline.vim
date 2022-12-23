@@ -63,7 +63,6 @@ function! CreateStatusLine()
 	if s:GetShowMode()
 		let l:statusline.=s:GetModeColour()													" colour of the VIM mode highlight
 		let l:statusline.=s:GetModeText()                           " text of the VIM mode
-		let l:statusline.="%#VisualNOS#"														" set highlight group colour to VisualNOS
 		let l:statusline.=s:gitBranch																" show the git branch
 	endif
 	let l:statusline.="%#LineNr#"																	" set the highlight group to LineNr

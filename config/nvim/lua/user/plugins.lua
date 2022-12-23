@@ -91,6 +91,9 @@ return require("packer").startup(function(use)
 	-- Hydra modes
 	use("anuvyklack/hydra.nvim")
 
+	-- Viewing live commands
+	use("smjonas/live-command.nvim")
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if packer_bootstrap then

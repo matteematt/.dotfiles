@@ -31,7 +31,8 @@ if colourscheme == "onedarkpro" then
 				purple = "#d55fde",
 			},
 		}, -- Override default colors by specifying colors for 'onelight' or 'onedark' themes
-		highlights = {}, -- Override default highlight groups
+		hlgroups = {}, -- Override default highlight groups
+		filetype_hlgroups = {}, -- Override default highlight groups for specific filetypes
 		plugins = { -- Override which plugins highlight groups are loaded
 			native_lsp = true,
 			polygot = true,
