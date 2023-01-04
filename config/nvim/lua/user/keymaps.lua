@@ -53,3 +53,11 @@ kmap('n', '<leader>yp', '"+p', opts)
 kmap('n', '<leader>g', ":lua require('user.hydra').git_hydra:activate()<CR>", opts)
 kmap('n', '<leader>k', ":lua require('user.hydra').lsp_hydra:activate()<CR>", opts)
 kmap('n', '<leader>m', ":lua require('user.hydra').misc_hydra:activate()<CR>", opts)
+
+-- Allows incsearch highlighting for range commands
+kmap('c', '$c', "<CR>:t''<CR>", opts)
+kmap('c', '$m', "<CR>:m''<CR>", opts)
+kmap('c', '$d', "<CR>:t''<CR>", opts)
+-- Unsure what these two are supposed to do
+-- kmap('c', '$T', "<CR>:T''<CR>", opts)
+-- kmap('c', '$M', "<CR>:M''<CR>", opts)
