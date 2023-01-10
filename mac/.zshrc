@@ -6,6 +6,9 @@ alias ls="ls -G"
 precmd() { print "" }
 RPROMPT="%*"
 
+# Use brew gawk as awk
+PATH="/opt/homebrew/opt/gawk/libexec/gnubin:$PATH"
+
 ########################################
 # PLUGINS
 ########################################
