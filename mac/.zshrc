@@ -13,6 +13,13 @@ PATH="/opt/homebrew/opt/gawk/libexec/gnubin:$PATH"
 # PLUGINS
 ########################################
 
+# Volta
+if [ -d "$HOME/.volta" ]
+then
+	export VOLTA_HOME="$HOME/.volta"
+	export PATH="$VOLTA_HOME/bin:$PATH"
+fi
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Setup shell prompt suggestions using history
