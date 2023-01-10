@@ -117,4 +117,6 @@ key_bindings:
   - { key: 7, mods: Alt, chars: "\x1b7"}
   - { key: 8, mods: Alt, chars: "\x1b8"}
   - { key: 9, mods: Alt, chars: "\x1b9"}
-
+    # Other bindings
+  - { key: K,        mods: Command, action: ClearHistory   }
+  - { key: K,        mods: Command, chars: "\x0c"          }
