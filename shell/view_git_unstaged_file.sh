@@ -17,8 +17,11 @@ case "$status_code" in
     bat --theme="OneHalfDark" --style=numbers,changes --color always "$file_path"
     ;;
   "M")
-    first_change=`git diff "$file_path" | awk '{if (match($0,/^@+\s+-?([0-9]+).+@+/,m)) {print m[1];exit 0}}'`
-    bat --theme="OneHalfDark" --style=numbers,changes --color always $file_path | tail -n+$first_change
+		# Try and match the first time we have the diff string
+		first_change=`git diff "$file_path" | awk '{if (match($0,/^@+\s+-?([0-9]+).+@+/,m)) {print m[1];exit 0}}'`
+		# Or fallback on displaying the first line
+		if ! [[ "$first_change" =~ ^[0-9]+$ ]]; then first_change="0"; fi
+		bat --theme="OneHalfDark" --style=numbers,changes --color always $file_path | tail -n+$first_change
     ;;
   "D")
     echo "New Dir $file_path\n\n`ls $file_path`"
