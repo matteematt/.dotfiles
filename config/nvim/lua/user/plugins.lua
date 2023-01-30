@@ -91,6 +91,19 @@ return require("packer").startup(function(use)
 	-- Hydra modes
 	use("anuvyklack/hydra.nvim")
 
+	-- Github copilot
+	use({
+		"zbirenbaum/copilot.lua",
+		cmd = "Copilot",
+		event = "InsertEnter",
+		config = require("user.copilot").copilot_setup,
+	})
+	use({
+		"zbirenbaum/copilot-cmp",
+		after = { "copilot.lua" },
+		config = require("user.copilot").copilot_cmp_setup,
+	})
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if packer_bootstrap then
