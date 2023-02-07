@@ -76,7 +76,7 @@ end
 M.on_attach = function(client, bufnr)
 	if client.name == "tsserver" then
 		-- Turn off document formatting so we can use prettier
-		client.resolved_capabilities.document_formatting = false
+		client.server_capabilities.document_formatting = false
 	end
 	lsp_keymaps(bufnr)
 	lsp_highlight_document(client)
