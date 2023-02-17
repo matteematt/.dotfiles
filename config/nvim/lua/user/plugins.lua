@@ -59,8 +59,9 @@ return require("packer").startup(function(use)
 
 	-- lsp
 	use("neovim/nvim-lspconfig")
-	use("williamboman/nvim-lsp-installer") -- language server installer
 	use("jose-elias-alvarez/null-ls.nvim") -- linter
+	use("williamboman/mason.nvim") -- simple to use language server installer
+	use("williamboman/mason-lspconfig.nvim") -- simple to use language server installer
 
 	-- telescope <C-q> to add to quickfix list
 	use("nvim-telescope/telescope.nvim")
