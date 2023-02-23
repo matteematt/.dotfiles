@@ -61,3 +61,6 @@ kmap('c', '$d', "<CR>:t''<CR>", opts)
 -- Unsure what these two are supposed to do
 -- kmap('c', '$T', "<CR>:T''<CR>", opts)
 -- kmap('c', '$M', "<CR>:M''<CR>", opts)
+
+-- rebind <C-w><CR> in insert mode to temporarily disable format options cro
+kmap('i', '<C-w><CR>', '<C-o>:set fo-=cro<CR><CR><C-o>:set fo+=cro<CR>', opts)

@@ -95,7 +95,4 @@ if has('persistent_undo')      "check if your vim version supports it
   set undofile                 "turn on the feature
   silent call system('mkdir -p ' . &undodir)
 endif
-
-" Github copilot can be annoying with comments going onto newlines
-autocmd FileType * set formatoptions-=cro
 ]]
