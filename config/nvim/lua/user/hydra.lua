@@ -106,7 +106,7 @@ local misc_hydra = hydra({
 		},
 	},
 	heads = {
-		{ "r", "<cmd>bufdo e!<CR>", { exit = true, nowait = true, desc = "reload" } },
+		{ "r", require("user.utils.misc").reload_session, { exit = true, nowait = true, desc = "reload" } },
 		{ "s", "<cmd>so %<CR>", { exit = true, nowait = true, desc = "source file" } },
 
 		-- can we improve with this https://stackoverflow.com/questions/5312235/how-do-i-correct-vim-spelling-mistakes-quicker
