@@ -65,6 +65,28 @@ function addLastDiffFile() {
   fi
 }
 
+function gitCheckoutWorktree() {
+	root_dir=$(git rev-parse --show-toplevel)
+	worktree_dir="_worktrees_git"
+	cd "$root_dir"
+
+	# branch name is the first argument if only one passed, flags is the first argument if two are passed and branch name is the second
+	if [ "$#" -eq 2 ]; then
+		flags="$1"
+		branch_name="$2"
+		git worktree add "$flags" "$worktree_dir/$branch_name" "$worktree_dir/$branch_name"
+	elif  [ "$#" -eq 1 ]; then
+		branch_name="$1"
+		git worktree add "$worktree_dir/$branch_name" "$worktree_dir/$branch_name"
+	else
+		cd -
+		echo "Wrong number of arguments to function"
+		exit 1;
+	fi
+	echo "$worktree_dir/$branch_name"
+	cd -
+}
+
 # Performs the same job as the update button on giuthub when a branch
 # is behind master, but with rebase instead
 function getUpdateWithRebase() {

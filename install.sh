@@ -31,6 +31,7 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
   brew install coreutils
   brew install rust
+	brew install fd
   cargo install zellij
   ln -s ~/.dotfiles/config/zellij.yml ~/.config/zellij
   ln -s ~/.dotfiles/mac/.zshrc ~/.zshrc
