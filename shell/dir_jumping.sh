@@ -11,6 +11,8 @@ function changeDirShortcut {
 function __pushchangeddirToListSave {
 	# return from function if the current working directory contains _worktrees_git
 	if [[ $(pwd) == *"_worktrees_git"* ]] && return;
+	# return from funtion if the current working directory contains /tmp
+	if [[ $(pwd) == *"/tmp"* ]] && return;
   cdhistory="$HOME/.cache/cdhistory"
   touch "$cdhistory"
 	echo "$(pwd | sed 's/ /<spc;>/') $(date +'%s')" >> "$cdhistory"
