@@ -13,11 +13,27 @@ if fn.empty(fn.glob(install_path)) > 0 then
 	vim.cmd([[packadd packer.nvim]])
 end
 
+function backup_sync_packer()
+	local snapshot_dir = os.getenv("HOME") .. "/.dotfiles/config/nvim/plugin/snapshot"
+	local date = os.date("%y%m%d")
+	local snapshot_file = snapshot_dir .. "/snapshot_" .. date .. ".json"
+	if fn.filereadable(snapshot_file) == 0 then
+		print("Creating snapshot")
+		vim.cmd("PackerSnapshot " .. snapshot_file)
+		print("Snapshot created at: " .. snapshot_file)
+	end
+
+	-- source the current file
+	vim.cmd("source " .. vim.fn.expand("%"))
+	-- call packer sync
+	vim.cmd("PackerSync")
+end
+
 -- Every time we update this file, rerun packer to update the plugins
 vim.cmd([[
 	augroup packer_user_config
 		autocmd!
-		autocmd BufWritePost plugins.lua source <afile> | PackerSync
+		autocmd BufWritePost plugins.lua :lua backup_sync_packer()
 	augroup end
 ]])
 
@@ -36,6 +52,7 @@ packer.init({
 		end,
 	},
 })
+
 
 return require("packer").startup(function(use)
 	use("wbthomason/packer.nvim")
