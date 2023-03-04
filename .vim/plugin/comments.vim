@@ -41,6 +41,7 @@ let s:filetypesMap = {
 	\"groovy":"cstyle",
 	\"c":"cstyle",
 	\"cpp":"cstyle",
+	\"rust":"cstyle",
 	\"sh":"shellstyle",
 	\"python":"shellstyle",
 	\"yaml":"shellstyle",
