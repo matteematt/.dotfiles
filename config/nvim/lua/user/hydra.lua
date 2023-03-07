@@ -13,6 +13,7 @@ _[_: Prev hunk
 _]_: Next hunk
 _b_: Toggle blame
 _d_: Diff file
+_t_: Telescope
 _<Esc>_: Exit
 ]]
 
@@ -31,6 +32,7 @@ local git_hydra = hydra({
 		{ "[", "<cmd>Gitsigns prev_hunk<CR>", { silent = true, desc = "prev hunk" } },
 		{ "b", "<cmd>Gitsigns toggle_current_line_blame<CR>", { silent = true, desc = "toggle diff" } },
 		{ "d", "<cmd>Gitsigns diffthis<CR>", { silent = true, exit = true, desc = "diff file" } },
+		{ "t", "<cmd>Telescope git_status<CR>", { silent = true, exit = true, desc = "telescope changes" } },
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
 })
@@ -42,7 +44,7 @@ local hint_lsp = [[
 ^
 _d_: Definition _D_: Declaration _i_: Implementation _r_: References _s_: Signature help
 _I_: Info _R_: Rename
-_[_: Prev diagnostic _]_: Next diagnostic _l_: Diagnostics loclist _f_: Diagnostics float
+_[_: Prev diagnostic _]_: Next diagnostic _l_: Diagnostics loclist _f_: Diagnostics float _t_: Diagnostics telescope
 _<Esc>_: Exit
 ]]
 
@@ -78,6 +80,7 @@ local lsp_hydra = hydra({
 		},
 		{ "f", "<cmd>lua vim.diagnostic.open_float()<CR>", { nowait = true, desc = "diagnostics float" } },
 		{ "l", "<cmd>lua vim.diagnostic.setloclist()<CR>", { nowait = true, desc = "diagnostics loclist" } },
+		{ "t", "<cmd>Telescope diagnostics<CR>", { nowait = true, exit = true, desc = "diagnostics telescope" } },
 
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
@@ -92,6 +95,8 @@ _r_: Reload buffers
 _s_: Source buffer vimscript/lua
 _[_: Auto-fix prev spelling issue
 _]_: Auto-fix next spelling issue
+_m_: Marks in telescope
+_j_: Jumplist in telescope
 _<Esc>_: Exit
 ]]
 
@@ -112,6 +117,9 @@ local misc_hydra = hydra({
 		-- can we improve with this https://stackoverflow.com/questions/5312235/how-do-i-correct-vim-spelling-mistakes-quicker
 		{ "[", "[s1z=<c-o>", { nowait = true, desc = "prev spelling error" } },
 		{ "]", "]s1z=<c-o>", { nowait = true, desc = "next spelling error" } },
+
+		{ "m", "<cmd>Telescope marks<CR>", { nowait = true, exit = true, desc = "marks in telescope" } },
+		{ "j", "<cmd>Telescope jumplist<CR>", { nowait = true, exit = true, desc = "jumplist in telescope" } },
 
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
