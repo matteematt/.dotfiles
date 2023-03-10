@@ -1,3 +1,4 @@
+# Used in gitViewAndStage and getDiffByList
 # Prints unstaged git file according to the git status
 # trims ' characters as they are added by fzf preview which calls this script
 # Untracked file - view file
@@ -9,6 +10,10 @@
 # M ~/test.txt
 # 'R ~/banana.txt'
 
+# if $FZF_PREVIEW_COLUMNS doesn't exist set it to be tput cols
+# this is dependent on whether it runs via gitViewAndStage or getDiffByList
+FZF_PREVIEW_COLUMNS=${FZF_PREVIEW_COLUMNS:-$(tput cols)}
+
 input=`echo "$1" | tr -d \'`
 status_code=`echo "$input" | cut -d" " -f1`
 file_path=`echo "$input" | cut -d" " -f2`
@@ -17,11 +22,7 @@ case "$status_code" in
     bat --theme="OneHalfDark" --style=numbers,changes --color always "$file_path"
     ;;
   "M")
-		# Try and match the first time we have the diff string
-		first_change=`git diff "$file_path" | awk '{if (match($0,/^@+\s+-?([0-9]+).+@+/,m)) {print m[1];exit 0}}'`
-		# Or fallback on displaying the first line
-		if ! [[ "$first_change" =~ ^[0-9]+$ ]]; then first_change="0"; fi
-		bat --theme="OneHalfDark" --style=numbers,changes --color always $file_path | tail -n+$first_change
+		git diff "$file_path" | delta "-w$FZF_PREVIEW_COLUMNS"
     ;;
   "D")
     echo "New Dir $file_path\n\n`ls $file_path`"

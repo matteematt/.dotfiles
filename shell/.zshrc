@@ -167,8 +167,12 @@ alias cdp="changeDirInsideGitProject"
 alias fcb="~/.dotfiles/shell/switch_branch.sh"
 alias gc="git commit"
 alias gcm="git checkout master"
+alias gsc="gitShowCommits"
 # Rebase a branch with all commits since master, so we can squash before we rebase on master (saves multiple merge conflicts)
 alias grs='git rebase -i HEAD~$(git rev-list --count master..)'
+
+# tmux attach
+alias ta="tmux attach"
 
 # [1]
 # https://unix.stackexchange.com/questions/6620/how-to-edit-command-line-in-full-screen-editor-in-zsh
