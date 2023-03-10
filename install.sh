@@ -30,8 +30,8 @@ if [[ "$unamestr" == 'Linux' ]]; then
 elif [[ "$unamestr" == 'Darwin' ]]; then
   platform='mac'
   brew install coreutils
-  brew install rust
 	brew install fd
+	brew install delta
   cargo install zellij
   ln -s ~/.dotfiles/config/zellij.yml ~/.config/zellij
   ln -s ~/.dotfiles/mac/.zshrc ~/.zshrc
@@ -63,3 +63,11 @@ ln -s ~/.dotfiles/config/tmux/ ~/.config
 git config --global core.excludesfile ~/.dotfiles/config/git/.gitignore_global
 git config --global core.hooksPath ~/.dotfiles/config/git/hooks
 git config --global core.editor vim
+
+git config --global core.pager "delta"
+git config --global interactive.diffFilter "delta --color-only"
+git config --global delta.navigate true
+git config --global delta.light false
+git config --global merge.conflictstyle "diff3"
+git config --global diff.colorMoved "default"
+git config --global delta.side-by-side true
