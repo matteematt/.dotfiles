@@ -1,4 +1,4 @@
-# Used in gitViewAndStage
+# Used in gitViewAndStage and getDiffByList
 # Prints unstaged git file according to the git status
 # trims ' characters as they are added by fzf preview which calls this script
 # Untracked file - view file
@@ -9,6 +9,10 @@
 # Expected input examples
 # M ~/test.txt
 # 'R ~/banana.txt'
+
+# if $FZF_PREVIEW_COLUMNS doesn't exist set it to be tput cols
+# this is dependent on whether it runs via gitViewAndStage or getDiffByList
+FZF_PREVIEW_COLUMNS=${FZF_PREVIEW_COLUMNS:-$(tput cols)}
 
 input=`echo "$1" | tr -d \'`
 status_code=`echo "$input" | cut -d" " -f1`
