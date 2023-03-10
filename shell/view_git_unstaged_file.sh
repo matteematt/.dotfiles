@@ -1,3 +1,4 @@
+# Used in gitViewAndStage
 # Prints unstaged git file according to the git status
 # trims ' characters as they are added by fzf preview which calls this script
 # Untracked file - view file
@@ -17,11 +18,7 @@ case "$status_code" in
     bat --theme="OneHalfDark" --style=numbers,changes --color always "$file_path"
     ;;
   "M")
-		# Try and match the first time we have the diff string
-		first_change=`git diff "$file_path" | awk '{if (match($0,/^@+\s+-?([0-9]+).+@+/,m)) {print m[1];exit 0}}'`
-		# Or fallback on displaying the first line
-		if ! [[ "$first_change" =~ ^[0-9]+$ ]]; then first_change="0"; fi
-		bat --theme="OneHalfDark" --style=numbers,changes --color always $file_path | tail -n+$first_change
+		git diff "$file_path" | delta "-w$FZF_PREVIEW_COLUMNS"
     ;;
   "D")
     echo "New Dir $file_path\n\n`ls $file_path`"
