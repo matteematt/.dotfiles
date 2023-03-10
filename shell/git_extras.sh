@@ -35,7 +35,7 @@ function __formatGitStatus() {
 # Similar to getDiffByList but views the output in bat inline and
 # selecting an option automatically calls 'git add' on it
 function gitViewAndStage() {
-  chosen_file=$(__formatGitStatus | fzf --with-nth 2 --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
+  chosen_file=$(__formatGitStatus | fzf --with-nth 2 --preview-window=right,70% --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
   if [ -z "$chosen_file" ]; then
     return
   else
@@ -100,7 +100,7 @@ function getUpdateWithRebase() {
 }
 
 function gitShowCommits() {
-	commit=$(git log --oneline | fzf --preview 'git show {+1} | delta -w$FZF_PREVIEW_COLUMNS')
+	commit=$(git log --oneline | fzf --preview-window=right,70% --preview 'git show {+1} | delta -w$FZF_PREVIEW_COLUMNS')
 	if [ -n "$commit" ]; then
 		commit=$(echo "$commit" | cut -d" " -f1)
 		git show "$commit"
