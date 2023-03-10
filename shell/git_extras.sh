@@ -102,8 +102,9 @@ function getUpdateWithRebase() {
 function gitShowCommits() {
 	commit=$(git log --oneline | fzf --preview-window=right,70% --preview 'git show {+1} | delta -w$FZF_PREVIEW_COLUMNS')
 	if [ -n "$commit" ]; then
-		commit=$(echo "$commit" | cut -d" " -f1)
-		git show "$commit"
+		hash=$(echo "$commit" | cut -d" " -f1)
+		git show "$hash"
+		echo "\n>> $commit"
 	fi
 }
 
