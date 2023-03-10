@@ -100,7 +100,7 @@ function getUpdateWithRebase() {
 }
 
 function gitShowCommits() {
-	commit=$(git log --oneline | fzf --preview 'git show {+1} | delta')
+	commit=$(git log --oneline | fzf --preview 'git show {+1} | delta -w$FZF_PREVIEW_COLUMNS')
 	if [ -n "$commit" ]; then
 		commit=$(echo "$commit" | cut -d" " -f1)
 		git show "$commit"
