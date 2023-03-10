@@ -99,3 +99,11 @@ function getUpdateWithRebase() {
   git push --force-with-lease
 }
 
+function gitShowCommits() {
+	commit=$(git log --oneline | fzf --preview 'git show {+1} | delta')
+	if [ -n "$commit" ]; then
+		commit=$(echo "$commit" | cut -d" " -f1)
+		git show "$commit"
+	fi
+}
+
