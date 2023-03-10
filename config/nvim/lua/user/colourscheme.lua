@@ -27,7 +27,7 @@ if colourscheme == "onedarkpro" then
     -- See the 'Configuring filetype highlights' section for the available list
   },
   plugins = { -- Override which plugin highlight groups are loaded
-	native_lsp = true,
+	nvim_lsp = true,
 	polygot = true,
 	treesitter = true,
     -- See the 'Supported plugins' section for the available list
