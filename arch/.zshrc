@@ -24,7 +24,7 @@ function precmd() {
 # ALIAS
 ########################################
 
-alias update="sudo informant check && sudo pacman -Syu && yay -Syu"
+alias update="sudo informant check && sudo pacman -Syu && yay -Syu && brew update && brew upgrade"
 alias ls="ls --color=auto --human-readable"
 alias icloud="firefox -P default https://www.icloud.com/notes &"
 alias windows="systemctl reboot --boot-loader-entry=auto-windows"
