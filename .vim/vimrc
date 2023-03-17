@@ -160,9 +160,6 @@ nnoremap <Right> :lnext<CR>zzzv
 " Highlight the last inserted text
 nnoremap gV `[v`]`
 
-" Open the undotree buffer
-nnoremap <leader>u :UndotreeToggle<CR>
-
 " :s// on visual selection
 vnoremap <C-r> :s/\%V
 
