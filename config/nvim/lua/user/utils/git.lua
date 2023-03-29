@@ -11,7 +11,7 @@ end
 
 local fzf_file_changes = function(opts)
 	local fullpath = vim.fn.expand("%:p")
-	local cmd = { "git", "log", "--oneline", "--follow", "--", fullpath }
+	local cmd = { "git", "log", "--oneline", "--follow", '--pretty=tformat:%h %s - %an (%as)', "--", fullpath }
 
 	opts = opts or {}
 	pickers.new(opts, {
