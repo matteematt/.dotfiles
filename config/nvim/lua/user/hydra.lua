@@ -14,6 +14,7 @@ _]_: Next hunk
 _b_: Toggle blame
 _d_: Diff file
 _t_: Telescope
+_h_: File history
 _<Esc>_: Exit
 ]]
 
@@ -33,6 +34,7 @@ local git_hydra = hydra({
 		{ "b", "<cmd>Gitsigns toggle_current_line_blame<CR>", { silent = true, desc = "toggle diff" } },
 		{ "d", "<cmd>Gitsigns diffthis<CR>", { silent = true, exit = true, desc = "diff file" } },
 		{ "t", "<cmd>Telescope git_status<CR>", { silent = true, exit = true, desc = "telescope changes" } },
+		{ "h", require("user.utils.git").choose_file_commits_via_fzf, { exit = true, nowait = true, desc = "file history" } },
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
 })
