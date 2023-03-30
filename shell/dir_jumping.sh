@@ -39,7 +39,7 @@ function changeDirFromHistory {
 # Works in a git repo or in a worktree
 function changeDirInsideGitProject {
 	top_level="$(git rev-parse --show-toplevel)"
-	chosen_dir=$(cd "$top_level" && fd --type directory | fzf --header "Project Jump")
+	chosen_dir=$(cd "$top_level" && echo "$(fd --type directory)\n/" | fzf --tac --no-sort --header "Project Jump")
 	chosen_dir="$top_level/$chosen_dir"
   if [[ -d "$chosen_dir" ]]; then
 		pushChangedDirToList "$chosen_dir"
