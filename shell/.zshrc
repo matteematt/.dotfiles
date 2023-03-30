@@ -151,6 +151,7 @@ alias rgf="rg -uu --files | rg --invert-match \.git | rg"
 
 source ~/.dotfiles/shell/git_extras.sh
 source ~/.dotfiles/shell/dir_jumping.sh
+source ~/.dotfiles/shell/lib/lib.sh
 
 #git diff list
 alias gdl="getDiffByList"

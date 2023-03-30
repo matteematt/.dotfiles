@@ -29,7 +29,7 @@ function pushChangedDirToList {
 # Use fzf to choose a dir to jump to from the history
 function changeDirFromHistory {
   cdhistory="$HOME/.cache/cdhistory"
-	chosen_dir=$(rev "$cdhistory" | cut -d" " -f 2-  | rev | sed 's/<spc;>/ /' | fzf --tac --header "History Jump")
+	chosen_dir=$(eval "$(fzfLsPreview "History Jump")" <<< "$(rev "$cdhistory" | cut -d" " -f 2-  | rev | sed 's/<spc;>/ /')" )
   if [[ -d "$chosen_dir" ]]; then
 		pushChangedDirToList "$chosen_dir"
   fi
@@ -39,8 +39,7 @@ function changeDirFromHistory {
 # Works in a git repo or in a worktree
 function changeDirInsideGitProject {
 	top_level="$(git rev-parse --show-toplevel)"
-	chosen_dir=$(cd "$top_level" && echo "$(fd --type directory)\n/" \
-		| fzf --ansi --tac --header "Project Jump" --preview 'CLICOLOR_FORCE=1 ls -al -G --color=auto {}')
+	chosen_dir=$(eval "$(fzfLsPreview "Project Jump")" <<< "$(cd "$top_level" && echo "$(fd --type directory)\n/")" )
 	chosen_dir="$top_level/$chosen_dir"
   if [[ -d "$chosen_dir" ]]; then
 		pushChangedDirToList "$chosen_dir"

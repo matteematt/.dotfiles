@@ -13,4 +13,6 @@ confirm() {
     esac
 }
 
-echo "Sourced this file"
+fzfLsPreview() {
+	echo "fzf --ansi --tac --header \"$1\" --preview 'CLICOLOR_FORCE=1 ls -al -G --color=auto {}'"
+}
