@@ -67,23 +67,22 @@ function addLastDiffFile() {
 
 function gitCheckoutWorktree() {
 	root_dir=$(git rev-parse --show-toplevel)
-	worktree_dir="_worktrees_git"
-	cd "$root_dir"
+	worktree_dir="$root_dir/_worktrees_git/"
 
 	# branch name is the first argument if only one passed, flags is the first argument if two are passed and branch name is the second
 	if [ "$#" -eq 2 ]; then
 		flags="$1"
 		branch_name="$2"
-		git worktree add "$flags" "$worktree_dir/$branch_name" "$worktree_dir/$branch_name"
+		git worktree add "$flags" "$worktree_dir/$branch_name" "$branch_name"
 	elif  [ "$#" -eq 1 ]; then
 		branch_name="$1"
-		git worktree add "$worktree_dir/$branch_name" "$worktree_dir/$branch_name"
+		git worktree add "$worktree_dir/$branch_name" "$branch_name"
 	else
 		cd -
 		echo "Wrong number of arguments to function"
 		exit 1;
 	fi
-	echo "$worktree_dir/$branch_name"
+	echo "Checked out $branch_name at $worktree_dir/$branch_name"
 	cd -
 }
 
