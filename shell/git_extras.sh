@@ -70,10 +70,11 @@ function gitCheckoutWorktree() {
 	worktree_dir="$root_dir/_worktrees_git/"
 
 	# branch name is the first argument if only one passed, flags is the first argument if two are passed and branch name is the second
+	# it seems that if you create a new one with -b you need to have the branch name first - otherwise the path first
 	if [ "$#" -eq 2 ]; then
 		flags="$1"
 		branch_name="$2"
-		git worktree add "$flags" "$worktree_dir/$branch_name" "$branch_name"
+		git worktree add "$flags" "$branch_name" "$worktree_dir/$branch_name"
 	elif  [ "$#" -eq 1 ]; then
 		branch_name="$1"
 		git worktree add "$worktree_dir/$branch_name" "$branch_name"
