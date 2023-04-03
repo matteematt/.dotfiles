@@ -45,3 +45,14 @@ function changeDirInsideGitProject {
 		pushChangedDirToList "$chosen_dir"
   fi
 }
+
+# Find all branches inside of the projects _worktrees_git to jump to
+function changeWorktreeProject {
+	top_level="$(git rev-parse --show-toplevel)"
+	chosen_dir=$(find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf --header "Worktree Jump" --preview "cd $top_level/_worktrees_git/{} && git log")
+	chosen_dir="$top_level/_worktrees_git/$chosen_dir"
+	if [[ -d "$chosen_dir" ]]; then
+		pushChangedDirToList "$chosen_dir"
+	fi
+}
+
