@@ -84,7 +84,7 @@ function gitCheckoutWorktree() {
 		exit 1;
 	fi
 	echo "Checked out $branch_name at $worktree_dir/$branch_name"
-	cd -
+	cd "$worktree_dir/$branch_name"
 }
 
 # Performs the same job as the update button on giuthub when a branch
@@ -99,11 +99,16 @@ function getUpdateWithRebase() {
   git push --force-with-lease
 }
 
+# Use fzf to view previous commits and then display them using delta
+# Use `tput smcup` and `tput rmcup` to view the delta pager on the
+# alternative screen.
 function gitShowCommits() {
 	commit=$(git log --oneline | fzf --preview-window=right,70% --preview 'git show {+1} | delta -w$FZF_PREVIEW_COLUMNS')
 	if [ -n "$commit" ]; then
 		hash=$(echo "$commit" | cut -d" " -f1)
-		git show "$hash"
+		# Launch the alternative screen
+		tput smcup
+		git show "$hash" | delta && tput rmcup
 		echo "\n>> $commit"
 	fi
 }
