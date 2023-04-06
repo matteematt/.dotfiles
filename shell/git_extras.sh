@@ -84,7 +84,7 @@ function gitCheckoutWorktree() {
 		exit 1;
 	fi
 	echo "Checked out $branch_name at $worktree_dir/$branch_name"
-	cd -
+	cd "$worktree_dir/$branch_name"
 }
 
 # Performs the same job as the update button on giuthub when a branch
