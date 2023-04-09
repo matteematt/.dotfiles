@@ -12,6 +12,10 @@ sudo informant check && sudo pacman -Syu
 echo "Updating AUR"
 yay -Syu
 
+# Update brew packages
+echo "Updating brew"
+brew update && brew upgrade
+
 # Keep a backup of the currently installed pacman packages, *not* listing
 # dependencies but pacman will take care of that. TODO: this list includes
 # things like amd-ucode and nvidia so be careful if changing hardware
