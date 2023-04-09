@@ -2,11 +2,10 @@ alacritty
 alsa-utils
 amd-ucode
 arandr
-autoconf
-automake
+authy
 base
+base-devel
 bc
-bison
 bitwarden
 cabal-install
 chromium
@@ -16,13 +15,13 @@ docker
 docker-compose
 dolphin
 eslint
+fd
 firefox
 flameshot
-flex
 fontforge
 get_iplayer-git
 ghc-static
-gimp
+git-delta
 go
 hlint-static-git
 htop
@@ -33,7 +32,6 @@ informant
 insync
 libreoffice-still-uk
 lsdvd
-make
 man-db
 man-pages
 minify
@@ -45,8 +43,6 @@ numlockx
 nvidia
 p3x-onenote
 pacman-contrib
-patch
-pkgconf
 postman-bin
 prettier
 ptags-git
