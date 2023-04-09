@@ -36,7 +36,7 @@ kmap('n', '<leader><leader>', ':Telescope buffers<CR>', opts)
 kmap('n', '<leader>u', ':UndotreeToggle<CR>', opts)
 
 -- Formatting
-kmap('n', '<leader>l', ':lua vim.lsp.buf.formatting_sync()<CR>',opts)
+kmap('n', '<leader>l', ':lua vim.lsp.buf.format { async = true }<CR>',opts)
 
 -- Terminal (make match standard vim)
 kmap('t', '<C-w>N', '<C-\\><C-n>', opts)
