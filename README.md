@@ -19,6 +19,8 @@ For now the main extra programmes required are:
 * [bat](https://github.com/sharkdp/bat) which is a `cat` clone with syntax highlighting and git integration
 * [fzf](https://github.com/junegunn/fzf) which allows you to fuzzy match on a line from standard input
 * [rg](https://github.com/BurntSushi/ripgrep) which is a `grep` clone written in rust
+* [fg](https://github.com/sharkdp/fd) which is a `find` alternative in rust
+* [delta](https://github.com/dandavison/delta) which is an enhanced diff viewer for binaries such as git
 
 All of the above "replacement" utils can be installed using `brew` or `linuxbrew`.
 
