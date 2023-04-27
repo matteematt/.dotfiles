@@ -176,6 +176,8 @@ alias grs='git rebase -i HEAD~$(git rev-list --count master..)'
 # tmux attach
 alias ta="tmux attach"
 
+alias wipe='clear && printf "\e[3J"'
+
 # [1]
 # https://unix.stackexchange.com/questions/6620/how-to-edit-command-line-in-full-screen-editor-in-zsh
 
