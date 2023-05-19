@@ -15,7 +15,7 @@ function __pushchangeddirToListSave {
 	if [[ $(pwd) == *"/tmp"* ]] && return;
   cdhistory="$HOME/.cache/cdhistory"
   touch "$cdhistory"
-	echo "$(pwd | sed 's/ /<spc;>/') $(date +'%s')" >> "$cdhistory"
+	echo "$(pwd | sed 's/ /<spc;>/g') $(date +'%s')" >> "$cdhistory"
   sort -r "$cdhistory" | sort -k1,1 --unique | sort -k 2,2 | tail -n 1000 > "$cdhistory.tmp"
   mv -f "$cdhistory.tmp" "$cdhistory"
 }
@@ -29,7 +29,7 @@ function pushChangedDirToList {
 # Use fzf to choose a dir to jump to from the history
 function changeDirFromHistory {
   cdhistory="$HOME/.cache/cdhistory"
-	chosen_dir=$(eval "$(fzfLsPreview "History Jump")" <<< "$(rev "$cdhistory" | cut -d" " -f 2-  | rev | sed 's/<spc;>/ /')" )
+	chosen_dir=$(eval "$(fzfLsPreview "History Jump")" <<< "$(rev "$cdhistory" | cut -d" " -f 2-  | rev | sed 's/<spc;>/ /g')" )
   if [[ -d "$chosen_dir" ]]; then
 		pushChangedDirToList "$chosen_dir"
   fi
