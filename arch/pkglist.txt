@@ -67,7 +67,6 @@ vlc
 wget
 whatsapp-nativefier
 xdotool
-xmrig-donateless
 xorg-xinit
 yay
 zsh-syntax-highlighting
