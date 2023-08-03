@@ -65,7 +65,7 @@ function addLastDiffFile() {
   fi
 }
 
-function gitCheckoutWorktree() {
+function gitWorktreeCheckout() {
 	root_dir=$(git rev-parse --show-toplevel)
 	worktree_dir="$root_dir/_worktrees_git/"
 
@@ -113,3 +113,28 @@ function gitShowCommits() {
 	fi
 }
 
+# List all branches inside the projects to remove
+function gitWorktreeCleanup {
+	top_level="$(cd "$(pwd | awk -v FS="_worktrees_git/" '{print $1}')" && git rev-parse --show-toplevel)"
+	if ! [[ -d "$top_level/_worktrees_git" ]]; then
+		echo "Error: No worktree directory"
+		return 2;
+	fi
+	git_branch=$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf --header "Worktree Cleanup" --preview "cd $top_level/_worktrees_git/{} && git log")
+	if [[ "$git_branch" == '' ]]; then
+		echo "Error: No branch selected for cleanup"
+		return 3;
+	fi
+	read -q "choice?Are you sure that you want to cleanup branch $git_branch branch? [y/N]" || return 1;
+	chosen_dir="$top_level/_worktrees_git/$git_branch"
+	if ! [[ -d "$chosen_dir" ]]; then
+		echo "Error: Unable to find branch on file system"
+		return 4;
+	fi
+
+	echo "\nCleaning up $chosen_dir"
+	rm -rf "$chosen_dir"
+	git branch -D "$git_branch"
+	git worktree prune
+	return 0;
+}
