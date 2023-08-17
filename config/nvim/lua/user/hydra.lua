@@ -45,7 +45,7 @@ local hint_lsp = [[
 ^^ LSP
 ^
 _d_: Definition _D_: Declaration _i_: Implementation _r_: References _s_: Signature help
-_I_: Info _R_: Rename
+_I_: Info _R_: Rename _a_: Code action
 _[_: Prev diagnostic _]_: Next diagnostic _l_: Diagnostics loclist _f_: Diagnostics float _t_: Diagnostics telescope
 _<Esc>_: Exit
 ]]
@@ -69,6 +69,7 @@ local lsp_hydra = hydra({
 
 		{ "I", "<cmd>lua vim.lsp.buf.hover()<CR>",          { exit = true, nowait = true, desc = "hover" } },
 		{ "R", "<cmd>lua vim.lsp.buf.rename()<CR>",         { exit = true, nowait = true, desc = "rename" } },
+		{ "a", "<cmd>lua vim.lsp.buf.code_action()<CR>",    { nowait = true, desc = "code_actions" } },
 
 		{
 			"[",
