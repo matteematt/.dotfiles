@@ -134,7 +134,8 @@ function gitWorktreeCleanup {
 
 	echo "\nCleaning up $chosen_dir"
 	rm -rf "$chosen_dir"
-	git branch -D "$git_branch"
+	echo "\nCleaning up branch $git_branch"
 	git worktree prune
+	git branch -D "$git_branch"
 	return 0;
 }
