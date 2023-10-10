@@ -25,7 +25,7 @@ git-delta
 go
 hlint-static-git
 htop
-i3-gaps
+i3-wm
 i3blocks
 inetutils
 informant
