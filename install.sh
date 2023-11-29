@@ -43,6 +43,7 @@ brew install fzf
 $(brew --prefix)/opt/fzf/install
 brew install bat
 brew install ripgrep
+brew install yq
 brew install isacikgoz/taps/tldr
 
 # Get fonts
