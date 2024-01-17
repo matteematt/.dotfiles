@@ -52,7 +52,7 @@ brew tap homebrew/cask-fonts
 
 # Perform the general symlinks here
 ln -s ~/.dotfiles/.vim/ ~/.vim
-ln -s ~/.dotfiles/.alacritty.yml ~/.alacritty.yml
+ln -s ~/.dotfiles/.alacritty.toml ~/.alacritty.toml
 ln -s ~/.dotfiles/.ctags.d ~/.ctags.d
 ln -s ~/.dotfiles/config/haskell/ghci.conf ~/.ghc/ghci.conf
 ln -s ~/.dotfiles/config/haskell/haskeline ~/.haskeline
