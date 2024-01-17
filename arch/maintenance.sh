@@ -23,6 +23,8 @@ brew update && brew upgrade
 # Use AUR to see how to install from this list
 echo "Backup installed packages list"
 pacman -Qqet > ~/.dotfiles/arch/pkglist.txt
+brew list --versions > ~/.dotfiles/arch/brewlist.txt
+cp -r $HOME/.cache $HOME/.cache.bak
 
 # Clear pacman cache, but keep the three most recent versions
 echo "Clearing pacman cache"
@@ -50,3 +52,6 @@ pacman -Qtd
 
 # Clean up systemd logs as they can grown very large
 sudo journalctl --vacuum-time=12weeks
+
+echo -e "\\nUpdate nvim packages with"
+echo "nvim $HOME/.dotfiles/config/nvim/lua/user/plugins.lua"
