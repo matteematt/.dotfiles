@@ -52,3 +52,6 @@ pacman -Qtd
 
 # Clean up systemd logs as they can grown very large
 sudo journalctl --vacuum-time=12weeks
+
+echo -e "\\nUpdate nvim packages with"
+echo "nvim $HOME/.dotfiles/config/nvim/lua/user/plugins.lua"
