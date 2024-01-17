@@ -1,0 +1,139 @@
+[colors.bright]
+black = "0x5c6370"
+blue = "0x61afef"
+cyan = "0x56b6c2"
+green = "0x98c379"
+magenta = "0xc678dd"
+red = "0xe06c75"
+white = "0xe6efff"
+yellow = "0xd19a66"
+
+[colors.normal]
+black = "0x1e2127"
+blue = "0x61afef"
+cyan = "0x2bbac5"
+green = "0x89ca78"
+magenta = "0xc678dd"
+red = "0xef596f"
+white = "0x828791"
+yellow = "0xd19a66"
+
+[colors.primary]
+background = "0x282c34"
+foreground = "0xabb2bf"
+
+[font]
+size = 12
+
+[font.bold]
+family = "Monego Nerd Font Fix"
+style = "Bold"
+
+[font.bold_italic]
+family = "Monego Nerd Font Fix"
+style = "Bold Italic"
+
+[font.italic]
+family = "Monego Nerd Font Fix"
+style = "Italic"
+
+[font.normal]
+family = "Monego Nerd Font Fix"
+style = "Regular"
+
+[[keyboard.bindings]]
+chars = "\u001Bn"
+key = "N"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bh"
+key = "H"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bj"
+key = "J"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bk"
+key = "K"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bl"
+key = "L"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bt"
+key = "T"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B0"
+key = 0
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B1"
+key = 1
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B2"
+key = 2
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B3"
+key = 3
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B4"
+key = 4
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B5"
+key = 5
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B6"
+key = 6
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B7"
+key = 7
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B8"
+key = 8
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001B9"
+key = 9
+mods = "Alt"
+
+[[keyboard.bindings]]
+action = "ClearHistory"
+key = "K"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\f"
+key = "K"
+mods = "Command"
+
+[window]
+decorations = "transparent"
+
+[window.padding]
+x = 8
+y = 8
