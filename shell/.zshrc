@@ -168,7 +168,7 @@ alias cdp="changeDirInsideGitProject"
 alias cwp="changeWorktreeProject"
 alias fcb="~/.dotfiles/shell/switch_branch.sh"
 alias gc="git commit"
-alias gcm="git checkout master"
+alias gcm="git checkout $(git symbolic-ref refs/remotes/origin/HEAD | rev | cut -d'/' -f1 | rev)"
 alias gsc="gitShowCommits"
 # Rebase a branch with all commits since master, so we can squash before we rebase on master (saves multiple merge conflicts)
 alias grs='git rebase -i HEAD~$(git rev-list --count master..)'
