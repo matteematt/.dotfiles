@@ -51,9 +51,7 @@ brew tap homebrew/cask-fonts
 # Get the liberation mono nerd font
 
 # Perform the general symlinks here
-ln -s ~/.dotfiles/.vim/ ~/.vim
 ln -s ~/.dotfiles/.alacritty.toml ~/.alacritty.toml
-ln -s ~/.dotfiles/.ctags.d ~/.ctags.d
 ln -s ~/.dotfiles/config/haskell/ghci.conf ~/.ghc/ghci.conf
 ln -s ~/.dotfiles/config/haskell/haskeline ~/.haskeline
 ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
