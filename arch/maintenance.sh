@@ -23,6 +23,8 @@ brew update && brew upgrade
 # Use AUR to see how to install from this list
 echo "Backup installed packages list"
 pacman -Qqet > ~/.dotfiles/arch/pkglist.txt
+brew list --versions > ~/.dotfiles/arch/brewlist.txt
+cp -r $HOME/.cache $HOME/.cache.bak
 
 # Clear pacman cache, but keep the three most recent versions
 echo "Clearing pacman cache"
