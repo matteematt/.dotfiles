@@ -1,28 +1,28 @@
 local options = {
-	autoindent=true,
-	smartindent=true,
-	backspace="indent,eol,start",
-	hidden= true,
+	autoindent = true,
+	smartindent = true,
+	backspace = "indent,eol,start",
+	hidden = true,
 	-- incsearch=true,
-	ruler= true,
-	wildmenu= true,
-	wildmode="longest:full,full",
-	number=true,
-	shiftwidth=2,
-	tabstop=2,
+	ruler = true,
+	wildmenu = true,
+	wildmode = "longest:full,full",
+	number = true,
+	shiftwidth = 2,
+	tabstop = 2,
 	-- softtabstop=2,
-	gdefault=true,
-	lazyredraw=true,
-	ttimeoutlen=50,
-	ignorecase=true,
-	smartcase=true,
-	shiftround=true,
-	spell=true,
-	spelllang="en",
-	foldmethod="indent",
-	foldlevelstart=2,
-	cursorline= true,
-	signcolumn="yes"
+	gdefault = true,
+	lazyredraw = true,
+	ttimeoutlen = 50,
+	ignorecase = true,
+	smartcase = true,
+	shiftround = true,
+	spell = true,
+	spelllang = "en",
+	foldmethod = "indent",
+	foldlevelstart = 2,
+	cursorline = true,
+	signcolumn = "yes",
 }
 
 -- g:startup_section_len = 10     -- set the number of recent items to show on my custom startup screen
@@ -30,12 +30,11 @@ local options = {
 -- g:netrw_fastbrowse = 0      -- keeping fastbrowse on sometimes makes the netrw buffers not close
 -- vim.cmd "set errorformat=%A%f:%l:%c:%m,%-G\\s%#,%-G%*\\d\ problem%.%#"
 
-for k,v in pairs(options) do
+for k, v in pairs(options) do
 	vim.opt[k] = v
 end
 
-
-vim.cmd [[
+vim.cmd([[
 " Create a new autogroup for all vimrc autocmds
 augroup vimrc
   autocmd!
@@ -73,7 +72,7 @@ autocmd vimrc QuickFixCmdPost    l* lwindow
 autocmd vimrc FileType qf setlocal nospell
 " Reduce CPU heavy items for very large files
 " Treesitter is also disabled for files larger than 100kb
-autocmd vimrc BufWinEnter * if line2byte(line("$") + 1) > 1000000 | syntax clear | set foldmethod=manual | set nospell | endif
+autocmd vimrc BufWinEnter * if line2byte(line("$") + 1) > 1000000 | syntax clear | set foldmethod=manual | set nospell | :IBLDisable | :LspDisable | lua vim.treesitter.stop() | lua vim.diagnostic.disable() | endif
 
 augroup vimrc-incsearch-highlight
 	autocmd!
@@ -95,4 +94,4 @@ if has('persistent_undo')      "check if your vim version supports it
   set undofile                 "turn on the feature
   silent call system('mkdir -p ' . &undodir)
 endif
-]]
+]])
