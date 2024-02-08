@@ -53,7 +53,6 @@ packer.init({
 	},
 })
 
-
 return require("packer").startup(function(use)
 	use("wbthomason/packer.nvim")
 
@@ -121,6 +120,9 @@ return require("packer").startup(function(use)
 		after = { "copilot.lua" },
 		config = require("user.copilot").copilot_cmp_setup,
 	})
+
+	--
+	use({ "lukas-reineke/indent-blankline.nvim" })
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
