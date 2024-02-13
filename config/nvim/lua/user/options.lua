@@ -88,6 +88,9 @@ autocmd vimrc TermOpen * setlocal signcolumn=no
 " Set any known jsonc files to the appropriate types (they support comments)
 autocmd BufRead,BufNewFile tsconfig.json set filetype=jsonc
 
+" Treat .mdx files as Markdown
+autocmd BufNewFile,BufRead *.mdx set filetype=markdown
+
 " You must create the dir set, it will not do it for you!
 if has('persistent_undo')      "check if your vim version supports it
   set undodir=$HOME/.cache/nvim/undo/  "directory where the undo files will be stored
