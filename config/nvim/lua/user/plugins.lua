@@ -121,6 +121,8 @@ return require("packer").startup(function(use)
 		config = require("user.copilot").copilot_cmp_setup,
 	})
 
+	use("nvim-tree/nvim-web-devicons")
+
 	--
 	use({ "lukas-reineke/indent-blankline.nvim" })
 
