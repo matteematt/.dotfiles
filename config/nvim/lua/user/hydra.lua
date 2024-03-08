@@ -29,13 +29,29 @@ local git_hydra = hydra({
 		},
 	},
 	heads = {
-		{ "]",     "<cmd>Gitsigns next_hunk<CR>",                         { silent = true, desc = "next hunk" } },
-		{ "[",     "<cmd>Gitsigns prev_hunk<CR>",                         { silent = true, desc = "prev hunk" } },
-		{ "b",     "<cmd>Gitsigns toggle_current_line_blame<CR>",         { silent = true, desc = "toggle diff" } },
-		{ "d",     "<cmd>Gitsigns diffthis<CR>",                          { silent = true, exit = true, desc = "diff file" } },
-		{ "t",     "<cmd>Telescope git_status<CR>",                       { silent = true, exit = true, desc = "telescope changes" } },
-		{ "h",     require("user.utils.git").choose_file_commits_via_fzf, { exit = true, nowait = true, desc = "file history" } },
-		{ "<Esc>", nil,                                                   { exit = true, nowait = true, desc = "exit" } },
+		{ "]", "<cmd>Gitsigns next_hunk<CR>", { silent = true, desc = "next hunk" } },
+		{ "[", "<cmd>Gitsigns prev_hunk<CR>", { silent = true, desc = "prev hunk" } },
+		{ "b", "<cmd>Gitsigns toggle_current_line_blame<CR>", { silent = true, desc = "toggle diff" } },
+		{
+			"d",
+			"<cmd>Gitsigns diffthis<CR>",
+			{ silent = true, exit = true, desc = "diff file" },
+		},
+		{
+			"t",
+			"<cmd>Telescope git_status<CR>",
+			{ silent = true, exit = true, desc = "telescope changes" },
+		},
+		{
+			"h",
+			require("user.utils.git").choose_file_commits_via_fzf,
+			{ exit = true, nowait = true, desc = "file history" },
+		},
+		{
+			"<Esc>",
+			nil,
+			{ exit = true, nowait = true, desc = "exit" },
+		},
 	},
 })
 
@@ -61,15 +77,15 @@ local lsp_hydra = hydra({
 		},
 	},
 	heads = {
-		{ "d", "<cmd>lua vim.lsp.buf.definition()<CR>",     { exit = true, nowait = true, desc = "definition" } },
-		{ "D", "<cmd>lua vim.lsp.buf.declaration()<CR>",    { exit = true, nowait = true, desc = "declaration" } },
+		{ "d", "<cmd>lua vim.lsp.buf.definition()<CR>", { exit = true, nowait = true, desc = "definition" } },
+		{ "D", "<cmd>lua vim.lsp.buf.declaration()<CR>", { exit = true, nowait = true, desc = "declaration" } },
 		{ "i", "<cmd>lua vim.lsp.buf.implementation()<CR>", { exit = true, nowait = true, desc = "implementation" } },
-		{ "r", "<cmd>lua vim.lsp.buf.references()<CR>",     { exit = true, nowait = true, desc = "references" } },
+		{ "r", "<cmd>lua vim.lsp.buf.references()<CR>", { exit = true, nowait = true, desc = "references" } },
 		{ "s", "<cmd>lua vim.lsp.buf.signature_help()<CR>", { exit = true, nowait = true, desc = "signature_help" } },
 
-		{ "I", "<cmd>lua vim.lsp.buf.hover()<CR>",          { exit = true, nowait = true, desc = "hover" } },
-		{ "R", "<cmd>lua vim.lsp.buf.rename()<CR>",         { exit = true, nowait = true, desc = "rename" } },
-		{ "a", "<cmd>lua vim.lsp.buf.code_action()<CR>",    { nowait = true, desc = "code_actions" } },
+		{ "I", "<cmd>lua vim.lsp.buf.hover()<CR>", { exit = true, nowait = true, desc = "hover" } },
+		{ "R", "<cmd>lua vim.lsp.buf.rename()<CR>", { exit = true, nowait = true, desc = "rename" } },
+		{ "a", "<cmd>lua vim.lsp.buf.code_action()<CR>", { nowait = true, desc = "code_actions" } },
 
 		{
 			"[",
@@ -81,11 +97,15 @@ local lsp_hydra = hydra({
 			'<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>',
 			{ nowait = true, desc = "diagnostic next" },
 		},
-		{ "f",     "<cmd>lua vim.diagnostic.open_float()<CR>", { nowait = true, desc = "diagnostics float" } },
-		{ "l",     "<cmd>lua vim.diagnostic.setloclist()<CR>", { nowait = true, desc = "diagnostics loclist" } },
-		{ "t",     "<cmd>Telescope diagnostics<CR>",           { nowait = true, exit = true, desc = "diagnostics telescope" } },
+		{ "f", "<cmd>lua vim.diagnostic.open_float()<CR>", { nowait = true, desc = "diagnostics float" } },
+		{ "l", "<cmd>lua vim.diagnostic.setloclist()<CR>", { nowait = true, desc = "diagnostics loclist" } },
+		{
+			"t",
+			"<cmd>Telescope diagnostics<CR>",
+			{ nowait = true, exit = true, desc = "diagnostics telescope" },
+		},
 
-		{ "<Esc>", nil,                                        { exit = true, nowait = true, desc = "exit" } },
+		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
 })
 
@@ -100,6 +120,7 @@ _[_: Auto-fix prev spelling issue
 _]_: Auto-fix next spelling issue
 _m_: Marks in telescope
 _j_: Jumplist in telescope
+_t_: Inbuilt terminal at file location
 _<Esc>_: Exit
 ]]
 
@@ -114,17 +135,31 @@ local misc_hydra = hydra({
 		},
 	},
 	heads = {
-		{ "r",     require("user.utils.misc").reload_session, { exit = true, nowait = true, desc = "reload" } },
-		{ "s",     "<cmd>so %<CR>",                           { exit = true, nowait = true, desc = "source file" } },
+		{ "r", require("user.utils.misc").reload_session, { exit = true, nowait = true, desc = "reload" } },
+		{ "s", "<cmd>so %<CR>", { exit = true, nowait = true, desc = "source file" } },
 
 		-- can we improve with this https://stackoverflow.com/questions/5312235/how-do-i-correct-vim-spelling-mistakes-quicker
-		{ "[",     "[s1z=<c-o>",                              { nowait = true, desc = "prev spelling error" } },
-		{ "]",     "]s1z=<c-o>",                              { nowait = true, desc = "next spelling error" } },
+		{ "[", "[s1z=<c-o>", { nowait = true, desc = "prev spelling error" } },
+		{ "]", "]s1z=<c-o>", { nowait = true, desc = "next spelling error" } },
 
-		{ "m",     "<cmd>Telescope marks<CR>",                { nowait = true, exit = true, desc = "marks in telescope" } },
-		{ "j",     "<cmd>Telescope jumplist<CR>",             { nowait = true, exit = true, desc = "jumplist in telescope" } },
+		{
+			"m",
+			"<cmd>Telescope marks<CR>",
+			{ nowait = true, exit = true, desc = "marks in telescope" },
+		},
+		{
+			"j",
+			"<cmd>Telescope jumplist<CR>",
+			{ nowait = true, exit = true, desc = "jumplist in telescope" },
+		},
 
-		{ "<Esc>", nil,                                       { exit = true, nowait = true, desc = "exit" } },
+		{
+			"t",
+			"<C-w>v<C-w>l <CMD>lcd %:p:h | term<CR>",
+			{ nowait = true, exit = true, desc = "open terminal at file location" },
+		},
+
+		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },
 	},
 })
 
@@ -134,3 +169,4 @@ return {
 	lsp_hydra = lsp_hydra,
 	misc_hydra = misc_hydra,
 }
+
