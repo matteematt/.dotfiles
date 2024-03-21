@@ -44,6 +44,7 @@ local kind_icons = {
 	Operator = "",
 	TypeParameter = "",
 	Copilot = "",
+	Codeium = "",
 }
 -- find more here: https://www.nerdfonts.com/cheat-sheet
 
@@ -114,6 +115,7 @@ cmp.setup({
 		end,
 	},
 	sources = {
+		{ name = "codeium" },
 		{ name = "nvim_lsp" },
 		{ name = "nvim_lua" },
 		{ name = "luasnip" },
