@@ -114,7 +114,6 @@ cmp.setup({
 		end,
 	},
 	sources = {
-		{ name = "copilot" },
 		{ name = "nvim_lsp" },
 		{ name = "nvim_lua" },
 		{ name = "luasnip" },
