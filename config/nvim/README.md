@@ -20,7 +20,6 @@ Config for the autopairs plugin (automatically adding in extra brackets for exam
 #### Cmp.lua
 
 Contains config for setting up the autocompletion. The available methods are:
-* Github copilot
 * LSP (nvim lsp)
 * LUA (nvim lua)
 * Snippets (luasnip)
@@ -79,10 +78,6 @@ This directory contains file which are used for the LSP config. To add a new LSP
 3. We can use `:LspInstallInfo` to managed the installed LSPs. Use `i` to install one, and `x` to remove.
 4. If we want custom settings on the LSP clients as explained by each ones readme, we can add the options
 under the settings directory, and then call these settings in the `lsp-installer.nvim` file.
-
-#### Github Copilot
-
-Need to connect with a github account using `:Copilot auth`
 
 ##### Settings
 
