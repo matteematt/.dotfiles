@@ -2,6 +2,7 @@ alacritty
 alsa-utils
 amd-ucode
 arandr
+audacity
 authy
 base
 base-devel
@@ -63,7 +64,6 @@ thunderbird
 ticktick-nativefier
 todoist-electron
 tree
-vlc
 wget
 whatsapp-nativefier
 xdotool
