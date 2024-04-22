@@ -24,7 +24,6 @@ get_iplayer-git
 ghc-static
 git-delta
 go
-hlint-static-git
 htop
 i3-wm
 i3blocks
