@@ -20,3 +20,5 @@ autocommand
 FASTElement
 setline
 TODO
+enum
+json
