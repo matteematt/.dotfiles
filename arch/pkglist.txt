@@ -20,6 +20,7 @@ fd
 firefox
 flameshot
 fontforge
+fuse2
 get_iplayer-git
 ghc-static
 git-delta
