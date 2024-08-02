@@ -1,9 +1,9 @@
-act 0.2.64
+act 0.2.65
 aom 3.9.1
 aribb24 1.0.4
 bat 0.24.0_1
 brotli 1.1.0
-c-ares 1.32.2
+c-ares 1.32.3
 ca-certificates 2024-07-02
 cairo 1.18.0
 capstone 5.0.1
@@ -11,7 +11,7 @@ cjson 1.7.18
 coreutils 9.5
 dav1d 1.4.3
 dtc 1.7.0
-eslint 9.7.0
+eslint 9.8.0
 fd 10.1.0
 ffmpeg 7.0.1
 flac 1.4.3
@@ -19,7 +19,7 @@ fontconfig 2.15.0
 freetype 2.13.2
 frei0r 2.3.3
 fribidi 1.0.15
-fzf 0.54.1
+fzf 0.54.3
 gawk 5.3.0
 gcc 14.1.0_2
 gdbm 1.24
