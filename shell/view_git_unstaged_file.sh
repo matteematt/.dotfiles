@@ -22,7 +22,7 @@ case "$status_code" in
     bat --theme="OneHalfDark" --style=numbers,changes --color always "$file_path"
     ;;
   "M")
-		git diff "$file_path" | delta "-w$FZF_PREVIEW_COLUMNS"
+		git diff --text "$file_path" | delta "-w$FZF_PREVIEW_COLUMNS"
     ;;
   "D")
     echo "New Dir $file_path\n\n`ls $file_path`"
