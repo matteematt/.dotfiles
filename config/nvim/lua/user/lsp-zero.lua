@@ -30,6 +30,20 @@ lsp_zero.extend_lspconfig({
 	capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
+lsp_zero.ui({
+	float_border = 'rounded',
+	sign_text = {
+		error = '✘',
+		warn = '▲',
+		hint = '⚑',
+		info = '»',
+	},
+})
+
+vim.diagnostic.config({
+	virtual_text = false
+})
+
 require('mason').setup({})
 require('mason-lspconfig').setup({
 	handlers = {
