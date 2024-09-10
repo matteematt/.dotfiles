@@ -102,6 +102,7 @@ local kind_icons = {
 cmp.setup({
 	sources = {
 		{ name = 'nvim_lsp' },
+		{ name = 'codeium' },
 	},
 	formatting = {
 		fields = { "kind", "abbr", "menu" },

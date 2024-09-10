@@ -100,6 +100,13 @@ return require("packer").startup(function(use)
 	use({ 'neovim/nvim-lspconfig' })
 	use({ 'hrsh7th/cmp-nvim-lsp' })
 	use({ 'hrsh7th/nvim-cmp' })
+	use({
+		"Exafunction/codeium.nvim",
+		requires = {
+			"nvim-lua/plenary.nvim",
+			"hrsh7th/nvim-cmp",
+		}
+	})
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
