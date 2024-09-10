@@ -94,6 +94,13 @@ return require("packer").startup(function(use)
 	--
 	use({ "lukas-reineke/indent-blankline.nvim" })
 
+	use({ 'VonHeikemen/lsp-zero.nvim', branch = 'v4.x' })
+	use({ 'williamboman/mason.nvim' })
+	use({ 'williamboman/mason-lspconfig.nvim' })
+	use({ 'neovim/nvim-lspconfig' })
+	use({ 'hrsh7th/cmp-nvim-lsp' })
+	use({ 'hrsh7th/nvim-cmp' })
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if packer_bootstrap then
