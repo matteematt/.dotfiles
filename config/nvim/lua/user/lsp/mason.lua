@@ -38,6 +38,7 @@ local opts = {}
 
 for _, server in pairs(servers) do
 	-- print(server)
+	server = server == 'tsserver' and 'ts_ls' or server
 	opts = {
 		on_attach = require("user.lsp.handlers").on_attach,
 		capabilities = require("user.lsp.handlers").capabilities,
