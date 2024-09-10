@@ -60,25 +60,6 @@ return require("packer").startup(function(use)
 	use("nvim-lua/popup.nvim")
 	use("nvim-lua/plenary.nvim")
 
-	-- cmp plugins
-	use("hrsh7th/nvim-cmp")
-	use("hrsh7th/cmp-buffer")
-	use("hrsh7th/cmp-path")
-	use("hrsh7th/cmp-cmdline")
-	use("saadparwaiz1/cmp_luasnip")
-	use("hrsh7th/cmp-nvim-lsp")
-	use("hrsh7th/cmp-nvim-lua")
-
-	-- snippets
-	use("L3MON4D3/LuaSnip") -- snippet engine
-	use("rafamadriz/friendly-snippets") -- a bunch of snippets
-
-	-- lsp
-	use("neovim/nvim-lspconfig")
-	use("jose-elias-alvarez/null-ls.nvim") -- linter
-	use("williamboman/mason.nvim") -- simple to use language server installer
-	use("williamboman/mason-lspconfig.nvim") -- simple to use language server installer
-
 	-- telescope <C-q> to add to quickfix list
 	use("nvim-telescope/telescope.nvim")
 
@@ -88,7 +69,7 @@ return require("packer").startup(function(use)
 	use("p00f/nvim-ts-rainbow")
 
 	-- Autopairs
-	use("windwp/nvim-autopairs")
+	-- use("windwp/nvim-autopairs")
 
 	-- git
 	use("lewis6991/gitsigns.nvim")
@@ -112,14 +93,6 @@ return require("packer").startup(function(use)
 
 	--
 	use({ "lukas-reineke/indent-blankline.nvim" })
-
-	use({
-		"Exafunction/codeium.nvim",
-		requires = {
-			"nvim-lua/plenary.nvim",
-			"hrsh7th/nvim-cmp",
-		}
-	})
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
