@@ -39,6 +39,19 @@ require('mason-lspconfig').setup({
 	},
 })
 
+Filetypes_connected = {}
+
+vim.api.nvim_create_autocmd("LspTokenUpdate", {
+	callback = function(_)
+		local filetype = vim.bo.filetype
+		if Filetypes_connected[filetype] then
+			return
+		end
+		print("Lsp attatched for filetype: " .. filetype)
+		Filetypes_connected[filetype] = true
+	end,
+})
+
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
 
@@ -121,6 +134,7 @@ cmp.setup({
 		select = false,
 	},
 	window = {
+		completion = cmp.config.window.bordered(),
 		documentation = cmp.config.window.bordered(),
 	},
 	experimental = {
