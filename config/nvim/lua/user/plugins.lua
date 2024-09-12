@@ -87,7 +87,7 @@ return require("packer").startup(function(use)
 	use("mechatroner/rainbow_csv")
 
 	-- Hydra modes
-	use("anuvyklack/hydra.nvim")
+	use("nvimtools/hydra.nvim")
 
 	use("nvim-tree/nvim-web-devicons")
 
