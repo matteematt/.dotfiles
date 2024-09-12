@@ -32,8 +32,8 @@ local git_hydra = hydra({
 		},
 	},
 	heads = {
-		{ "]", "<cmd>Gitsigns next_hunk<CR>", { silent = true, desc = "next hunk" } },
-		{ "[", "<cmd>Gitsigns prev_hunk<CR>", { silent = true, desc = "prev hunk" } },
+		{ "]", "<cmd>Gitsigns next_hunk<CR>",                 { silent = true, desc = "next hunk" } },
+		{ "[", "<cmd>Gitsigns prev_hunk<CR>",                 { silent = true, desc = "prev hunk" } },
 		{ "b", "<cmd>Gitsigns toggle_current_line_blame<CR>", { silent = true, desc = "toggle diff" } },
 		{
 			"d",
@@ -83,15 +83,15 @@ local lsp_hydra = hydra({
 		},
 	},
 	heads = {
-		{ "d", "<cmd>lua vim.lsp.buf.definition()<CR>", { exit = true, nowait = true, desc = "definition" } },
-		{ "D", "<cmd>lua vim.lsp.buf.declaration()<CR>", { exit = true, nowait = true, desc = "declaration" } },
+		{ "d", "<cmd>lua vim.lsp.buf.definition()<CR>",     { exit = true, nowait = true, desc = "definition" } },
+		{ "D", "<cmd>lua vim.lsp.buf.declaration()<CR>",    { exit = true, nowait = true, desc = "declaration" } },
 		{ "i", "<cmd>lua vim.lsp.buf.implementation()<CR>", { exit = true, nowait = true, desc = "implementation" } },
-		{ "r", "<cmd>lua vim.lsp.buf.references()<CR>", { exit = true, nowait = true, desc = "references" } },
+		{ "r", "<cmd>lua vim.lsp.buf.references()<CR>",     { exit = true, nowait = true, desc = "references" } },
 		{ "s", "<cmd>lua vim.lsp.buf.signature_help()<CR>", { exit = true, nowait = true, desc = "signature_help" } },
 
-		{ "I", "<cmd>lua vim.lsp.buf.hover()<CR>", { exit = true, nowait = true, desc = "hover" } },
-		{ "R", "<cmd>lua vim.lsp.buf.rename()<CR>", { exit = true, nowait = true, desc = "rename" } },
-		{ "a", "<cmd>lua vim.lsp.buf.code_action()<CR>", { nowait = true, desc = "code_actions" } },
+		{ "I", "<cmd>lua vim.lsp.buf.hover()<CR>",          { exit = true, nowait = true, desc = "hover" } },
+		{ "R", "<cmd>lua vim.lsp.buf.rename()<CR>",         { exit = true, nowait = true, desc = "rename" } },
+		{ "a", "<cmd>lua vim.lsp.buf.code_action()<CR>",    { nowait = true, desc = "code_actions" } },
 
 		{
 			"[",
@@ -145,11 +145,11 @@ local misc_hydra = hydra({
 	},
 	heads = {
 		{ "r", require("user.utils.misc").reload_session, { exit = true, nowait = true, desc = "reload" } },
-		{ "s", "<cmd>so %<CR>", { exit = true, nowait = true, desc = "source file" } },
+		{ "s", "<cmd>so %<CR>",                           { exit = true, nowait = true, desc = "source file" } },
 
 		-- can we improve with this https://stackoverflow.com/questions/5312235/how-do-i-correct-vim-spelling-mistakes-quicker
-		{ "[", "[s1z=<c-o>", { nowait = true, desc = "prev spelling error" } },
-		{ "]", "]s1z=<c-o>", { nowait = true, desc = "next spelling error" } },
+		{ "[", "[s1z=<c-o>",                              { nowait = true, desc = "prev spelling error" } },
+		{ "]", "]s1z=<c-o>",                              { nowait = true, desc = "next spelling error" } },
 
 		{
 			"m",
@@ -178,4 +178,3 @@ return {
 	lsp_hydra = lsp_hydra,
 	misc_hydra = misc_hydra,
 }
-
