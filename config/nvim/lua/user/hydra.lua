@@ -24,8 +24,11 @@ local git_hydra = hydra({
 	config = {
 		color = "pink",
 		hint = {
-			border = "rounded",
 			offset = 2,
+			float_opts = {
+				border = "rounded",
+				style = "minimal",
+			}
 		},
 	},
 	heads = {
@@ -72,8 +75,11 @@ local lsp_hydra = hydra({
 	config = {
 		color = "pink",
 		hint = {
-			border = "rounded",
 			offset = 2,
+			float_opts = {
+				border = "rounded",
+				style = "minimal",
+			}
 		},
 	},
 	heads = {
@@ -130,8 +136,11 @@ local misc_hydra = hydra({
 	config = {
 		color = "pink",
 		hint = {
-			border = "rounded",
 			offset = 2,
+			float_opts = {
+				border = "rounded",
+				style = "minimal",
+			}
 		},
 	},
 	heads = {
