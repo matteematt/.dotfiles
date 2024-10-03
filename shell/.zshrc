@@ -151,6 +151,7 @@ alias rgf="rg -uu --files | rg --invert-match \.git | rg"
 
 source ~/.dotfiles/shell/git_extras.sh
 source ~/.dotfiles/shell/dir_jumping.sh
+source ~/.dotfiles/shell/ai.sh
 source ~/.dotfiles/shell/lib/lib.sh
 
 function checkoutPrimaryGitBranch {
@@ -181,6 +182,8 @@ alias grs='git rebase -i HEAD~$(git rev-list --count master..)'
 alias ta="tmux attach"
 
 alias wipe='clear && printf "\e[3J"'
+
+alias llmc='openLLMinEditor'
 
 # [1]
 # https://unix.stackexchange.com/questions/6620/how-to-edit-command-line-in-full-screen-editor-in-zsh
