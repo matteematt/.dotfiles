@@ -1,13 +1,20 @@
 function openLLMinEditor {
     local extension=""
     local tempfile
+    local persistent=false
+    local reset=false
 
-    # Parse options, -f can be used to specify an extension for the tempfile
-		# effectively setting syntax highlighting in the editor
-    while getopts "f:" opt; do
+    # Parse options
+    while getopts "f:pr" opt; do
         case $opt in
             f)
                 extension=".$OPTARG"
+                ;;
+            p)
+                persistent=true
+                ;;
+            r)
+                reset=true
                 ;;
             \?)
                 echo "Invalid option: -$OPTARG" >&2
@@ -22,13 +29,19 @@ function openLLMinEditor {
 
     editor="${EDITOR:-nvim}"
 
-    if [ -n "$extension" ]; then
-        tempfile="$(mktemp)$extension"
+    if $persistent; then
+        tempfile="/tmp/llm_temp$extension"
+        if [ ! -f "$tempfile" ] || $reset; then
+            > "$tempfile"  # Create or clear the file
+        fi
     else
-        tempfile=$(mktemp)
+        if [ -n "$extension" ]; then
+            tempfile="$(mktemp)$extension"
+        else
+            tempfile=$(mktemp)
+        fi
+        trap "rm -f $tempfile" EXIT
     fi
-
-    trap "rm -f $tempfile" EXIT
 
     $editor "$tempfile"
 
@@ -37,5 +50,10 @@ function openLLMinEditor {
         cat "$tempfile" | llm
     else
         echo "No input detected"
+    fi
+
+    # If not persistent, remove the tempfile
+    if ! $persistent; then
+        rm -f "$tempfile"
     fi
 }
