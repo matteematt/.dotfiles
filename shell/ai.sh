@@ -82,7 +82,7 @@ function openLLMinEditor {
 						cat "$tempfile" | llm
         fi
     else
-        echo "No input detected"
+        echo "No input detected. Skipping LLM processing."
     fi
 
     # If not persistent, remove the tempfile
