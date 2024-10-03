@@ -33,7 +33,7 @@ function openLLMinEditor {
     if $persistent; then
         tempfile="/tmp/llm_temp$extension"
         if [ ! -f "$tempfile" ] || $reset; then
-            > "$tempfile"  # Create or clear the file
+            echo -n '' > "$tempfile"  # Create or clear the file
         else
             # Get the current user request count
             user_request_count=$(grep -c "=======user " "$tempfile")
@@ -54,8 +54,8 @@ function openLLMinEditor {
 =======user $user_request_count========
 " >> "$tempfile"
 
-			# Store the initial md5sum if in persistent mode
-        initial_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
+      # Store the initial md5sum if in persistent mode
+      initial_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
     fi
 
     # Open the editor with specific commands for Neovim in persistent mode
