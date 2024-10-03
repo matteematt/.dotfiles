@@ -71,24 +71,18 @@ function openLLMinEditor {
             # Compare the md5sum after editing with the initial md5sum
             current_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
-                local llm_response
-                llm_response=$(cat "$tempfile" | llm)
-                echo "$llm_response"
-
                 echo -e "
 =======response========
 " >> "$tempfile"
-                echo "$llm_response" >> "$tempfile"
+                cat "$tempfile" | llm "Don't ever create additional user inputs" | tee -a "$tempfile"
             else
                 echo "No input detected. Skipping LLM processing."
             fi
         else
-            local llm_response
-            llm_response=$(cat "$tempfile" | llm)
-            echo "$llm_response"
+						cat "$tempfile" | llm
         fi
     else
-        echo "No input detected"
+        echo "No input detected. Skipping LLM processing."
     fi
 
     # If not persistent, remove the tempfile
