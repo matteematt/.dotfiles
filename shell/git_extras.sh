@@ -32,6 +32,17 @@ function __formatGitStatus() {
   echo "$formatted"
 }
 
+function checkoutPrimaryGitBranch {
+	if git rev-parse --verify master >/dev/null 2>&1; then
+		git checkout master
+	elif git rev-parse --verify main >/dev/null 2>&1; then
+		git checkout main
+	else
+		primary_branch=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
+		git checkout "$primary_branch"
+	fi
+}
+
 # Similar to getDiffByList but views the output in bat inline and
 # selecting an option automatically calls 'git add' on it
 function gitViewAndStage() {
