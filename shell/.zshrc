@@ -155,7 +155,7 @@ source ~/.dotfiles/shell/ai.sh
 source ~/.dotfiles/shell/lib/lib.sh
 
 function checkoutPrimaryGitBranch {
-	git checkout $(git symbolic-ref refs/remotes/origin/HEAD | rev | cut -d'/' -f1 | rev)
+	git checkout $(git remote show origin | sed -n "/HEAD branch/s/.*: //p")
 }
 
 #git diff list
