@@ -154,17 +154,6 @@ source ~/.dotfiles/shell/dir_jumping.sh
 source ~/.dotfiles/shell/ai.sh
 source ~/.dotfiles/shell/lib/lib.sh
 
-function checkoutPrimaryGitBranch {
-	if git rev-parse --verify master >/dev/null 2>&1; then
-		git checkout master
-	elif git rev-parse --verify main >/dev/null 2>&1; then
-		git checkout main
-	else
-		primary_branch=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
-		git checkout "$primary_branch"
-	fi
-}
-
 #git diff list
 alias gdl="getDiffByList"
 #git add last
