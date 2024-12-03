@@ -5,7 +5,6 @@ arandr
 audacity
 authy
 base
-base-devel
 bc
 bitwarden
 cabal-install
