@@ -108,13 +108,11 @@ local kind_icons = {
 	Operator = "",
 	TypeParameter = "",
 	Copilot = "",
-	Codeium = "",
 }
 
 cmp.setup({
 	sources = {
 		{ name = 'nvim_lsp' },
-		{ name = 'codeium' },
 	},
 	formatting = {
 		fields = { "kind", "abbr", "menu" },
