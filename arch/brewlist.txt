@@ -1,11 +1,11 @@
-bat 0.24.0_1
+bat 0.24.0_2
 bzip2 1.0.8
-ca-certificates 2024-11-26
-fzf 0.56.3
-libgit2@1.7 1.7.2
+ca-certificates 2024-12-31
+fzf 0.57.0
+libgit2@1.8 1.8.4
 libssh2 1.11.1
 ncurses 6.5
-oniguruma 6.9.9
+oniguruma 6.9.10
 openssl@3 3.4.0
 pcre2 10.44
 ripgrep 14.1.1
