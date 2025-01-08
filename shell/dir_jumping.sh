@@ -38,11 +38,17 @@ function changeDirFromHistory {
 # Find all directories inside of a git project and jump to it
 # Works in a git repo or in a worktree
 function changeDirInsideGitProject {
-	top_level="$(git rev-parse --show-toplevel)"
-	chosen_dir=$(eval "$(fzfLsPreview "Project Jump" "$top_level/")" <<< "$(cd "$top_level" && echo "$(fd --type directory)\n/")" )
-	chosen_dir="$top_level/$chosen_dir"
-  if [[ -d "$chosen_dir" ]]; then
-		pushChangedDirToList "$chosen_dir"
+  if ! top_level="$(git rev-parse --show-toplevel)"; then
+    return 1
+  fi
+  chosen_dir=$(eval "$(fzfLsPreview "Project Jump" "$top_level/")" <<< "$(cd "$top_level" && echo "$(fd --type directory)\n/")" )
+
+  # Only proceed if fzf returned a selection (not cancelled with Esc/Ctrl-C)
+  if [[ -n "$chosen_dir" ]]; then
+    chosen_dir="$top_level/$chosen_dir"
+    if [[ -d "$chosen_dir" ]]; then
+      pushChangedDirToList "$chosen_dir"
+    fi
   fi
 }
 
