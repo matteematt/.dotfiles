@@ -38,21 +38,31 @@ function changeDirFromHistory {
 # Find all directories inside of a git project and jump to it
 # Works in a git repo or in a worktree
 function changeDirInsideGitProject {
-	top_level="$(git rev-parse --show-toplevel)"
-	chosen_dir=$(eval "$(fzfLsPreview "Project Jump" "$top_level/")" <<< "$(cd "$top_level" && echo "$(fd --type directory)\n/")" )
-	chosen_dir="$top_level/$chosen_dir"
-  if [[ -d "$chosen_dir" ]]; then
-		pushChangedDirToList "$chosen_dir"
+  if ! top_level="$(git rev-parse --show-toplevel)"; then
+    return 1
+  fi
+  chosen_dir=$(eval "$(fzfLsPreview "Project Jump" "$top_level/")" <<< "$(cd "$top_level" && echo "$(fd --type directory)\n/")" )
+
+  # Only proceed if fzf returned a selection (not cancelled with Esc/Ctrl-C)
+  if [[ -n "$chosen_dir" ]]; then
+    chosen_dir="$top_level/$chosen_dir"
+    if [[ -d "$chosen_dir" ]]; then
+      pushChangedDirToList "$chosen_dir"
+    fi
   fi
 }
 
 # Find all branches inside of the projects _worktrees_git to jump to
 function changeWorktreeProject {
-	top_level="$(cd "$(pwd | awk -v FS="_worktrees_git/" '{print $1}')" && git rev-parse --show-toplevel)"
-	chosen_dir=$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf --header "Worktree Jump" --preview "cd $top_level/_worktrees_git/{} && git log")
-	chosen_dir="$top_level/_worktrees_git/$chosen_dir"
-	if [[ -d "$chosen_dir" ]]; then
-		pushChangedDirToList "$chosen_dir"
-	fi
+  top_level="$(cd "$(pwd | awk -v FS="_worktrees_git/" '{print $1}')" && git rev-parse --show-toplevel)"
+  chosen_dir=$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf --header "Worktree Jump" --preview "cd $top_level/_worktrees_git/{} && git log")
+
+  # Only proceed if fzf returned a selection (not cancelled with Esc/Ctrl-C)
+  if [[ -n "$chosen_dir" ]]; then
+    chosen_dir="$top_level/_worktrees_git/$chosen_dir"
+    if [[ -d "$chosen_dir" ]]; then
+      pushChangedDirToList "$chosen_dir"
+    fi
+  fi
 }
 
