@@ -4,21 +4,31 @@ function openLLMinEditor {
     local persistent=false
     local reset=false
     local user_request_count=0
+    local persistent_name="temp"  # Default name
 
     # Parse options
-    while getopts "f:pr" opt; do
+    while getopts ":p:f:r" opt; do
         case $opt in
-            f)
-                extension=".$OPTARG"
-                ;;
             p)
                 persistent=true
+                if [ -z "$OPTARG" ]; then
+                    echo "Error: -p requires a name argument" >&2
+                    return 1
+                fi
+                persistent_name="$OPTARG"
+                ;;
+            f)
+                extension=".$OPTARG"
                 ;;
             r)
                 reset=true
                 ;;
             \?)
                 echo "Invalid option: -$OPTARG" >&2
+                return 1
+                ;;
+            :)
+                echo "Error: Option -$OPTARG requires an argument." >&2
                 return 1
                 ;;
         esac
@@ -31,7 +41,7 @@ function openLLMinEditor {
     editor="${EDITOR:-nvim}"
 
     if $persistent; then
-        tempfile="/tmp/llm_temp$extension"
+        tempfile="/tmp/llm_${persistent_name}$extension"
         if [ ! -f "$tempfile" ] || $reset; then
             echo -n '' > "$tempfile"  # Create or clear the file
         else
@@ -54,8 +64,8 @@ function openLLMinEditor {
 =======user $user_request_count========
 " >> "$tempfile"
 
-      # Store the initial md5sum if in persistent mode
-      initial_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
+        # Store the initial md5sum if in persistent mode
+        initial_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
     fi
 
     # Open the editor with specific commands for Neovim in persistent mode
@@ -79,7 +89,7 @@ function openLLMinEditor {
                 echo "No input detected. Skipping LLM processing."
             fi
         else
-						cat "$tempfile" | llm
+            cat "$tempfile" | llm
         fi
     else
         echo "No input detected. Skipping LLM processing."
