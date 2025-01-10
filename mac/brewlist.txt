@@ -1,7 +1,7 @@
 act 0.2.71
 aom 3.11.0
 aribb24 1.0.4
-bat 0.24.0_2
+bat 0.25.0_1
 brotli 1.1.0
 c-ares 1.34.4
 ca-certificates 2024-12-31
@@ -24,7 +24,7 @@ gdbm 1.24
 gettext 0.23.1
 ghc 9.10.1
 giflib 5.2.2
-git-delta 0.18.2_2
+git-delta 0.18.2_3
 glib 2.82.4
 gmp 6.3.0
 gnutls 3.8.4
@@ -52,7 +52,7 @@ libidn2 2.3.7
 libmicrohttpd 1.0.1
 libnghttp2 1.64.0
 libogg 1.3.5
-libpng 1.6.44
+libpng 1.6.45
 librist 0.2.11
 libsamplerate 0.2.2
 libsndfile 1.2.2
@@ -92,10 +92,10 @@ mpfr 4.2.1
 mpg123 1.32.10
 msgpack 6.1.0
 ncurses 6.5
-neovide 0.13.3
+neovide 0.14.0
 neovim 0.10.3
-nettle 3.10
-node 23.5.0
+nettle 3.10.1
+node 23.6.0
 oniguruma 6.9.10
 opencore-amr 0.1.6
 openexr 3.3.2
@@ -104,7 +104,7 @@ openssl@1.1 1.1.1w
 openssl@3 3.4.0
 opus 1.5.2
 p11-kit 0.25.5
-pango 1.55.5
+pango 1.56.0
 pcre2 10.44
 pixman 0.44.2
 prettier 3.4.2
