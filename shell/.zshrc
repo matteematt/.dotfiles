@@ -33,12 +33,32 @@ export LESS_TERMCAP_so=$'\e[01;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 
+configure_autocompletion() {
 # Autocompletion behaviour when pressing tab
 autoload -Uz compinit && compinit
 # case insensitive path-completion 
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
 # partial completion suggestions
 zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
+}
+
+# Load completion system when first attempting completion
+zmodload -i zsh/complist
+
+# Create function to delete widget and load completions
+load_completion_on_demand() {
+    # Remove this widget
+    zle -D load_completion_on_demand
+    # Load completions
+    configure_autocompletion
+    # Re-run the completion widget
+    zle complete-word
+}
+
+# Bind tab to the demand-loading widget
+zle -N load_completion_on_demand
+bindkey "^I" load_completion_on_demand
+
 
 ##############################
 # Open prompt in editor [1]
