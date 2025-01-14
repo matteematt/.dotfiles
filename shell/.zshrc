@@ -7,6 +7,13 @@
 
 [ -f "$HOME/.secrets.sh" ] && source "$HOME/.secrets.sh"
 [ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
+#
+########################################
+# PLUGINS
+########################################
+
+# Used to defer loading of git integration to make loading faster
+source ~/.dotfiles/shell/lib/zsh-defer.plugin.zsh
 
 ########################################
 # SETTINGS & OPTIONS
@@ -33,13 +40,37 @@ export LESS_TERMCAP_so=$'\e[01;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 
+########################################
+# Completions (lazy loaded)
+########################################
+
+# Create a wrapper function for compdef at the start
+# buffering the input and output. This handles the functionality
+# before the real function is lazily loaded in
+function compdef() {
+  [[ -z $compdef_queue ]] && compdef_queue=()
+  compdef_queue+=("compdef $*")
+}
+
 configure_autocompletion() {
-# Autocompletion behaviour when pressing tab
-autoload -Uz compinit && compinit
-# case insensitive path-completion 
-zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
-# partial completion suggestions
-zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
+  autoload -Uz compinit
+  compinit
+
+  # Run stored compdef calls
+  local compdef_call
+  for compdef_call in $compdef_queue; do
+    eval $compdef_call
+  done
+  unset compdef_queue
+
+  # Restore original compdef function
+  unfunction compdef
+  autoload -Uz compdef
+
+  # case insensitive path-completion
+  zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
+  # partial completion suggestions
+  zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
 }
 
 # Load completion system when first attempting completion
@@ -47,18 +78,17 @@ zmodload -i zsh/complist
 
 # Create function to delete widget and load completions
 load_completion_on_demand() {
-    # Remove this widget
-    zle -D load_completion_on_demand
-    # Load completions
-    configure_autocompletion
-    # Re-run the completion widget
-    zle complete-word
+  # Remove this widget
+  zle -D load_completion_on_demand
+  # Load completions
+  configure_autocompletion
+  # Re-run the completion widget
+  zle complete-word
 }
 
 # Bind tab to the demand-loading widget
 zle -N load_completion_on_demand
 bindkey "^I" load_completion_on_demand
-
 
 ##############################
 # Open prompt in editor [1]
@@ -105,31 +135,40 @@ RPROMPT="%*"
 # Current directory name
 PROMPT='%(?.%F{green}✓.%F{red}?%?)%f %B%F{cyan}%1~%f%b'
 
-# If in a git repo then show the branch name [3]
-# and indicate unstaged, staged, and untracked change
-autoload -Uz vcs_info
-precmd_vcs_info() { vcs_info }
-precmd_functions+=( precmd_vcs_info )
-zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:*' get-revision true
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' stagedstr '✚ '
-zstyle ':vcs_info:*' unstagedstr '● '
-zstyle ':vcs_info:*' formats ' %F{blue}git:(%f%F{167}%m%u%c%b%f%F{blue})%f'
-zstyle ':vcs_info:*' actionformats ' %F{red}git:(%f%F{red}%B%m%u%c%b%f%F{red})%f'
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
-vcs_info
-PROMPT+=\$vcs_info_msg_0_
-setopt prompt_subst
+# Initialize empty vcs_info_msg_0_
+vcs_info_msg_0_=''
 
-+vi-git-untracked() {
-    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
-        git status --porcelain | grep -m 1 '^??' &>/dev/null
-    then
-        hook_com[misc]='? '
-    fi
+# Function to setup vcs_info
+function load_vcs_info() {
+    autoload -Uz vcs_info
+    precmd_vcs_info() { vcs_info }
+    precmd_functions+=( precmd_vcs_info )
+    zstyle ':vcs_info:*' enable git
+    zstyle ':vcs_info:*' get-revision true
+    zstyle ':vcs_info:*' check-for-changes true
+    zstyle ':vcs_info:*' stagedstr '✚ '
+    zstyle ':vcs_info:*' unstagedstr '● '
+    zstyle ':vcs_info:*' formats ' %F{blue}git:(%f%F{167}%m%u%c%b%f%F{blue})%f'
+    zstyle ':vcs_info:*' actionformats ' %F{red}git:(%f%F{red}%B%m%u%c%b%f%F{red})%f'
+    zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
+
+    # Define the untracked files hook
+    +vi-git-untracked() {
+        if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+            git status --porcelain | grep -m 1 '^??' &>/dev/null
+        then
+            hook_com[misc]='? '
+        fi
+    }
+
+    vcs_info
 }
 
+# Defer loading of vcs_info
+zsh-defer load_vcs_info
+
+PROMPT+=\$vcs_info_msg_0_
+setopt prompt_subst
 
 # Show % or # depending whether the prompt has privileged access
 PROMPT+=' %# '
