@@ -1,21 +1,31 @@
 function openLLMinEditor {
     local extension=""
     local tempfile
-    local persistent=false
+    local thread=false
+    local persist=false
     local reset=false
     local user_request_count=0
-    local persistent_name="temp"  # Default name
+    local thread_name="temp"  # Default name
+    local cache_dir="$HOME/.cache/llmc-chatbot"
 
     # Parse options
-    while getopts ":p:f:r:" opt; do
+    while getopts ":t:p:f:r:" opt; do
         case $opt in
+            t)
+                thread=true
+                if [ -z "$OPTARG" ]; then
+                    echo "Error: -t requires a name argument" >&2
+                    return 1
+                fi
+                thread_name="$OPTARG"
+                ;;
             p)
-                persistent=true
+                persist=true
                 if [ -z "$OPTARG" ]; then
                     echo "Error: -p requires a name argument" >&2
                     return 1
                 fi
-                persistent_name="$OPTARG"
+                thread_name="$OPTARG"
                 ;;
             f)
                 extension=".$OPTARG"
@@ -26,8 +36,8 @@ function openLLMinEditor {
                     echo "Error: -r requires a filename argument" >&2
                     return 1
                 fi
-                persistent_name="$OPTARG"
-                persistent=true
+                thread_name="$OPTARG"
+                thread=true
                 ;;
             \?)
                 echo "Invalid option: -$OPTARG" >&2
@@ -46,8 +56,14 @@ function openLLMinEditor {
 
     editor="${EDITOR:-nvim}"
 
-    if $persistent; then
-        tempfile="/tmp/llm_${persistent_name}$extension"
+    if $thread || $persist; then
+        # Create cache directory if it doesn't exist
+        if $persist; then
+            mkdir -p "$cache_dir"
+            tempfile="$cache_dir/${thread_name}$extension"
+        else
+            tempfile="/tmp/llm_${thread_name}$extension"
+        fi
 
         # Create the file if it doesn't exist or if reset flag is true
         if [ ! -f "$tempfile" ]; then
@@ -75,7 +91,7 @@ function openLLMinEditor {
             echo -e "=======user $user_request_count========\n\n" >> "$tempfile"
         fi
 
-        # Store the initial md5sum if in persistent mode
+        # Store the initial md5sum if in thread or persist mode
         initial_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
     else
         if [ -n "$extension" ]; then
@@ -86,8 +102,8 @@ function openLLMinEditor {
         trap "rm -f $tempfile" EXIT
     fi
 
-    # Open the editor with specific commands for Neovim in persistent mode
-    if $persistent && [[ "$editor" == *"nvim"* ]]; then
+    # Open the editor with specific commands for Neovim in thread/persist mode
+    if ($thread || $persist) && [[ "$editor" == *"nvim"* ]]; then
         nvim -c "normal G" -c "normal zt" "$tempfile"
     else
         $editor "$tempfile"
@@ -95,7 +111,7 @@ function openLLMinEditor {
 
     # Check if tempfile exists and is non-empty
     if [ -s "$tempfile" ]; then
-        if $persistent; then
+        if $thread || $persist; then
             # Compare the md5sum after editing with the initial md5sum
             current_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
@@ -111,8 +127,8 @@ function openLLMinEditor {
         echo "No input detected. Skipping LLM processing."
     fi
 
-    # If not persistent, remove the tempfile
-    if ! $persistent; then
+    # If not thread or persist, remove the tempfile
+    if ! $thread && ! $persist; then
         rm -f "$tempfile"
     fi
 }
