@@ -2,17 +2,24 @@ handle_llm_output() {
     local input=$1
 		local tempfile=$2  # Add tempfile as second parameter
 
+		    local prompt
+    read -r -d '' prompt << 'EOF'
+You are a helpful assistant. Please follow these guidelines:
+- Use markdown formatting when appropriate - when adding code blocks please always tag the language name after the backticks
+- Stay focused on the user's question - Don't create additional user prompts
+EOF
+
     # Save screen and switch to alternate screen
     echo -en "\033[?1049h"
 
     # Stream output and capture it
-    temp_output=$(echo "$input" | llm "Don't ever create additional user inputs" | tee /dev/tty)
+    temp_output=$(echo "$input" | llm "$prompt" | tee /dev/tty)
 
     # Switch back to main screen
     echo -en "\033[?1049l"
 
     # Display formatted output
-    echo "$temp_output" | bat --paging=never
+    echo "$temp_output" | bat --paging=never --theme="OneHalfDark" --color always -p -l md
 
     # If we need to append to tempfile (for thread/persist mode)
     if [ -n "$tempfile" ]; then
