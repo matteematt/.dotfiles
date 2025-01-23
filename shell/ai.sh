@@ -1,3 +1,32 @@
+call_llm_and_handle() {
+    local input=$1
+    local tempfile=$2  # Add tempfile as second parameter
+
+    local prompt
+    read -r -d '' prompt << 'EOF'
+You are a helpful assistant. Please follow these guidelines:
+- Use markdown formatting when appropriate - when adding code blocks please always tag the language name after the backticks
+- Stay focused on the user's question - Don't create additional user prompts
+EOF
+
+    # Save screen and switch to alternate screen
+    echo -en "[?1049h"
+
+    # Stream output and capture it
+    temp_output=$(echo "$input" | llm "$prompt" | tee /dev/tty)
+
+    # Switch back to main screen
+    echo -en "[?1049l"
+
+    # Display formatted output
+    echo "$temp_output" | bat --paging=never --theme="OneHalfDark" --color always -p -l md
+
+    # If we need to append to tempfile (for thread/persist mode)
+    if [ -n "$tempfile" ]; then
+        echo "$temp_output" >> "$tempfile"
+    fi
+}
+
 function openLLMinEditor {
     local extension=""
     local tempfile
@@ -116,12 +145,12 @@ function openLLMinEditor {
             current_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
                 echo -e "\n=======response========" >> "$tempfile"
-                cat "$tempfile" | llm "Don't ever create additional user inputs" | tee -a "$tempfile"
+                call_llm_and_handle "$(cat "$tempfile")" "$tempfile"
             else
                 echo "No input detected. Skipping LLM processing."
             fi
         else
-            cat "$tempfile" | llm
+            call_llm_and_handle "$(cat "$tempfile")"
         fi
     else
         echo "No input detected. Skipping LLM processing."
