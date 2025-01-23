@@ -1,5 +1,6 @@
 handle_llm_output() {
     local input=$1
+		local tempfile=$2  # Add tempfile as second parameter
 
     # Save screen and switch to alternate screen
     echo -en "\033[?1049h"
@@ -138,13 +139,13 @@ function openLLMinEditor {
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
                 echo -e "\n=======response========" >> "$tempfile"
                 # New streaming output with bat formatting
-								handle_llm_output "$(cat "$tempfile")" true
+								handle_llm_output "$(cat "$tempfile")" "$tempfile"
             else
                 echo "No input detected. Skipping LLM processing."
             fi
         else
             # For non-persistent mode, just use bat directly
-						handle_llm_output "$(cat "$tempfile")" true
+						handle_llm_output "$(cat "$tempfile")"
         fi
     else
         echo "No input detected. Skipping LLM processing."
