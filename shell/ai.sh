@@ -10,13 +10,13 @@ You are a helpful assistant. Please follow these guidelines:
 EOF
 
     # Save screen and switch to alternate screen
-    echo -en "[?1049h"
+    echo -en "\033[?1049h"
 
     # Stream output and capture it
     temp_output=$(echo "$input" | llm "$prompt" | tee /dev/tty)
 
     # Switch back to main screen
-    echo -en "[?1049l"
+    echo -en "\033[?1049l"
 
     # Display formatted output
     echo "$temp_output" | bat --paging=never --theme="OneHalfDark" --color always -p -l md
