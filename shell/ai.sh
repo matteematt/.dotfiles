@@ -1,8 +1,8 @@
-handle_llm_output() {
+call_llm_and_handle() {
     local input=$1
-		local tempfile=$2  # Add tempfile as second parameter
+    local tempfile=$2  # Add tempfile as second parameter
 
-		    local prompt
+    local prompt
     read -r -d '' prompt << 'EOF'
 You are a helpful assistant. Please follow these guidelines:
 - Use markdown formatting when appropriate - when adding code blocks please always tag the language name after the backticks
@@ -10,13 +10,13 @@ You are a helpful assistant. Please follow these guidelines:
 EOF
 
     # Save screen and switch to alternate screen
-    echo -en "\033[?1049h"
+    echo -en "[?1049h"
 
     # Stream output and capture it
     temp_output=$(echo "$input" | llm "$prompt" | tee /dev/tty)
 
     # Switch back to main screen
-    echo -en "\033[?1049l"
+    echo -en "[?1049l"
 
     # Display formatted output
     echo "$temp_output" | bat --paging=never --theme="OneHalfDark" --color always -p -l md
@@ -138,21 +138,19 @@ function openLLMinEditor {
         $editor "$tempfile"
     fi
 
-		# Check if tempfile exists and is non-empty
+    # Check if tempfile exists and is non-empty
     if [ -s "$tempfile" ]; then
         if $thread || $persist; then
             # Compare the md5sum after editing with the initial md5sum
             current_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
                 echo -e "\n=======response========" >> "$tempfile"
-                # New streaming output with bat formatting
-								handle_llm_output "$(cat "$tempfile")" "$tempfile"
+                call_llm_and_handle "$(cat "$tempfile")" "$tempfile"
             else
                 echo "No input detected. Skipping LLM processing."
             fi
         else
-            # For non-persistent mode, just use bat directly
-						handle_llm_output "$(cat "$tempfile")"
+            call_llm_and_handle "$(cat "$tempfile")"
         fi
     else
         echo "No input detected. Skipping LLM processing."
