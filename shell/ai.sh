@@ -1,3 +1,26 @@
+# Helper function for streaming output and bat display
+function stream_and_display() {
+    local input_text="$1"
+    local append_file="$2"  # Optional: file to append to
+
+    # Stream to terminal
+    echo "$input_text" | tee /dev/tty > /dev/null
+
+    # Clear the streamed output
+    local lines=$(echo "$input_text" | wc -l)
+    for ((i=0; i<$lines; i++)); do
+        echo -en "\033[1A\033[2K"
+    done
+
+    # Display with bat
+    echo "$input_text" | bat --paging=never
+
+    # If a file was specified, append the output to it
+    if [ -n "$append_file" ]; then
+        echo "$input_text" >> "$append_file"
+    fi
+}
+
 function openLLMinEditor {
     local extension=""
     local tempfile
@@ -56,7 +79,7 @@ function openLLMinEditor {
 
     editor="${EDITOR:-nvim}"
 
-    if $thread || $persist; then
+			if $thread || $persist; then
         # Create cache directory if it doesn't exist
         if $persist; then
             mkdir -p "$cache_dir"
@@ -109,19 +132,25 @@ function openLLMinEditor {
         $editor "$tempfile"
     fi
 
-    # Check if tempfile exists and is non-empty
+		# Check if tempfile exists and is non-empty
     if [ -s "$tempfile" ]; then
         if $thread || $persist; then
             # Compare the md5sum after editing with the initial md5sum
             current_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
+                # First append just the response marker to the file
                 echo -e "\n=======response========" >> "$tempfile"
-                cat "$tempfile" | llm "Don't ever create additional user inputs" | tee -a "$tempfile"
+
+                # Get the LLM response and handle the output
+                temp_output=$(cat "$tempfile" | llm "Don't ever create additional user inputs")
+                stream_and_display "$temp_output" "$tempfile"
             else
                 echo "No input detected. Skipping LLM processing."
             fi
         else
-            cat "$tempfile" | llm
+            # Use same streaming + bat functionality for non-persistent mode
+            temp_output=$(cat "$tempfile" | llm)
+            stream_and_display "$temp_output"
         fi
     else
         echo "No input detected. Skipping LLM processing."
