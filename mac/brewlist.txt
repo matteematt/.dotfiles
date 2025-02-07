@@ -1,4 +1,4 @@
-act 0.2.71
+act 0.2.72
 aom 3.11.0
 aribb24 1.0.4
 bat 0.25.0_1
@@ -6,7 +6,7 @@ brotli 1.1.0
 c-ares 1.34.4
 ca-certificates 2024-12-31
 cairo 1.18.2
-certifi 2024.12.14
+certifi 2025.1.31
 cjson 1.7.18
 coreutils 9.6
 dav1d 1.5.1
@@ -18,7 +18,7 @@ fontconfig 2.16.0
 freetype 2.13.3
 frei0r 2.3.3
 fribidi 1.0.16
-fzf 0.58.0
+fzf 0.59.0
 gawk 5.3.1
 gdbm 1.24
 gettext 0.23.1
@@ -78,7 +78,7 @@ libxrender 0.9.12
 libyaml 0.2.5
 lima 1.0.4
 little-cms2 2.16
-llm 0.20
+llm 0.21
 lmdb 0.9.33
 lpeg 1.1.0
 luajit 2.1.1736781742
@@ -110,14 +110,14 @@ prettier 3.4.2
 python-packaging 24.2
 python@3.10 3.10.16
 python@3.11 3.11.11
-python@3.12 3.12.8
-python@3.13 3.13.1
+python@3.12 3.12.9
+python@3.13 3.13.2
 python@3.9 3.9.21
 rav1e 0.7.1
 readline 8.2.13
 ripgrep 14.1.1
 rubberband 4.0.0
-sdl2 2.30.11
+sdl2 2.30.12
 snappy 1.2.1
 speex 1.2.1
 sqlite 3.48.0
