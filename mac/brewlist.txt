@@ -18,7 +18,7 @@ fontconfig 2.16.0
 freetype 2.13.3
 frei0r 2.3.3
 fribidi 1.0.16
-fzf 0.60.0
+fzf 0.60.1
 gawk 5.3.1
 gdbm 1.24
 gettext 0.23.1
@@ -78,11 +78,11 @@ libxrender 0.9.12
 libyaml 0.2.5
 lima 1.0.6
 little-cms2 2.17
-llm 0.21
+llm 0.22
 lmdb 0.9.33
 lpeg 1.1.0
 luajit 2.1.1736781742
-luv 1.50.0-0
+luv 1.50.0-1
 lz4 1.10.0
 lzo 2.10
 mbedtls 3.6.2
@@ -120,7 +120,7 @@ rubberband 4.0.0
 sdl2 2.32.0
 snappy 1.2.1
 speex 1.2.1
-sqlite 3.49.0
+sqlite 3.49.1
 srt 1.5.4
 stylua 2.0.2
 svt-av1 2.3.0_1
@@ -145,8 +145,8 @@ yq 4.45.1
 zeromq 4.3.5_1
 zimg 3.0.5
 zsh-syntax-highlighting 0.8.0
-zstd 1.5.6
-alacritty 0.15.0
+zstd 1.5.7
+alacritty 0.15.1
 audacity 3.7.1
 background-music 0.4.0
 dozer 4.0.0
