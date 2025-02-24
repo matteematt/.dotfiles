@@ -1,13 +1,12 @@
 bat 0.25.0_1
 bzip2 1.0.8
 ca-certificates 2024-12-31
-fzf 0.58.0
+fzf 0.60.2
 libgit2 1.9.0
-libgit2@1.8 1.8.4
 libssh2 1.11.1
 ncurses 6.5
 oniguruma 6.9.10
-openssl@3 3.4.0
+openssl@3 3.4.1
 pcre2 10.44
 ripgrep 14.1.1
 tldr 0.6.1

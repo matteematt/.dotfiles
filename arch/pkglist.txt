@@ -32,7 +32,6 @@ informant
 insync
 libreoffice-still-uk
 lsdvd
-man-db
 man-pages
 minify
 neovim
