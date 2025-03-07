@@ -1,5 +1,7 @@
 source ~/.dotfiles/shell/.zshrc
 
+comp_base_setup
+
 # Shell settings
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 export PATH=/home/linuxbrew/.linuxbrew/bin/:$PATH
