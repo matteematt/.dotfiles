@@ -82,11 +82,15 @@ load_completion_on_demand() {
   zle -D load_completion_on_demand
   # Load completions
   configure_autocompletion
+  # Re-establish the widget
+  zle -N load_completion_on_demand
+  bindkey "^I" load_completion_on_demand
+
   # Re-run the completion widget
   zle complete-word
 }
 
-# Bind tab to the demand-loading widget
+# Bind tab to the demand-loading widget initially
 zle -N load_completion_on_demand
 bindkey "^I" load_completion_on_demand
 
