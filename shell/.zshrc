@@ -44,6 +44,16 @@ export LESS_TERMCAP_us=$'\e[1;4;31m'
 # Completions (lazy loaded)
 ########################################
 
+comp_base_setup() {
+  autoload -Uz compinit
+  compinit
+
+  # case insensitive path-completion
+  zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
+  # partial completion suggestions
+  zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
+}
+
 # Create a wrapper function for compdef at the start
 # buffering the input and output. This handles the functionality
 # before the real function is lazily loaded in
@@ -53,8 +63,7 @@ function compdef() {
 }
 
 configure_autocompletion() {
-  autoload -Uz compinit
-  compinit
+	base_autocomplete_config()
 
   # Run stored compdef calls
   local compdef_call
@@ -66,15 +75,8 @@ configure_autocompletion() {
   # Restore original compdef function
   unfunction compdef
   autoload -Uz compdef
-
-  # case insensitive path-completion
-  zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
-  # partial completion suggestions
-  zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
 }
 
-# Load completion system when first attempting completion
-zmodload -i zsh/complist
 
 # Create function to delete widget and load completions
 load_completion_on_demand() {
@@ -82,17 +84,18 @@ load_completion_on_demand() {
   zle -D load_completion_on_demand
   # Load completions
   configure_autocompletion
-  # Re-establish the widget
-  zle -N load_completion_on_demand
-  bindkey "^I" load_completion_on_demand
-
   # Re-run the completion widget
   zle complete-word
 }
 
-# Bind tab to the demand-loading widget initially
-zle -N load_completion_on_demand
-bindkey "^I" load_completion_on_demand
+comp_lazy_setup() {
+	# Load completion system when first attempting completion
+	zmodload -i zsh/complist
+
+	# Bind tab to the demand-loading widget
+	zle -N load_completion_on_demand
+	bindkey "^I" load_completion_on_demand
+}
 
 ##############################
 # Open prompt in editor [1]
