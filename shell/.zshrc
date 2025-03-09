@@ -63,7 +63,7 @@ function compdef() {
 }
 
 configure_autocompletion() {
-	base_autocomplete_config()
+	comp_base_setup
 
   # Run stored compdef calls
   local compdef_call
