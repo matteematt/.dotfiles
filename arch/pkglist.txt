@@ -22,6 +22,7 @@ fontforge
 fuse2
 get_iplayer-git
 ghc-static
+gimp
 git-delta
 go
 htop
