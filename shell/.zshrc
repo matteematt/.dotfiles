@@ -41,17 +41,16 @@ export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 
 ########################################
-# Completions (lazy loaded)
+# Completions
 ########################################
 
-comp_base_setup() {
-  autoload -Uz compinit
-  compinit
-
+# Configuration for completion system
+setup_completion_styles() {
   # case insensitive path-completion
   zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
   # partial completion suggestions
-  zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
+  zstyle ':completion:*' list-suffixes
+  zstyle ':completion:*' expand prefix suffix
 }
 
 # Create a wrapper function for compdef at the start
@@ -62,8 +61,14 @@ function compdef() {
   compdef_queue+=("compdef $*")
 }
 
-configure_autocompletion() {
-	comp_base_setup
+# Initialize completion system - call directly or via zsh-defer
+initialize_completion_system() {
+  # Initialize the completion system
+  autoload -Uz compinit
+  compinit
+
+  # Set up completion styles
+  setup_completion_styles
 
   # Run stored compdef calls
   local compdef_call
@@ -77,24 +82,14 @@ configure_autocompletion() {
   autoload -Uz compdef
 }
 
-
-# Create function to delete widget and load completions
-load_completion_on_demand() {
-  # Remove this widget
-  zle -D load_completion_on_demand
-  # Load completions
-  configure_autocompletion
-  # Re-run the completion widget
-  zle complete-word
+# For immediate initialization (Arch Linux)
+function setup_immediate_completion() {
+  initialize_completion_system
 }
 
-comp_lazy_setup() {
-	# Load completion system when first attempting completion
-	zmodload -i zsh/complist
-
-	# Bind tab to the demand-loading widget
-	zle -N load_completion_on_demand
-	bindkey "^I" load_completion_on_demand
+# For deferred initialization (macOS)
+function setup_deferred_completion() {
+  zsh-defer initialize_completion_system
 }
 
 ##############################

@@ -1,6 +1,6 @@
 source ~/.dotfiles/shell/.zshrc
 
-comp_lazy_setup
+setup_deferred_completion
 
 alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
 alias ls="ls -G"
