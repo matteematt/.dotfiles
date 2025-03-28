@@ -1,6 +1,7 @@
 source ~/.dotfiles/shell/.zshrc
 
-comp_base_setup
+# Use immediate completion initialization
+setup_immediate_completion
 
 # Shell settings
 export SSH_KEY_PATH="~/.ssh/rsa_id"
