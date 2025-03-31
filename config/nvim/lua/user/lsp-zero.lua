@@ -38,10 +38,32 @@ lsp_zero.ui({
 		hint = '⚑',
 		info = '»',
 	},
+	hover = {
+		enabled = true,
+		border = 'rounded',
+		max_width = 80,
+		max_height = 20,
+	}
 })
 
 vim.diagnostic.config({
-	virtual_text = false
+	virtual_text = false,
+	float = {
+		border = "rounded",
+	},
+})
+
+-- Apply floating window styling with custom background color
+vim.api.nvim_create_autocmd({"VimEnter", "ColorScheme"}, {
+  callback = function()
+    -- Style for LSP floating windows with contrasting background
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#1f2335" })
+    
+    -- Also set Pmenu highlighting for consistent styling
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = "#1f2335" })
+    vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#2a324a", fg = "#ffffff" })
+  end,
+  group = vim.api.nvim_create_augroup("CustomFloatHighlights", { clear = true })
 })
 
 require('mason').setup({})
