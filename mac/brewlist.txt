@@ -1,5 +1,5 @@
 act 0.2.75
-aider 0.79.1
+aider 0.79.2
 aom 3.12.0
 aribb24 1.0.4
 bat 0.25.0_1
@@ -20,16 +20,16 @@ fontconfig 2.16.0
 freetype 2.13.3
 frei0r 2.3.3
 fribidi 1.0.16
-fzf 0.60.3
+fzf 0.61.0
 gawk 5.3.1
 gcc 14.2.0_1
-gdbm 1.24
+gdbm 1.25
 gettext 0.24
 ghc 9.12.2
 giflib 5.2.2
 git-delta 0.18.2_3
 git-filter-repo 2.47.0
-glib 2.84.0
+glib 2.84.0_1
 gmp 6.3.0
 gnutls 3.8.9
 graphite2 1.3.14
