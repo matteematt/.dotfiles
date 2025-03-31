@@ -46,27 +46,47 @@ lsp_zero.ui({
 	}
 })
 
+-- Define border characters with simple string format for Neovim 0.11+
+local border_chars = "rounded"
+
+-- Configure diagnostics with rounded borders
 vim.diagnostic.config({
 	virtual_text = false,
 	float = {
-		border = "rounded",
+		border = border_chars,
 	},
 })
 
--- Apply floating window styling with custom background color
+-- Apply floating window styling with custom background color and borders
 vim.api.nvim_create_autocmd({"VimEnter", "ColorScheme"}, {
   callback = function()
+    -- Get current theme colors for better integration
+    local bg_dark = "#24283b" -- Darker background
+    local bg_lighter = "#2c3043" -- Slightly lighter background
+    local accent = "#7aa2f7" -- Accent color (blue)
+    
     -- Style for LSP floating windows with contrasting background
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#1f2335" })
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = bg_dark })
     
     -- Also set Pmenu highlighting for consistent styling
-    vim.api.nvim_set_hl(0, "Pmenu", { bg = "#1f2335" })
-    vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#2a324a", fg = "#ffffff" })
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = bg_dark })
+    vim.api.nvim_set_hl(0, "PmenuSel", { bg = bg_lighter, fg = "#ffffff" })
+    
+    -- Set FloatBorder highlight group for borders
+    vim.api.nvim_set_hl(0, "FloatBorder", { fg = accent, bg = bg_dark })
   end,
   group = vim.api.nvim_create_augroup("CustomFloatHighlights", { clear = true })
 })
 
 require('mason').setup({})
+-- Set up border for all windows, including hover
+local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+  opts = opts or {}
+  opts.border = opts.border or border_chars
+  return orig_util_open_floating_preview(contents, syntax, opts, ...)
+end
+
 require('mason-lspconfig').setup({
 	handlers = {
 		function(server_name)
