@@ -57,23 +57,32 @@ vim.diagnostic.config({
 	},
 })
 
--- Apply floating window styling with custom background color and borders
+-- Apply floating window styling to match editor background with darker borders
 vim.api.nvim_create_autocmd({"VimEnter", "ColorScheme"}, {
   callback = function()
-    -- Get current theme colors for better integration
-    local bg_dark = "#24283b" -- Darker background
-    local bg_lighter = "#2c3043" -- Slightly lighter background
-    local accent = "#7aa2f7" -- Accent color (blue)
+    -- Get Normal background color for consistent styling
+    local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+    local normal_bg_hex = normal_hl.bg and string.format("#%06x", normal_hl.bg) or "NONE"
     
-    -- Style for LSP floating windows with contrasting background
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = bg_dark })
+    -- Try to get TelescopeBorder highlight color for consistency
+    local telescope_border_hl = vim.api.nvim_get_hl(0, { name = "TelescopeBorder" })
+    local border_color
     
-    -- Also set Pmenu highlighting for consistent styling
-    vim.api.nvim_set_hl(0, "Pmenu", { bg = bg_dark })
-    vim.api.nvim_set_hl(0, "PmenuSel", { bg = bg_lighter, fg = "#ffffff" })
+    -- If TelescopeBorder is defined, use its color
+    if telescope_border_hl.fg then
+      border_color = string.format("#%06x", telescope_border_hl.fg)
+    else
+      -- Fallback to Comment highlight color
+      local comment_hl = vim.api.nvim_get_hl(0, { name = "Comment" })
+      border_color = comment_hl.fg and string.format("#%06x", comment_hl.fg) or "#6a6a6a"
+    end
     
-    -- Set FloatBorder highlight group for borders
-    vim.api.nvim_set_hl(0, "FloatBorder", { fg = accent, bg = bg_dark })
+    -- Set colors to editor background
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = normal_bg_hex })
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = normal_bg_hex })
+    
+    -- Use the border color from telescope or fallback to comment
+    vim.api.nvim_set_hl(0, "FloatBorder", { fg = border_color, bg = normal_bg_hex })
   end,
   group = vim.api.nvim_create_augroup("CustomFloatHighlights", { clear = true })
 })
