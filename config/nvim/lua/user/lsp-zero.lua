@@ -38,13 +38,64 @@ lsp_zero.ui({
 		hint = '⚑',
 		info = '»',
 	},
+	hover = {
+		enabled = true,
+		border = 'rounded',
+		max_width = 80,
+		max_height = 20,
+	}
 })
 
+-- Define border characters with simple string format for Neovim 0.11+
+local border_chars = "rounded"
+
+-- Configure diagnostics with rounded borders
 vim.diagnostic.config({
-	virtual_text = false
+	virtual_text = false,
+	float = {
+		border = border_chars,
+	},
+})
+
+-- Apply floating window styling to match editor background with darker borders
+vim.api.nvim_create_autocmd({"VimEnter", "ColorScheme"}, {
+  callback = function()
+    -- Get Normal background color for consistent styling
+    local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+    local normal_bg_hex = normal_hl.bg and string.format("#%06x", normal_hl.bg) or "NONE"
+    
+    -- Try to get TelescopeBorder highlight color for consistency
+    local telescope_border_hl = vim.api.nvim_get_hl(0, { name = "TelescopeBorder" })
+    local border_color
+    
+    -- If TelescopeBorder is defined, use its color
+    if telescope_border_hl.fg then
+      border_color = string.format("#%06x", telescope_border_hl.fg)
+    else
+      -- Fallback to Comment highlight color
+      local comment_hl = vim.api.nvim_get_hl(0, { name = "Comment" })
+      border_color = comment_hl.fg and string.format("#%06x", comment_hl.fg) or "#6a6a6a"
+    end
+    
+    -- Set colors to editor background
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = normal_bg_hex })
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = normal_bg_hex })
+    
+    -- Use the border color from telescope or fallback to comment
+    vim.api.nvim_set_hl(0, "FloatBorder", { fg = border_color, bg = normal_bg_hex })
+  end,
+  group = vim.api.nvim_create_augroup("CustomFloatHighlights", { clear = true })
 })
 
 require('mason').setup({})
+-- Set up border for all windows, including hover
+local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+  opts = opts or {}
+  opts.border = opts.border or border_chars
+  return orig_util_open_floating_preview(contents, syntax, opts, ...)
+end
+
 require('mason-lspconfig').setup({
 	handlers = {
 		function(server_name)
