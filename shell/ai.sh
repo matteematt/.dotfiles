@@ -1,6 +1,7 @@
 call_llm_and_handle() {
     local input=$1
     local tempfile=$2  # Add tempfile as second parameter
+    local system_prompt_override=$3
 
     local prompt
     read -r -d '' prompt << 'EOF'
@@ -9,11 +10,17 @@ You are a helpful assistant. Please follow these guidelines:
 - Stay focused on the user's question - Don't create additional user prompts
 EOF
 
+    # Append system prompt override if provided
+    if [ -n "$system_prompt_override" ]; then
+        prompt="$prompt
+$system_prompt_override"
+    fi
+
     # Save screen and switch to alternate screen
     echo -en "\033[?1049h"
 
     # Stream output and capture it
-    temp_output=$(echo "$input" | llm "$prompt" | tee /dev/tty)
+    temp_output=$(echo "$input" | llm "$prompt" -u | tee /dev/tty)
 
     # Switch back to main screen
     echo -en "\033[?1049l"
@@ -36,9 +43,10 @@ function openLLMinEditor {
     local user_request_count=0
     local thread_name="temp"  # Default name
     local cache_dir="$HOME/.cache/llmc-chatbot"
+    local system_prompt_override=""
 
     # Parse options
-    while getopts ":t:p:f:r:" opt; do
+    while getopts ":t:p:f:r:s:" opt; do
         case $opt in
             t)
                 thread=true
@@ -67,6 +75,9 @@ function openLLMinEditor {
                 fi
                 thread_name="$OPTARG"
                 thread=true
+                ;;
+            s)
+                system_prompt_override="$OPTARG"
                 ;;
             \?)
                 echo "Invalid option: -$OPTARG" >&2
@@ -145,12 +156,12 @@ function openLLMinEditor {
             current_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
                 echo -e "\n=======response========" >> "$tempfile"
-                call_llm_and_handle "$(cat "$tempfile")" "$tempfile"
+                call_llm_and_handle "$(cat "$tempfile")" "$tempfile" "$system_prompt_override"
             else
                 echo "No input detected. Skipping LLM processing."
             fi
         else
-            call_llm_and_handle "$(cat "$tempfile")"
+            call_llm_and_handle "$(cat "$tempfile")" "" "$system_prompt_override"
         fi
     else
         echo "No input detected. Skipping LLM processing."
