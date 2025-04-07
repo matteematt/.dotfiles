@@ -2,6 +2,7 @@ call_llm_and_handle() {
     local input=$1
     local tempfile=$2  # Add tempfile as second parameter
     local system_prompt_override=$3
+    local direct_stream=$4  # New parameter for direct streaming mode
 
     local prompt
     read -r -d '' prompt << 'EOF'
@@ -16,17 +17,24 @@ EOF
 $system_prompt_override"
     fi
 
-    # Save screen and switch to alternate screen
-    echo -en "\033[?1049h"
+    local temp_output
+    
+    if [ "$direct_stream" = "true" ]; then
+        # Stream directly to terminal
+        temp_output=$(echo "$input" | llm "$prompt" -u | tee /dev/tty)
+    else
+        # Save screen and switch to alternate screen
+        echo -en "\033[?1049h"
 
-    # Stream output and capture it
-    temp_output=$(echo "$input" | llm "$prompt" -u | tee /dev/tty)
+        # Stream output and capture it
+        temp_output=$(echo "$input" | llm "$prompt" -u | tee /dev/tty)
 
-    # Switch back to main screen
-    echo -en "\033[?1049l"
+        # Switch back to main screen
+        echo -en "\033[?1049l"
 
-    # Display formatted output
-    echo "$temp_output" | bat --paging=never --theme="OneHalfDark" --color always -p -l md
+        # Display formatted output
+        echo "$temp_output" | bat --paging=never --theme="OneHalfDark" --color always -p -l md
+    fi
 
     # If we need to append to tempfile (for thread/persist mode)
     if [ -n "$tempfile" ]; then
@@ -40,13 +48,14 @@ function openLLMinEditor {
     local thread=false
     local persist=false
     local reset=false
+    local direct_stream=false
     local user_request_count=0
     local thread_name="temp"  # Default name
     local cache_dir="$HOME/.cache/llmc-chatbot"
     local system_prompt_override=""
 
     # Parse options
-    while getopts ":t:p:f:r:s:" opt; do
+    while getopts ":t:p:f:r:s:d" opt; do
         case $opt in
             t)
                 thread=true
@@ -78,6 +87,9 @@ function openLLMinEditor {
                 ;;
             s)
                 system_prompt_override="$OPTARG"
+                ;;
+            d)
+                direct_stream=true
                 ;;
             \?)
                 echo "Invalid option: -$OPTARG" >&2
@@ -156,12 +168,12 @@ function openLLMinEditor {
             current_md5sum=$(md5sum "$tempfile" | awk '{print $1}')
             if [ "$initial_md5sum" != "$current_md5sum" ]; then
                 echo -e "\n=======response========" >> "$tempfile"
-                call_llm_and_handle "$(cat "$tempfile")" "$tempfile" "$system_prompt_override"
+                call_llm_and_handle "$(cat "$tempfile")" "$tempfile" "$system_prompt_override" "$direct_stream"
             else
                 echo "No input detected. Skipping LLM processing."
             fi
         else
-            call_llm_and_handle "$(cat "$tempfile")" "" "$system_prompt_override"
+            call_llm_and_handle "$(cat "$tempfile")" "" "$system_prompt_override" "$direct_stream"
         fi
     else
         echo "No input detected. Skipping LLM processing."
