@@ -35,7 +35,6 @@ libreoffice-still-uk
 lsdvd
 man-pages
 minify
-neovim
 netctl
 nodejs-http-server
 nodejs-nativefier
