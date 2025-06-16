@@ -64,8 +64,10 @@ return require("packer").startup(function(use)
 	use("nvim-telescope/telescope.nvim")
 
 	-- Treesitter
-	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
-	use("nvim-treesitter/playground")
+	use({ "nvim-treesitter/nvim-treesitter", branch = "main", run = ":TSUpdate" })
+	-- Playground not yet compatible with main branch, commented out for now
+	-- -- TODO reactivate this?
+	-- use("nvim-treesitter/playground")
 	use("HiPhish/rainbow-delimiters.nvim")
 
 	-- Autopairs
