@@ -24,6 +24,8 @@ if nvim_version_ok then
 	treesitter.setup {
 		install_dir = vim.fn.stdpath('data') .. '/site'
 	}
+	
+	-- Don't enable highlighting here - it will be enabled per-buffer in the autocmd
 
 	-- Install all parsers except phpdoc
 	-- The treesitter.install API has different syntax in main branch
@@ -34,14 +36,34 @@ if nvim_version_ok then
 		print("Note: Failed to run treesitter.install, this may be expected if you're running a development version")
 	end
 	
-	-- Disable treesitter highlighting for large files
+	-- Enable treesitter for all files except large ones
 	local max_filesize = 100 * 1024 -- 100 KB
-	vim.api.nvim_create_autocmd({"BufReadPre"}, {
+	vim.api.nvim_create_autocmd({"FileType"}, {
 		callback = function(ev)
-			local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(0))
-			if ok and stats and stats.size > max_filesize then
-				vim.treesitter.stop()
+			local bufnr = ev.buf
+			
+			-- Only enable when we have a filetype
+			if vim.bo[bufnr].filetype == "" then
+				return
 			end
+			
+			-- Check file size
+			local file_path = vim.api.nvim_buf_get_name(bufnr)
+			local ok, stats = pcall(vim.loop.fs_stat, file_path)
+			
+			-- Skip large files
+			if ok and stats and stats.size > max_filesize then
+				pcall(vim.treesitter.stop, bufnr)
+				return
+			end
+			
+			-- Safely enable treesitter for this buffer
+			pcall(function()
+				-- Check if we have a parser for this filetype
+				if vim.treesitter.language.get_lang(vim.bo[bufnr].filetype) then
+					vim.treesitter.start(bufnr)
+				end
+			end)
 		end
 	})
 	
