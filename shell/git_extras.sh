@@ -131,22 +131,40 @@ function gitWorktreeCleanup {
 		echo "Error: No worktree directory"
 		return 2;
 	fi
-	git_branch=$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf --header "Worktree Cleanup" --preview "cd $top_level/_worktrees_git/{} && git log")
-	if [[ "$git_branch" == '' ]]; then
-		echo "Error: No branch selected for cleanup"
+	git_branches=$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf -m --header "Worktree Cleanup (TAB to select multiple)" --preview "cd $top_level/_worktrees_git/{} && git log")
+	if [[ "$git_branches" == '' ]]; then
+		echo "Error: No branches selected for cleanup"
 		return 3;
 	fi
-	read -q "choice?Are you sure that you want to cleanup branch $git_branch branch? [y/N]" || return 1;
-	chosen_dir="$top_level/_worktrees_git/$git_branch"
-	if ! [[ -d "$chosen_dir" ]]; then
-		echo "Error: Unable to find branch on file system"
-		return 4;
+	
+	# Convert newline-separated branches to array
+	branches_array=(${(f)git_branches})
+	
+	# Show confirmation with all selected branches
+	echo "Selected branches for cleanup:"
+	for branch in "${branches_array[@]}"; do
+		echo "  - $branch"
+	done
+	if [[ ${#branches_array[@]} -eq 1 ]]; then
+		read -q "choice?Are you sure that you want to cleanup this branch? [y/N]" || return 1;
+	else
+		read -q "choice?Are you sure that you want to cleanup these ${#branches_array[@]} branches? [y/N]" || return 1;
 	fi
+	
+	# Clean up each selected branch
+	for git_branch in "${branches_array[@]}"; do
+		chosen_dir="$top_level/_worktrees_git/$git_branch"
+		if ! [[ -d "$chosen_dir" ]]; then
+			echo "Error: Unable to find branch $git_branch on file system"
+			continue
+		fi
 
-	echo "\nCleaning up $chosen_dir"
-	rm -rf "$chosen_dir"
-	echo "\nCleaning up branch $git_branch"
-	git worktree prune
-	git branch -D "$git_branch"
+		echo "\nCleaning up $chosen_dir"
+		rm -rf "$chosen_dir"
+		echo "Pruning worktree references for $git_branch"
+		git worktree prune
+		echo "Cleaning up branch $git_branch"
+		git branch -D "$git_branch"
+	done
 	return 0;
 }
