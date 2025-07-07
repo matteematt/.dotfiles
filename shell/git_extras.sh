@@ -136,10 +136,10 @@ function gitWorktreeCleanup {
 		echo "Error: No branches selected for cleanup"
 		return 3;
 	fi
-	
+
 	# Convert newline-separated branches to array
 	branches_array=(${(f)git_branches})
-	
+
 	# Show confirmation with all selected branches
 	echo "Selected branches for cleanup:"
 	for branch in "${branches_array[@]}"; do
@@ -150,7 +150,9 @@ function gitWorktreeCleanup {
 	else
 		read -q "choice?Are you sure that you want to cleanup these ${#branches_array[@]} branches? [y/N]" || return 1;
 	fi
-	
+
+	echo "\n";
+
 	# Clean up each selected branch
 	for git_branch in "${branches_array[@]}"; do
 		chosen_dir="$top_level/_worktrees_git/$git_branch"
