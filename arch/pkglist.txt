@@ -62,6 +62,7 @@ thunderbird
 ticktick-nativefier
 todoist-electron
 tree
+vlc
 wget
 whatsapp-nativefier
 xdotool
