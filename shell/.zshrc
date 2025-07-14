@@ -223,6 +223,7 @@ alias gal="addLastDiffFile"
 alias gur="getUpdateWithRebase"
 # git view (and) stage
 alias gvs="gitViewAndStage"
+alias gus="gitUnstageFiles"
 alias cd="pushChangedDirToList"
 alias cdd="changeDirFromHistory"
 alias cdf="changeDirShortcut"

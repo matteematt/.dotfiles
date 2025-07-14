@@ -32,6 +32,27 @@ function __formatGitStatus() {
   echo "$formatted"
 }
 
+# Returns git status formatted with
+# M x - for file x modified
+# R x - for file x deleted
+# A x - for file x added
+# for all *staged* files
+# returns exit code 1 if this is not a git directory
+function __formatStagedGitStatus() {
+  git branch --show-current &>/dev/null || { echo "Error: not a git directory";return 1; }
+  formatted=$(git status | awk 'BEGIN {parseMode=0} \
+  { \
+    if (parseMode==1) { \
+      if (match($0,/^\s+deleted:\s*(.+)/)) {print "R " $2}; \
+      if (match($0,/^\s+modified:\s*(.+)/)) {print "M " $2}; \
+      if (match($0,/^\s+new file:\s*(.+)/)) {print "A " $2}; \
+    }; \
+    if ($0 ~ /Changes to be committed/) {parseMode=1}; \
+    if ($0 ~ /Changes not staged for commit/) {parseMode=0}; \
+  }')
+  echo "$formatted"
+}
+
 function checkoutPrimaryGitBranch {
 	if git rev-parse --verify master >/dev/null 2>&1; then
 		git checkout master
@@ -46,12 +67,48 @@ function checkoutPrimaryGitBranch {
 # Similar to getDiffByList but views the output in bat inline and
 # selecting an option automatically calls 'git add' on it
 function gitViewAndStage() {
-  chosen_file=$(__formatGitStatus | fzf --with-nth 2 --preview-window=right,70% --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
-  if [ -z "$chosen_file" ]; then
+  chosen_files=$(__formatGitStatus | fzf -m --with-nth 2 --header "File Staging (TAB to select multiple)" --preview-window=right,70% --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
+  if [ -z "$chosen_files" ]; then
     return
   else
-    git add $(echo "$chosen_file" | cut -d" " -f2)
-    unset chosen_file
+    # Convert newline-separated files to array
+    files_array=(${(f)chosen_files})
+    
+    # Stage each selected file
+    for file in "${files_array[@]}"; do
+      file_path=$(echo "$file" | cut -d" " -f2)
+      git add "$file_path"
+      if [[ ${#files_array[@]} -gt 1 ]]; then
+        echo "Staged: $file_path"
+      fi
+    done
+    
+    unset chosen_files
+    unset files_array
+  fi
+}
+
+# Similar to gitViewAndStage but for unstaging files that are already staged
+# selecting an option automatically calls 'git reset HEAD' on it
+function gitUnstageFiles() {
+  chosen_files=$(__formatStagedGitStatus | fzf -m --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached {}')
+  if [ -z "$chosen_files" ]; then
+    return
+  else
+    # Convert newline-separated files to array
+    files_array=(${(f)chosen_files})
+    
+    # Unstage each selected file
+    for file in "${files_array[@]}"; do
+      file_path=$(echo "$file" | cut -d" " -f2)
+      git reset HEAD "$file_path"
+      if [[ ${#files_array[@]} -gt 1 ]]; then
+        echo "Unstaged: $file_path"
+      fi
+    done
+    
+    unset chosen_files
+    unset files_array
   fi
 }
 
