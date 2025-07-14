@@ -110,7 +110,7 @@ function gitUnstageFiles() {
     return 0
   fi
 
-  chosen_files=$(echo "$staged_files" | fzf -m --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached {}')
+  chosen_files=$(echo "$staged_files" | fzf -m --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached "$(echo {} | cut -d" " -f2-)"')
   if [ -z "$chosen_files" ]; then
     return
   else
