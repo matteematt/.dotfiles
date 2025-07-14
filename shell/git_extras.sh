@@ -67,13 +67,22 @@ function checkoutPrimaryGitBranch {
 # Similar to getDiffByList but views the output in bat inline and
 # selecting an option automatically calls 'git add' on it
 function gitViewAndStage() {
+  # Check if we're in a git repo
+  git branch --show-current &>/dev/null || { echo "Error: not a git directory"; return 1; }
+
+  # Check if working tree is clean
+  if git diff-index --quiet HEAD --; then
+    echo "Working tree is clean - nothing to stage"
+    return 0
+  fi
+
   chosen_files=$(__formatGitStatus | fzf -m --with-nth 2 --header "File Staging (TAB to select multiple)" --preview-window=right,70% --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
   if [ -z "$chosen_files" ]; then
     return
   else
     # Convert newline-separated files to array
     files_array=(${(f)chosen_files})
-    
+
     # Stage each selected file
     for file in "${files_array[@]}"; do
       file_path=$(echo "$file" | cut -d" " -f2)
@@ -82,7 +91,7 @@ function gitViewAndStage() {
         echo "Staged: $file_path"
       fi
     done
-    
+
     unset chosen_files
     unset files_array
   fi
@@ -91,13 +100,23 @@ function gitViewAndStage() {
 # Similar to gitViewAndStage but for unstaging files that are already staged
 # selecting an option automatically calls 'git reset HEAD' on it
 function gitUnstageFiles() {
-  chosen_files=$(__formatStagedGitStatus | fzf -m --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached {}')
+  # Check if we're in a git repo
+  git branch --show-current &>/dev/null || { echo "Error: not a git directory"; return 1; }
+
+  # Check if there are any staged files to unstage
+  staged_files=$(__formatStagedGitStatus)
+  if [ -z "$staged_files" ]; then
+    echo "No staged files to unstage"
+    return 0
+  fi
+
+  chosen_files=$(echo "$staged_files" | fzf -m --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached "$(echo {} | cut -d" " -f2-)"')
   if [ -z "$chosen_files" ]; then
     return
   else
     # Convert newline-separated files to array
     files_array=(${(f)chosen_files})
-    
+
     # Unstage each selected file
     for file in "${files_array[@]}"; do
       file_path=$(echo "$file" | cut -d" " -f2)
@@ -106,9 +125,10 @@ function gitUnstageFiles() {
         echo "Unstaged: $file_path"
       fi
     done
-    
+
     unset chosen_files
     unset files_array
+    unset staged_files
   fi
 }
 
