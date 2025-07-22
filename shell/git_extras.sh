@@ -70,8 +70,8 @@ function gitViewAndStage() {
   # Check if we're in a git repo
   git branch --show-current &>/dev/null || { echo "Error: not a git directory"; return 1; }
 
-  # Check if working tree is clean
-  if git diff-index --quiet HEAD --; then
+  # Check if working tree is clean (including untracked files)
+  if [ -z "$(git status --porcelain)" ]; then
     echo "Working tree is clean - nothing to stage"
     return 0
   fi
