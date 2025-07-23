@@ -87,9 +87,7 @@ function gitViewAndStage() {
     for file in "${files_array[@]}"; do
       file_path=$(echo "$file" | cut -d" " -f2)
       git add "$file_path"
-      if [[ ${#files_array[@]} -gt 1 ]]; then
-        echo "Staged: $file_path"
-      fi
+			echo "Staged: $file_path"
     done
 
     unset chosen_files
