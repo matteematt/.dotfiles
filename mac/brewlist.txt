@@ -12,9 +12,9 @@ cffi 1.17.1_1
 cjson 1.7.18
 coreutils 9.7
 dav1d 1.5.1
-eslint 9.33.0
-fd 10.2.0
-ffmpeg 7.1.1_5
+eslint 9.34.0
+fd 10.3.0
+ffmpeg 8.0
 flac 1.5.0
 fontconfig 2.16.0
 freetype 2.13.3
@@ -34,7 +34,7 @@ gmp 6.3.0
 gnutls 3.8.10
 go 1.25.0
 graphite2 1.3.14
-harfbuzz 11.4.1
+harfbuzz 11.4.4
 highway 1.3.0
 htop 3.4.1
 http-server 14.1.1
@@ -60,7 +60,7 @@ libmicrohttpd 1.0.2
 libmpc 1.3.1
 libnghttp2 1.66.0
 libnghttp3 1.11.0
-libngtcp2 1.14.0
+libngtcp2 1.15.0
 libogg 1.3.6
 libpng 1.6.50
 libraqm 0.10.3
@@ -106,9 +106,9 @@ ncurses 6.5
 neovide 0.15.1
 neovim 0.11.3
 nettle 3.10.2
-node 24.6.0
+node 24.7.0
 numpy 2.3.2
-ollama 0.11.6
+ollama 0.11.8
 oniguruma 6.9.10
 openblas 0.3.30
 opencore-amr 0.1.6
@@ -119,7 +119,7 @@ openssl@3 3.5.2
 opus 1.5.2
 p11-kit 0.25.5
 pango 1.56.4
-pcre2 10.45
+pcre2 10.46
 pillow 11.3.0
 pixman 0.46.4
 prettier 3.6.2
@@ -142,7 +142,7 @@ speex 1.2.1
 sqlite 3.50.4
 srt 1.5.4
 stylua 2.1.0
-svt-av1 3.1.0
+svt-av1 3.1.2
 tesseract 5.5.1
 theora 1.2.0
 tldr 0.6.1
@@ -152,7 +152,8 @@ tree-sitter 0.25.8_1
 unbound 1.23.1
 unibilium 2.1.2
 utf8proc 2.10.0
-uv 0.8.13
+uv 0.8.14
+uvwasi 0.0.21
 webp 1.6.0
 x264 r3108
 x265 4.1
