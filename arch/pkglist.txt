@@ -34,7 +34,6 @@ insync
 libreoffice-still-uk
 lsdvd
 man-pages
-minify
 netctl
 nodejs-http-server
 nodejs-nativefier
