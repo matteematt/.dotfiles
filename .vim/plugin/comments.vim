@@ -38,6 +38,7 @@ let s:filetypesMap = {
 	\"typescriptreact":"cstyle",
 	\"scala":"cstyle",
 	\"java":"cstyle",
+	\"kotlin":"cstyle",
 	\"groovy":"cstyle",
 	\"c":"cstyle",
 	\"cpp":"cstyle",
