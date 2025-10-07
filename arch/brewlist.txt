@@ -1,9 +1,9 @@
 bat 0.25.0_1
 berkeley-db@5 5.3.28_1
 bzip2 1.0.8
-ca-certificates 2025-08-12
-certifi 2025.8.3
-expat 2.7.1
+ca-certificates 2025-09-09
+certifi 2025.10.5
+expat 2.7.3
 fzf 0.65.2
 libedit 20250104-3.1
 libffi 3.5.2
@@ -14,7 +14,7 @@ llm 0.27.1
 mpdecimal 4.0.1
 ncurses 6.5
 oniguruma 6.9.10
-openssl@3 3.5.2
+openssl@3 3.6.0
 pcre2 10.46
 python@3.13 3.13.7
 readline 8.3.1
