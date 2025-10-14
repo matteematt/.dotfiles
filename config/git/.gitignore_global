@@ -2,8 +2,9 @@
 [._]*.sw[a-p]
 [._]s[a-v][a-z]
 [._]sw[a-p]
-tags
 .java-version
 .idea
 _worktrees_git
 CLAUDE.md
+.kotlin
+kls_database.db
