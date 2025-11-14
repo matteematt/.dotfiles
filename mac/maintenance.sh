@@ -9,11 +9,11 @@ rsync -av  $HOME/.cache/ $HOME/.cache.backup/
 
 if command -v llm >/dev/null 2>&1; then
     echo "Updating llm"
-		llm install llm-claude-3
+		# llm install llm-claude-3
 		# llm models default claude-3-5-sonnet-latest
-		llm models default claude-3.7-sonnet-latest
-		# llm install llm-gemini
-		# llm models default gemini-2.0-flash
+		# llm models default claude-3.7-sonnet-latest
+		llm install llm-gemini
+		llm models default gemini-2.0-flash
 else
     echo "llm is not installed"
 fi
