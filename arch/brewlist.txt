@@ -1,10 +1,10 @@
 bat 0.26.0
 berkeley-db@5 5.3.28_1
 bzip2 1.0.8
-ca-certificates 2025-09-09
-certifi 2025.10.5_1
+ca-certificates 2025-11-04
+certifi 2025.11.12
 expat 2.7.3
-fzf 0.66.1
+fzf 0.67.0
 libedit 20251016-3.1_1
 libffi 3.5.2
 libgit2 1.9.1
@@ -19,7 +19,7 @@ pcre2 10.47
 python@3.13 3.13.9_1
 readline 8.3.1
 ripgrep 15.1.0
-sqlite 3.50.4
+sqlite 3.51.0
 tldr 0.6.1
 unzip 6.0_8
 xz 5.8.1
