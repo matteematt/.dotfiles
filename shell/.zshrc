@@ -249,6 +249,24 @@ alias wipe='clear && printf "\e[3J"'
 
 alias llmc='openLLMinEditor'
 
+fkill() {
+  if [ "$#" -eq 0 ]; then
+    echo "Usage: fkill <proc> [proc ...]"
+    return 1
+  fi
+
+  # Prompt for sudo *immediately*
+  sudo -v || return 1
+
+  local pattern
+  pattern="^($(printf "%s|" "$@" | sed 's/|$//'))"
+
+  lsof 2>/dev/null \
+    | awk -v pat="$pattern" '$1 ~ pat {print $2}' \
+    | sort -u \
+    | xargs -r sudo kill -9
+}
+
 # [1]
 # https://unix.stackexchange.com/questions/6620/how-to-edit-command-line-in-full-screen-editor-in-zsh
 
