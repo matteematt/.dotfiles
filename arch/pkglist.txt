@@ -38,7 +38,7 @@ netctl
 nodejs-http-server
 nodejs-nativefier
 numlockx
-nvidia
+nvidia-open
 p3x-onenote
 pacman-contrib
 postman-bin
