@@ -53,5 +53,9 @@ pacman -Qtd
 # Clean up systemd logs as they can grown very large
 sudo journalctl --vacuum-time=12weeks
 
+# Clean yay caches
+command -v yay >/dev/null && yay -Sc --noconfirm
+rm -rf ~/.cache/yay/*/src
+
 echo -e "\\nUpdate nvim packages with"
 echo "nvim $HOME/.dotfiles/config/nvim/lua/user/plugins.lua"
