@@ -96,7 +96,6 @@ return require("packer").startup(function(use)
 	--
 	use({ "lukas-reineke/indent-blankline.nvim" })
 
-	use({ 'VonHeikemen/lsp-zero.nvim', branch = 'v4.x' })
 	use({ 'williamboman/mason.nvim' })
 	use({ 'williamboman/mason-lspconfig.nvim' })
 	use({ 'neovim/nvim-lspconfig' })
