@@ -88,13 +88,6 @@ vim.api.nvim_create_autocmd({"VimEnter", "ColorScheme"}, {
 })
 
 require('mason').setup({})
--- Set up border for all windows, including hover
-local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-  opts = opts or {}
-  opts.border = opts.border or border_chars
-  return orig_util_open_floating_preview(contents, syntax, opts, ...)
-end
 
 require('mason-lspconfig').setup({
 	handlers = {
@@ -114,19 +107,6 @@ require('mason-lspconfig').setup({
 			require('lspconfig')[server_name].setup({})
 		end,
 	},
-})
-
-Filetypes_connected = {}
-
-vim.api.nvim_create_autocmd("LspTokenUpdate", {
-	callback = function(_)
-		local filetype = vim.bo.filetype
-		if Filetypes_connected[filetype] then
-			return
-		end
-		print("Lsp attatched for filetype: " .. filetype)
-		Filetypes_connected[filetype] = true
-	end,
 })
 
 local cmp = require('cmp')

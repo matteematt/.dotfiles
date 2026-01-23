@@ -25,7 +25,12 @@ Neovim v0.11.5 was experiencing instant crashes (segfaults) when triggering LSP 
 - Modified `lua/user/treesitter.lua` to explicitly ignore buffers with `buftype` of `nofile`, `prompt`, or `quickfix`.
 - This prevents Treesitter from attempting to highlight LSP hover windows or telescope prompts, which was a significant source of crashes.
 
-### 4. Parametric Fixes
+### 4. Version and Plugin Isolation Tests (Update Jan 23)
+- **Neovim 0.11.4 Test:** Downloaded and ran a standalone 0.11.4 binary. The crash persisted when using `markdown` syntax in hovers, indicating the regression is not limited to 0.11.5.
+- **Plugin Isolation:** Completely disabled the `nvim-treesitter` plugin directory. The crash still occurred with standard regex-based markdown highlighting. This confirms the issue is within Neovim core's `markdown` syntax rendering in floating windows, rather than a specific plugin bug.
+- **Snapshot Checked:** Verified `snapshot_260123.json` for known-good plugin states, but confirmed the core crash happens even without plugins.
+
+### 5. Parametric Fixes
 - Updated `make_position_params` calls to dynamically retrieve and pass the client's `offset_encoding` (e.g., `utf-8` or `utf-16`).
 
 ## Current State
@@ -36,4 +41,4 @@ Neovim v0.11.5 was experiencing instant crashes (segfaults) when triggering LSP 
 
 ## Next Steps for Later
 - **Test Neovim Updates:** Once a newer build of Neovim 0.11.x is available, try reverting `plaintext` to `markdown` in `lua/user/lsp.lua` to see if the core highlighting bug is fixed.
-- **Refine Treesitter:** Investigate why the regex-based markdown highlighting also crashes; this might point to a deeper issue with the `markdown` syntax file in the Neovim runtime.
+- **Revert to 0.10.4:** If stability is desired with full Markdown highlighting, consider downgrading to the stable 0.10.4 release. Note that this would require some configuration adjustments for backwards compatibility with older LSP APIs.

@@ -27,13 +27,23 @@ if nvim_version_ok then
 	
 	-- Don't enable highlighting here - it will be enabled per-buffer in the autocmd
 
-	-- Install all parsers except phpdoc
-	-- The treesitter.install API has different syntax in main branch
-	local install_result, _ = pcall(function() 
-		treesitter.install("all") 
-	end)
-	if not install_result then
-		print("Note: Failed to run treesitter.install, this may be expected if you're running a development version")
+	-- Install commonly used parsers
+	-- The main branch requires explicit parser installation
+	local parsers_to_install = {
+		"bash", "c", "cpp", "css", "dockerfile", "go", "html", "javascript", 
+		"json", "lua", "markdown", "python", "rust", "sql", "toml", "typescript",
+		"vim", "yaml", "zig", "scala", "java", "kotlin", "php", "ruby", "xml",
+		"cmake", "make", "ninja", "diff", "git_rebase", "gitcommit", "gitignore",
+		"vimdoc", "query", "regex", "comment", "help", "fish", "zsh"
+	}
+	
+	for _, parser in ipairs(parsers_to_install) do
+		local install_result, _ = pcall(function() 
+			treesitter.install(parser) 
+		end)
+		if not install_result then
+			print("Note: Failed to install parser: " .. parser)
+		end
 	end
 	
 	-- Enable treesitter for all files except large ones
@@ -44,6 +54,12 @@ if nvim_version_ok then
 			
 			-- Only enable when we have a filetype
 			if vim.bo[bufnr].filetype == "" then
+				return
+			end
+
+			-- Skip special buffers (nofile, prompt, quickfix) to prevent crashes in floats
+			local buftype = vim.bo[bufnr].buftype
+			if buftype == "nofile" or buftype == "prompt" or buftype == "quickfix" then
 				return
 			end
 			
@@ -86,6 +102,22 @@ if nvim_version_ok then
 	if not indent_status then
 		print("Note: Treesitter indentation could not be set up")
 	end
+	
+	-- Add a command to manually update treesitter parsers
+	vim.api.nvim_create_user_command("TSUpdateAll", function()
+		print("Updating all treesitter parsers...")
+		for _, parser in ipairs(parsers_to_install) do
+			local install_result, _ = pcall(function() 
+				treesitter.install(parser) 
+			end)
+			if install_result then
+				print("✓ Updated parser: " .. parser)
+			else
+				print("✗ Failed to update parser: " .. parser)
+			end
+		end
+		print("Treesitter parser update complete!")
+	end, { desc = "Update all treesitter parsers" })
 else
 	-- Legacy configuration for master branch (Neovim < 0.11)
 	local status_ok, configs = pcall(require, "nvim-treesitter.configs")

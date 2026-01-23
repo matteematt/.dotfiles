@@ -57,15 +57,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 				end
 				-- result.contents can be string, MarkupContent, or MarkedString[]
 				local markdown_lines = vim.lsp.util.convert_input_to_markdown_lines(result.contents)
-				if vim.tbl_isempty(markdown_lines) then
-					print("No hover content")
-					return
-				end
-				-- Use plaintext to prevent crashes with Markdown highlighting
-				vim.lsp.util.open_floating_preview(markdown_lines, "plaintext", { border = "rounded" })
-			end)
-		end, opts)
-		vim.keymap.set('n', 'ggi', vim.lsp.buf.implementation, opts)
+				                				if vim.tbl_isempty(markdown_lines) then
+				                					print("No hover content")
+				                					return
+				                				end
+				                				-- Use plaintext to prevent crashes with Markdown highlighting
+				                				vim.lsp.util.open_floating_preview(markdown_lines, "plaintext", { border = "rounded" })
+				                			end)
+				                		end, opts)		vim.keymap.set('n', 'ggi', vim.lsp.buf.implementation, opts)
 		vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
 		vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
 		vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
