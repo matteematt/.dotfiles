@@ -1,3 +1,5 @@
+vim.o.winborder = 'rounded'
+
 local options = {
 	autoindent = true,
 	smartindent = true,
