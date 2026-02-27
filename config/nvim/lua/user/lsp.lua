@@ -1,13 +1,19 @@
 -- Native LSP Setup for Neovim 0.11+
 -- Replaces lsp-zero functionality
 
--- 1. Setup Mason (manage external tools)
+-- 1. Setup lazydev (Neovim API type definitions for lua_ls)
+local lazydev_ok, lazydev = pcall(require, 'lazydev')
+if lazydev_ok then
+	lazydev.setup()
+end
+
+-- 2. Setup Mason (manage external tools)
 require('mason').setup({})
 
--- 2. Setup Capabilities for Completion
+-- 3. Setup Capabilities for Completion
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
--- 3. Setup Mason LSP Config (bridge between Mason and lspconfig)
+-- 4. Setup Mason LSP Config (bridge between Mason and lspconfig)
 require('mason-lspconfig').setup({
 	handlers = {
 		-- Default handler for all servers
@@ -15,13 +21,6 @@ require('mason-lspconfig').setup({
 			if server_name == 'lua_ls' then
 				require('lspconfig')[server_name].setup({
 					capabilities = capabilities,
-					settings = {
-						Lua = {
-							diagnostics = {
-								globals = { 'vim' }
-							}
-						}
-					}
 				})
 				return
 			end
@@ -164,6 +163,7 @@ local kind_icons = {
 
 cmp.setup({
 	sources = {
+		{ name = 'lazydev', group_index = 0 },
 		{ name = 'nvim_lsp' },
 	},
 	formatting = {
