@@ -64,7 +64,7 @@ local hint_lsp = [[
 ^
 _d_: Definition _D_: Declaration _i_: Implementation _r_: References _s_: Signature help
 _I_: Info _R_: Rename _a_: Code action
-_[_: Prev diagnostic _]_: Next diagnostic _l_: Diagnostics loclist _f_: Diagnostics float _t_: Diagnostics telescope
+_[_: Prev diagnostic _]_: Next diagnostic _l_: Diagnostics loclist _f_: Diagnostics float _t_: Diagnostics telescope _y_: Copy diagnostic
 _<Esc>_: Exit
 ]]
 
@@ -107,6 +107,12 @@ local lsp_hydra = hydra({
 			"t",
 			"<cmd>Telescope diagnostics<CR>",
 			{ nowait = true, exit = true, desc = "diagnostics telescope" },
+		},
+
+		{
+			"y",
+			require("user.utils.misc").copy_line_diagnostics,
+			{ nowait = true, desc = "copy diagnostic" },
 		},
 
 		{ "<Esc>", nil, { exit = true, nowait = true, desc = "exit" } },

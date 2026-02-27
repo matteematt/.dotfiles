@@ -72,6 +72,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 		vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, opts)
 		vim.keymap.set('n', 'gl', vim.diagnostic.open_float, opts)
 		vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
+		vim.keymap.set('n', '<leader>dy', require("user.utils.misc").copy_line_diagnostics, opts)
 
 		-- Format command
 		vim.api.nvim_buf_create_user_command(ev.buf, 'Format', function()
@@ -83,6 +84,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- 5. Diagnostic Configuration
 vim.diagnostic.config({
 	virtual_text = false,
+	virtual_lines = { current_line = true },
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = '✘',
