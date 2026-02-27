@@ -26,7 +26,6 @@ local git_hydra = hydra({
 		hint = {
 			offset = 2,
 			float_opts = {
-				border = "rounded",
 				style = "minimal",
 			}
 		},
@@ -77,7 +76,6 @@ local lsp_hydra = hydra({
 		hint = {
 			offset = 2,
 			float_opts = {
-				border = "rounded",
 				style = "minimal",
 			}
 		},
@@ -95,12 +93,12 @@ local lsp_hydra = hydra({
 
 		{
 			"[",
-			'<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>',
+			'<cmd>lua vim.diagnostic.goto_prev()<CR>',
 			{ nowait = true, desc = "diagnostic prev" },
 		},
 		{
 			"]",
-			'<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>',
+			'<cmd>lua vim.diagnostic.goto_next()<CR>',
 			{ nowait = true, desc = "diagnostic next" },
 		},
 		{ "f", "<cmd>lua vim.diagnostic.open_float()<CR>", { nowait = true, desc = "diagnostics float" } },
@@ -138,7 +136,6 @@ local misc_hydra = hydra({
 		hint = {
 			offset = 2,
 			float_opts = {
-				border = "rounded",
 				style = "minimal",
 			}
 		},

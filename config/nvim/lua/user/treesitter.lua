@@ -27,25 +27,6 @@ if nvim_version_ok then
 	
 	-- Don't enable highlighting here - it will be enabled per-buffer in the autocmd
 
-	-- Install commonly used parsers
-	-- The main branch requires explicit parser installation
-	local parsers_to_install = {
-		"bash", "c", "cpp", "css", "dockerfile", "go", "html", "javascript", 
-		"json", "lua", "markdown", "python", "rust", "sql", "toml", "typescript",
-		"vim", "yaml", "zig", "scala", "java", "kotlin", "php", "ruby", "xml",
-		"cmake", "make", "ninja", "diff", "git_rebase", "gitcommit", "gitignore",
-		"vimdoc", "query", "regex", "comment", "help", "fish", "zsh"
-	}
-	
-	for _, parser in ipairs(parsers_to_install) do
-		local install_result, _ = pcall(function() 
-			treesitter.install(parser) 
-		end)
-		if not install_result then
-			print("Note: Failed to install parser: " .. parser)
-		end
-	end
-	
 	-- Enable treesitter for all files except large ones
 	local max_filesize = 100 * 1024 -- 100 KB
 	vim.api.nvim_create_autocmd({"FileType"}, {
@@ -104,11 +85,18 @@ if nvim_version_ok then
 	end
 	
 	-- Add a command to manually update treesitter parsers
+	local parsers_to_install = {
+		"bash", "c", "cpp", "css", "dockerfile", "go", "html", "javascript",
+		"json", "lua", "markdown", "markdown_inline", "python", "rust", "sql", "toml", "typescript",
+		"vim", "yaml", "zig", "scala", "java", "kotlin", "php", "ruby", "xml",
+		"cmake", "make", "ninja", "diff", "git_rebase", "gitcommit", "gitignore",
+		"vimdoc", "query", "regex", "comment",
+	}
 	vim.api.nvim_create_user_command("TSUpdateAll", function()
 		print("Updating all treesitter parsers...")
 		for _, parser in ipairs(parsers_to_install) do
-			local install_result, _ = pcall(function() 
-				treesitter.install(parser) 
+			local install_result, _ = pcall(function()
+				treesitter.install(parser)
 			end)
 			if install_result then
 				print("✓ Updated parser: " .. parser)

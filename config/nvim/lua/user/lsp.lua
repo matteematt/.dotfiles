@@ -61,13 +61,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
 					print("No hover content")
 					return
 				end
-				vim.lsp.util.open_floating_preview(markdown_lines, "markdown", { border = "rounded" })
+				vim.lsp.util.open_floating_preview(markdown_lines, "markdown")
 			end)
 		end, opts)		vim.keymap.set('n', 'ggi', vim.lsp.buf.implementation, opts)
 		vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-		vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
 		vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-		-- vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
 
 		-- Diagnostics keymaps
 		vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, opts)
@@ -85,9 +83,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- 5. Diagnostic Configuration
 vim.diagnostic.config({
 	virtual_text = false,
-	float = {
-		border = 'rounded',
-	},
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = '✘',
@@ -130,9 +125,7 @@ vim.diagnostic.config({
 -- })
 
 vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-	vim.lsp.handlers.signature_help, {
-		border = "rounded"
-	}
+	vim.lsp.handlers.signature_help, {}
 )
 
 -- 7. Completion Setup (nvim-cmp)
