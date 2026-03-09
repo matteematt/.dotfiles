@@ -21,3 +21,6 @@ fi
 
 echo -e "\\nUpdate nvim packages with"
 echo "nvim $HOME/.dotfiles/config/nvim/lua/user/plugins.lua"
+
+echo -e "\\nCleaning up TypeScript typings installer logs"
+rm -f ~/ti-*.log
