@@ -16,8 +16,8 @@ function __pushchangeddirToListSave {
   cdhistory="$HOME/.cache/cdhistory"
   touch "$cdhistory"
 	echo "$(pwd | sed 's/ /<spc;>/g') $(date +'%s')" >> "$cdhistory"
-  sort -r "$cdhistory" | sort -k1,1 --unique | sort -k 2,2 | tail -n 1000 > "$cdhistory.tmp"
-  mv -f "$cdhistory.tmp" "$cdhistory"
+  sort -r "$cdhistory" | sort -k1,1 --unique | sort -k 2,2 | tail -n 1000 > "$cdhistory.tmp.$$"
+  mv -f "$cdhistory.tmp.$$" "$cdhistory"
 }
 
 # After a normal 'cd' calls function to save dir in the background, unless in a worktree
