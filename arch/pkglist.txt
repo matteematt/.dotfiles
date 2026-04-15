@@ -67,4 +67,3 @@ whatsapp-nativefier
 xdotool
 xorg-xinit
 yay
-zsh-syntax-highlighting
