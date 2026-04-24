@@ -12,11 +12,12 @@ if [ -z "$sessions" ]; then
 fi
 
 # Use fzf to select sessions (multiple selection with -m flag)
-selected_sessions=$(echo "$sessions" | fzf -m \
+selected_sessions=$(echo "$sessions" | fzf -m --ansi \
     --prompt="Select sessions to kill: " \
     --preview="$(dirname "$0")/session_preview.sh {}" \
-    --preview-window=up:90% \
-    --header="Tab: select/deselect | Ctrl+A: select all | Ctrl+D: deselect all | Enter: confirm")
+    --preview-window=up:85% \
+    --bind 'ctrl-u:preview-up,ctrl-d:preview-down,ctrl-b:preview-page-up,ctrl-f:preview-page-down' \
+    --header="Tab: select/deselect | Ctrl-u/d: scroll preview | Ctrl-b/f: page preview | Enter: confirm")
 
 if [ -z "$selected_sessions" ]; then
     echo "No sessions selected"
