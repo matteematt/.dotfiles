@@ -75,7 +75,8 @@ else
             printf '%*s\n' "${COLUMNS:-80}" '' | tr ' ' '-'
             
             # Capture and display pane content (last 18 lines)
-            content=$(tmux capture-pane -t "$session:$pane" -p 2>/dev/null | tail -18)
+            # `-e` preserves ANSI colour/style escapes so fzf (with --ansi) can render them
+            content=$(tmux capture-pane -e -t "$session:$pane" -p 2>/dev/null | tail -18)
             if [ -n "$content" ]; then
                 echo "$content"
             else

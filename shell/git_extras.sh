@@ -76,7 +76,7 @@ function gitViewAndStage() {
     return 0
   fi
 
-  chosen_files=$(__formatGitStatus | fzf -m --with-nth 2 --header "File Staging (TAB to select multiple)" --preview-window=right,70% --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
+  chosen_files=$(__formatGitStatus | fzf -m --with-nth 2 --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview)" --preview-window=right,70% --bind 'ctrl-u:preview-up,ctrl-d:preview-down,ctrl-b:preview-page-up,ctrl-f:preview-page-down' --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
   if [ -z "$chosen_files" ]; then
     return
   else
