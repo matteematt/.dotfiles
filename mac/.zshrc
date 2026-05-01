@@ -33,3 +33,5 @@ export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 # Requires installing via pacman or AUR
 # Sourcing this must be at the end of the .zshrc
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+alias chrome-unsafe="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --ignore-certificate-errors --allow-insecure-localhost --allow-running-insecure-content"
