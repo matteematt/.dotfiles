@@ -1,0 +1,24 @@
+config/nvim/lua/user/lsp.lua
+  s_33c2445cf00c6c::t_783ce020b613e8 67
+  s_33c2445cf00c6c::t_5c6595102648d6 40
+config/nvim/lua/user/colourscheme.lua
+  s_33c2445cf00c6c::t_64bfdc39b4195a 1-2,10-40
+config/nvim/lua/user/closetag.lua
+  s_33c2445cf00c6c::t_a38425b80e07f0 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "19876273085f50fa04e60099bef075d950e6b800",
+  "prompts": {},
+  "sessions": {
+    "s_33c2445cf00c6c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b670ee13-1b1f-4b85-a9d1-25494f07585f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
