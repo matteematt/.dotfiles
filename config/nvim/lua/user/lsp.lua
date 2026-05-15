@@ -11,23 +11,29 @@ end
 require('mason').setup({})
 
 -- 3. Setup Capabilities for Completion
+-- Apply nvim-cmp capabilities to every LSP server. mason-lspconfig v2 auto-enables
+-- installed servers via vim.lsp.enable(), so this is how capabilities get through.
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
+vim.lsp.config('*', { capabilities = capabilities })
 
 -- 4. Setup Mason LSP Config (bridge between Mason and lspconfig)
+-- Servers chosen to cover every filetype handled by ~/.dotfiles/.vim/plugin/comments.vim.
+-- Scala (metals) and Haskell (hls) intentionally skipped — not used on this machine.
 require('mason-lspconfig').setup({
-	handlers = {
-		-- Default handler for all servers
-		function(server_name)
-			if server_name == 'lua_ls' then
-				require('lspconfig')[server_name].setup({
-					capabilities = capabilities,
-				})
-				return
-			end
-			require('lspconfig')[server_name].setup({
-				capabilities = capabilities,
-			})
-		end,
+	ensure_installed = {
+		'bashls',                   -- sh, zsh
+		'clangd',                   -- c, cpp
+		'dockerls',                 -- dockerfile
+		'groovyls',                 -- groovy
+		'jdtls',                    -- java
+		'jsonls',                   -- jsonc
+		'kotlin_language_server',   -- kotlin
+		'lua_ls',                   -- lua
+		'pyright',                  -- python
+		'rust_analyzer',            -- rust
+		'ts_ls',                    -- javascript, typescript, jsx, tsx
+		'vimls',                    -- vim
+		'yamlls',                   -- yaml, yaml.docker-compose
 	},
 })
 
