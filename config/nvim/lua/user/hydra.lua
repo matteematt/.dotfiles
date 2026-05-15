@@ -93,12 +93,12 @@ local lsp_hydra = hydra({
 
 		{
 			"[",
-			'<cmd>lua vim.diagnostic.goto_prev()<CR>',
+			'<cmd>lua vim.diagnostic.jump({count=-1})<CR>',
 			{ nowait = true, desc = "diagnostic prev" },
 		},
 		{
 			"]",
-			'<cmd>lua vim.diagnostic.goto_next()<CR>',
+			'<cmd>lua vim.diagnostic.jump({count=1})<CR>',
 			{ nowait = true, desc = "diagnostic next" },
 		},
 		{ "f", "<cmd>lua vim.diagnostic.open_float()<CR>", { nowait = true, desc = "diagnostics float" } },

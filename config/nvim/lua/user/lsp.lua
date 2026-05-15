@@ -11,58 +11,42 @@ end
 require('mason').setup({})
 
 -- 3. Setup Capabilities for Completion
+-- Apply nvim-cmp capabilities to every LSP server. mason-lspconfig v2 auto-enables
+-- installed servers via vim.lsp.enable(), so this is how capabilities get through.
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
+vim.lsp.config('*', { capabilities = capabilities })
 
 -- 4. Setup Mason LSP Config (bridge between Mason and lspconfig)
+-- Servers chosen to cover every filetype handled by ~/.dotfiles/.vim/plugin/comments.vim.
+-- Scala (metals) and Haskell (hls) intentionally skipped — not used on this machine.
 require('mason-lspconfig').setup({
-	handlers = {
-		-- Default handler for all servers
-		function(server_name)
-			if server_name == 'lua_ls' then
-				require('lspconfig')[server_name].setup({
-					capabilities = capabilities,
-				})
-				return
-			end
-			require('lspconfig')[server_name].setup({
-				capabilities = capabilities,
-			})
-		end,
+	ensure_installed = {
+		'bashls',                   -- sh, zsh
+		'clangd',                   -- c, cpp
+		'dockerls',                 -- dockerfile
+		'groovyls',                 -- groovy
+		'jdtls',                    -- java
+		'jsonls',                   -- jsonc
+		'kotlin_language_server',   -- kotlin
+		'lua_ls',                   -- lua
+		'pyright',                  -- python
+		'rust_analyzer',            -- rust
+		'ts_ls',                    -- javascript, typescript, jsx, tsx
+		'vimls',                    -- vim
+		'yamlls',                   -- yaml, yaml.docker-compose
 	},
 })
 
--- 4. Keymaps and Autocommands on LspAttach
+-- 5. Keymaps and Autocommands on LspAttach
 vim.api.nvim_create_autocmd('LspAttach', {
 	group = vim.api.nvim_create_augroup('UserLspConfig', {}),
 	callback = function(ev)
 		local opts = { noremap = true, silent = true, buffer = ev.buf }
-		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
 		vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
 		vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-		vim.keymap.set('n', 'K', function()
-			-- Get the client for the current buffer to find its offset encoding
-			local client = vim.lsp.get_client_by_id(ev.data.client_id)
-			local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
-
-			vim.lsp.buf_request(0, 'textDocument/hover', params, function(err, result, ctx, config)
-				if err then
-					print("LSP Error: " .. tostring(err))
-					return
-				end
-				if not (result and result.contents) then
-					print("No hover info")
-					return
-				end
-				-- result.contents can be string, MarkupContent, or MarkedString[]
-				local markdown_lines = vim.lsp.util.convert_input_to_markdown_lines(result.contents)
-				if vim.tbl_isempty(markdown_lines) then
-					print("No hover content")
-					return
-				end
-				vim.lsp.util.open_floating_preview(markdown_lines, "markdown")
-			end)
-		end, opts)		vim.keymap.set('n', 'ggi', vim.lsp.buf.implementation, opts)
+		vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+		vim.keymap.set('n', 'ggi', vim.lsp.buf.implementation, opts)
 		vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
 		vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
 
@@ -80,7 +64,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 	end,
 })
 
--- 5. Diagnostic Configuration
+-- 6. Diagnostic Configuration
 vim.diagnostic.config({
 	virtual_text = false,
 	virtual_lines = { current_line = true },
@@ -93,41 +77,6 @@ vim.diagnostic.config({
 		},
 	},
 })
-
--- 6. UI Customization (Borders & Highlights)
--- Apply floating window styling to match editor background with darker borders
--- vim.api.nvim_create_autocmd({"VimEnter", "ColorScheme"}, {
---   callback = function()
---     -- Get Normal background color for consistent styling
---     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
---     local normal_bg_hex = normal_hl.bg and string.format("#%06x", normal_hl.bg) or "NONE"
-
---     -- Try to get TelescopeBorder highlight color for consistency
---     local telescope_border_hl = vim.api.nvim_get_hl(0, { name = "TelescopeBorder" })
---     local border_color
-
---     -- If TelescopeBorder is defined, use its color
---     if telescope_border_hl.fg then
---       border_color = string.format("#%06x", telescope_border_hl.fg)
---     else
---       -- Fallback to Comment highlight color
---       local comment_hl = vim.api.nvim_get_hl(0, { name = "Comment" })
---       border_color = comment_hl.fg and string.format("#%06x", comment_hl.fg) or "#6a6a6a"
---     end
-
---     -- Set colors to editor background
---     vim.api.nvim_set_hl(0, "NormalFloat", { bg = normal_bg_hex })
---     vim.api.nvim_set_hl(0, "Pmenu", { bg = normal_bg_hex })
-
---     -- Use the border color from telescope or fallback to comment
---     vim.api.nvim_set_hl(0, "FloatBorder", { fg = border_color, bg = normal_bg_hex })
---   end,
---   group = vim.api.nvim_create_augroup("CustomFloatHighlights", { clear = true })
--- })
-
-vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-	vim.lsp.handlers.signature_help, {}
-)
 
 -- 7. Completion Setup (nvim-cmp)
 local cmp = require('cmp')

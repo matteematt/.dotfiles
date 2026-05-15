@@ -70,9 +70,6 @@ return require("packer").startup(function(use)
 	-- use("nvim-treesitter/playground")
 	use("HiPhish/rainbow-delimiters.nvim")
 
-	-- Autopairs
-	-- use("windwp/nvim-autopairs")
-
 	-- git
 	use("lewis6991/gitsigns.nvim")
 
