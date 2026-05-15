@@ -131,10 +131,6 @@ vim.diagnostic.config({
 --   group = vim.api.nvim_create_augroup("CustomFloatHighlights", { clear = true })
 -- })
 
-vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-	vim.lsp.handlers.signature_help, {}
-)
-
 -- 7. Completion Setup (nvim-cmp)
 local cmp = require('cmp')
 
