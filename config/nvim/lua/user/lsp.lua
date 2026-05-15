@@ -37,7 +37,7 @@ require('mason-lspconfig').setup({
 	},
 })
 
--- 4. Keymaps and Autocommands on LspAttach
+-- 5. Keymaps and Autocommands on LspAttach
 vim.api.nvim_create_autocmd('LspAttach', {
 	group = vim.api.nvim_create_augroup('UserLspConfig', {}),
 	callback = function(ev)
@@ -64,7 +64,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 	end,
 })
 
--- 5. Diagnostic Configuration
+-- 6. Diagnostic Configuration
 vim.diagnostic.config({
 	virtual_text = false,
 	virtual_lines = { current_line = true },
