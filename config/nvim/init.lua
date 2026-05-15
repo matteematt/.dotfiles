@@ -7,7 +7,6 @@ require("user.telescope")
 require("user.lsp")
 require("user.treesitter")
 
-require("user.autopairs")
 require("user.colourscheme")
 require("user.gitsigns")
 require("user.closetag")
