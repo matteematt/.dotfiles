@@ -1,0 +1,26 @@
+config/nvim/lua/user/hydra.lua
+  s_33c2445cf00c6c::t_1c1958f019314e 96,101
+config/nvim/lua/user/options.lua
+  s_33c2445cf00c6c::t_9dfc41315e9937 77
+config/nvim/lua/user/lsp.lua
+  s_33c2445cf00c6c::t_7d91330dc66d25 48-49
+config/nvim/lua/user/treesitter.lua
+  s_33c2445cf00c6c::t_bbafbda58d556b 41
+  s_33c2445cf00c6c::t_491efbded978c9 12-16,18-20,22-26,28-31,33-36,38-40,42-46,48-54,56,58-67,69-75,77-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "8565bd219415aef5a935c82fbfca63c18471180a",
+  "prompts": {},
+  "sessions": {
+    "s_33c2445cf00c6c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b670ee13-1b1f-4b85-a9d1-25494f07585f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
