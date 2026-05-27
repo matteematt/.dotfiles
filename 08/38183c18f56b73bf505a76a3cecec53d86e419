@@ -1,0 +1,24 @@
+install.sh
+  s_5736e66c89f9c4::t_954975a9552ee2 61-63
+ai/skills/handoff/SKILL.md
+  s_5736e66c89f9c4::t_d84403f0c148c2 9-10
+  s_5736e66c89f9c4::t_bfdd8848a57fa1 1-8,11-17
+ai/skills/install.sh
+  s_5736e66c89f9c4::t_72f295479ef40a 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0838183c18f56b73bf505a76a3cecec53d86e419",
+  "prompts": {},
+  "sessions": {
+    "s_5736e66c89f9c4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2719af3c-dab7-4df0-8866-8e8ba155c04e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
