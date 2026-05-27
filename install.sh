@@ -47,7 +47,7 @@ brew install yq
 brew install isacikgoz/taps/tldr
 
 # Get fonts
-brew tap homebrew/cask-fonts
+# brew tap homebrew/cask-fonts
 # Get the liberation mono nerd font
 
 # Perform the general symlinks here
@@ -57,6 +57,9 @@ ln -s ~/.dotfiles/config/haskell/haskeline ~/.haskeline
 ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
 ln -s ~/.dotfiles/config/nvim ~/.config
 ln -s ~/.dotfiles/config/tmux/ ~/.config
+
+# Install AI skills for Claude Code
+~/.dotfiles/ai/skills/install.sh
 
 # Set up global git commands
 git config --global core.excludesfile ~/.dotfiles/config/git/.gitignore_global
