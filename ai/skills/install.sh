@@ -16,3 +16,7 @@ mkdir -p "$CLAUDE_SKILLS_DIR"
 # handoff
 mkdir -p "$CLAUDE_SKILLS_DIR/handoff"
 ln -sf "$SKILLS_SRC/handoff/SKILL.md" "$CLAUDE_SKILLS_DIR/handoff/SKILL.md"
+
+# github-review
+mkdir -p "$CLAUDE_SKILLS_DIR/github-review"
+ln -sf "$SKILLS_SRC/github-review/SKILL.md" "$CLAUDE_SKILLS_DIR/github-review/SKILL.md"
