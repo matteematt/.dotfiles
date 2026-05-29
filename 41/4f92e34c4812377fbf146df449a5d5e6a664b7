@@ -1,0 +1,21 @@
+config/tmux/tmux.conf
+  s_48933347fb71cf::t_226f037bbefd7a 39
+  s_48933347fb71cf::t_ffe25fab7709bd 33-38
+  s_48933347fb71cf::t_30078b0d056a84 124-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "414f92e34c4812377fbf146df449a5d5e6a664b7",
+  "prompts": {},
+  "sessions": {
+    "s_48933347fb71cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e91b670f-41cb-49e5-bc61-7dd3138fa2bf",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
