@@ -1,0 +1,38 @@
+ai/claude/statusline-command.sh
+  s_48933347fb71cf::t_c5c7ebc75802c0 1-55
+config/tmux/tmux.conf
+  s_48933347fb71cf::t_e6729cbc1b276e 37
+  s_48933347fb71cf::t_57e9db873ddc08 35-36,38
+  s_48933347fb71cf::t_f366a278852e62 96-101
+  s_48933347fb71cf::t_bd8cacf2ba9953 112
+  s_48933347fb71cf::t_85323dced279bb 122-124
+config/tmux/scripts/claude_notify.sh
+  s_48933347fb71cf::t_bcec9cf236e6eb 1-16,33-36
+  s_48933347fb71cf::t_b2e73aca7fcb6d 29
+  s_48933347fb71cf::t_d645ce769ed1cb 21,28
+  s_48933347fb71cf::t_bf7116920bb351 17-20,22-27,30-32
+install.sh
+  s_48933347fb71cf::t_b5361746480129 64-66
+ai/claude/settings.json
+  s_48933347fb71cf::t_fb38593b15c1c3 51
+  s_48933347fb71cf::t_933d3dd5ff500f 1-49,52-54
+ai/claude/install.sh
+  s_48933347fb71cf::t_eddf162a1bcf37 1-4,10-17
+  s_48933347fb71cf::t_444fbc93c0489c 5-9,18-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a37ff1f060a3e5392652a38fca8a59f87d6aba9f",
+  "prompts": {},
+  "sessions": {
+    "s_48933347fb71cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e91b670f-41cb-49e5-bc61-7dd3138fa2bf",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
