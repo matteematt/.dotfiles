@@ -61,6 +61,9 @@ ln -s ~/.dotfiles/config/tmux/ ~/.config
 # Install AI skills for Claude Code
 ~/.dotfiles/ai/skills/install.sh
 
+# Install global Claude Code config (settings.json)
+~/.dotfiles/ai/claude/install.sh
+
 # Set up global git commands
 git config --global core.excludesfile ~/.dotfiles/config/git/.gitignore_global
 git config --global core.hooksPath ~/.dotfiles/config/git/hooks
