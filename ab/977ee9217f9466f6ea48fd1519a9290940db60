@@ -1,0 +1,19 @@
+config/tmux/scripts/claude_notify.sh
+  s_3db97eb62b7f59::t_85ba114d131c00 41-47,49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "ab977ee9217f9466f6ea48fd1519a9290940db60",
+  "prompts": {},
+  "sessions": {
+    "s_3db97eb62b7f59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0200b84a-9e83-42d1-8821-a7e879954507",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
