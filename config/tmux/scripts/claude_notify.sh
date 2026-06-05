@@ -38,6 +38,13 @@ front=$(lsappinfo info -only name "$(lsappinfo front 2>/dev/null)" 2>/dev/null)
 case "$front" in *"$TERM_APP"*) exit 0 ;; esac
 
 # You've left the terminal for another app → pop a notification to pull you back.
+# Message reflects which event fired: Stop = response complete and idle;
+# permission_prompt = blocked mid-task waiting for your approval.
+if [ "$event" = "Stop" ]; then
+  msg="finished"
+else
+  msg="needs approval"
+fi
 if command -v osascript >/dev/null 2>&1; then
-  osascript -e "display notification \"needs you\" with title \"Claude · ${sess}\" sound name \"Submarine\"" >/dev/null 2>&1
+  osascript -e "display notification \"${msg}\" with title \"Claude · ${sess}\" sound name \"Submarine\"" >/dev/null 2>&1
 fi
