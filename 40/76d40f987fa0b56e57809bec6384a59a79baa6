@@ -1,0 +1,20 @@
+ai/skills/handoff/SKILL.md
+  s_3db97eb62b7f59::t_eb0b019ab51679 4,7-11
+  s_3db97eb62b7f59::t_4b872dbc528df1 12-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "4076d40f987fa0b56e57809bec6384a59a79baa6",
+  "prompts": {},
+  "sessions": {
+    "s_3db97eb62b7f59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0200b84a-9e83-42d1-8821-a7e879954507",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
