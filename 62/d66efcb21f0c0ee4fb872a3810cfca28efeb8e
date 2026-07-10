@@ -1,0 +1,19 @@
+config/tmux/scripts/name_session_from_git.sh
+  s_b788de711868d1::t_a40c185fd3f6b8 43-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "62d66efcb21f0c0ee4fb872a3810cfca28efeb8e",
+  "prompts": {},
+  "sessions": {
+    "s_b788de711868d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e68e5ff-ac39-4dc7-92ce-ebbb307fe9de",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
