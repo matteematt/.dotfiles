@@ -40,13 +40,14 @@ if [[ "$name" == "$current" ]]; then
     exit 0
 fi
 
-# Suffix on collision (e.g. two worktrees on the same branch).
-candidate=$name
-n=2
-while tmux has-session -t="=$candidate" 2>/dev/null; do
-    candidate="${name}-${n}"
-    n=$((n + 1))
-done
+# If another session already owns this name (e.g. a second window/session on
+# the same repo+branch), refuse to rename rather than create a confusing
+# duplicate. Surface a clear message instead of tmux's terse "duplicate
+# session" error, then exit non-zero so the failure is visible.
+if tmux has-session -t "=$name" 2>/dev/null; then
+    tmux display-message "Session '$name' already exists — switch to it instead of opening a second one"
+    exit 1
+fi
 
-tmux rename-session -t "$current" "$candidate"
-tmux display-message "Session renamed to '$candidate'"
+tmux rename-session -t "$current" "$name"
+tmux display-message "Session renamed to '$name'"
