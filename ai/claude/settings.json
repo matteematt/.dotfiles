@@ -1,4 +1,5 @@
 {
+  "model": "opus[1m]",
   "hooks": {
     "PostToolUse": [
       {
@@ -48,8 +49,8 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "theme": "dark",
   "editorMode": "vim",
-  "skipAutoPermissionPrompt": true,
-  "tui": "fullscreen"
+  "skipAutoPermissionPrompt": true
 }
