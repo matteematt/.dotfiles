@@ -47,6 +47,7 @@ ptags-git
 python-pylint
 ranger
 redshift
+reflector
 sbt
 scala
 scalastyle
