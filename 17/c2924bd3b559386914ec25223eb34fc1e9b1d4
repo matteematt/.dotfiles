@@ -1,0 +1,23 @@
+shell/README.md
+  s_f81cb358d28f1e::t_311a1c265cad12 30-33,37
+  s_f81cb358d28f1e::t_4e7ba652689117 34-36
+shell/file_extras.sh
+  s_f81cb358d28f1e::t_ce35fab62b8e98 2-8,10-11,15-30
+  s_f81cb358d28f1e::t_6279fa005d42ef 1,9,12-14,31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "17c2924bd3b559386914ec25223eb34fc1e9b1d4",
+  "prompts": {},
+  "sessions": {
+    "s_f81cb358d28f1e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c747a1d-557f-4623-999a-ca03c8c7b6cd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
