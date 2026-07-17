@@ -27,6 +27,14 @@ files ready for commit.
 		`$chosen_file`. Aliased to `gdl` in the `.zshrc`.
 * `addLastDiffFile` stages the filename from `$chosen_file`. Aliases to `gal` in the `.zshrc`.
 
+### File Extras
+
+The `file_extras.sh` file contains shell functions to help with everyday file operations.
+
+* `moveAndPrintPath` moves one or more files into the current directory and then echoes each new
+		absolute path. Handy for dragging file(s) in from Finder to move them into the working directory
+		and get their new location. Aliased to `mvpp` in the `.zshrc`.
+
 ## Scripts
 
 ### View Unstaged File
