@@ -1,0 +1,20 @@
+shell/.zshrc
+  s_f81cb358d28f1e::t_25108ec7be3bf4 224
+  s_f81cb358d28f1e::t_9ee4eee216c9f6 233-234
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "7ede5dec75cece4a94d1e153e09b235d281a96e8",
+  "prompts": {},
+  "sessions": {
+    "s_f81cb358d28f1e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c747a1d-557f-4623-999a-ca03c8c7b6cd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
