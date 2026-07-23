@@ -21,6 +21,7 @@ If the base branch isn't supplied, abort and ask for it. Do not guess.
    If there's no PR yet, tell the user and stop — pending reviews need a PR.
 2. Pull the diff against the supplied base: `git diff <base>...HEAD`. If it's large, save to `/tmp/pr_diff.patch` and Read in chunks rather than dumping into the context.
 3. Read the surrounding context for every hunk you'll comment on — bugs in unchanged lines of a touched function are in scope.
+4. Install dependencies if it helps the review. If the repo's deps aren't present and having them would let you type-check, lint, resolve imports, or run the finder/verifier agents against real modules, go ahead and run `npm i` (or the project's equivalent — `pnpm i`, `yarn`, etc.). This is worth doing whenever it raises confidence in the findings; don't hold back on it.
 
 ## Phase 2 — Find candidates (run in parallel)
 
@@ -51,6 +52,8 @@ Keep CONFIRMED + PLAUSIBLE. Recall mode: a single non-REFUTED vote carries the f
 Run one more finder as a fresh reviewer with the verified list, looking only for gaps. Don't pad — if nothing new, return empty.
 
 ## Phase 5 — Write the comments in the user's voice
+
+**Everything important goes in inline comments.** The top-level review `body` (the summary written when the review is created) frequently gets dropped and only the inline comments survive to be posted. Never put a finding, caveat, or piece of context the user needs solely in the top-level `body` — treat it as throwaway. If a point matters, anchor it to a line as an inline comment. Keep the top-level `body` to at most a short throat-clear (or leave it empty).
 
 **Voice summary:** direct, technically dense, conversational. Questions outnumber demands. Lead with the concern (often as a rhetorical question), then mechanism / failure scenario, then optional fix. Hedged but precise — soft framing, exact technical content.
 
@@ -129,6 +132,8 @@ The body shape:
   ]
 }
 ```
+
+The top-level `body` is unreliable — it often gets dropped, leaving only the `comments` array. So every finding and every piece of context the user needs must live inside `comments` as an inline comment anchored to a line. Do not stash anything load-bearing in the top-level `body`.
 
 Expected response: `state: PENDING`. If you don't see that, something is wrong — stop and report.
 
