@@ -1,0 +1,21 @@
+ai/skills/github-review/SKILL.md
+  s_bfefaaee9006d4::t_5d78ab786d220d 24
+  s_bfefaaee9006d4::t_9f71e14bbecf89 56-57
+  s_bfefaaee9006d4::t_8110257d2ec1b5 136-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "3201e566265cc5a28f0e04ad290ebbad197125c7",
+  "prompts": {},
+  "sessions": {
+    "s_bfefaaee9006d4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "128d8e0c-127f-457d-a434-03fd5bfb39b0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
