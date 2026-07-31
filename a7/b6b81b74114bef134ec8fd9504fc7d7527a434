@@ -1,0 +1,19 @@
+mac/brewlist.txt
+  s_3b94f889b58fa0::t_b43457b70dad65 2,9-10,13,19,24,40,53,59-60,63,78,80,85,101,104-105,108,115,118,133,135,144,147,161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "a7b6b81b74114bef134ec8fd9504fc7d7527a434",
+  "prompts": {},
+  "sessions": {
+    "s_3b94f889b58fa0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4321c64-4d8a-42bc-94c6-7b507049f0f9",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
