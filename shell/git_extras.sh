@@ -165,9 +165,8 @@ function gitWorktreeCheckout() {
 		branch_name="$1"
 		git worktree add "$worktree_dir/$branch_name" "$branch_name"
 	else
-		cd -
 		echo "Wrong number of arguments to function"
-		exit 1;
+		return 1;
 	fi
 	echo "Checked out $branch_name at $worktree_dir/$branch_name"
 	cd "$worktree_dir/$branch_name"
@@ -199,26 +198,217 @@ function gitShowCommits() {
 	fi
 }
 
+# Lists every process whose working directory is inside $1, one
+# "<pid>\t<command>\t<cwd>" line each. Used to spot a shell, editor or claude
+# session still sitting in a worktree before it gets deleted.
+# Only the working directory is checked - a process that merely holds a file
+# open under the worktree is not reported, as scanning every open file on the
+# system takes seconds rather than milliseconds.
+# Returns 1 when there is no way to inspect processes at all, so that the
+# caller can say so rather than read "no output" as "nothing is running".
+function __worktreeProcesses() {
+	local dir link cwd
+	dir="$(cd "$1" 2>/dev/null && pwd -P)" || return 0
+
+	if [[ -d /proc/self ]]; then
+		# Linux: read /proc directly rather than depend on lsof being
+		# installed. ${link:A} resolves the cwd symlink, and leaves it
+		# unresolved - so unable to match $dir - for other users' processes.
+		for link in /proc/<1->/cwd(N); do
+			cwd="${link:A}"
+			if [[ "$cwd" == "$dir" || "$cwd" == "$dir"/* ]]; then
+				printf '%s\t%s\t%s\n' "${${link:h}:t}" "$(<${link:h}/comm)" "$cwd"
+			fi
+		done
+		return 0
+	fi
+
+	command -v lsof >/dev/null 2>&1 || return 1
+
+	# macOS: lsof resolves symlinks, hence comparing against the physical path
+	# above. Running from / stops the lsof and awk processes matching $dir
+	# themselves, and passing $dir through the environment keeps it out of
+	# awk's argv.
+	(cd / && lsof -w -d cwd -F pcn 2>/dev/null | dir="$dir" awk '
+		/^p/ { pid = substr($0, 2) }
+		/^c/ { cmd = substr($0, 2) }
+		/^n/ {
+			path = substr($0, 2)
+			if (path == ENVIRON["dir"] || index(path, ENVIRON["dir"] "/") == 1) {
+				print pid "\t" cmd "\t" path
+			}
+		}')
+	return 0
+}
+
+# Filters "<pid>\t<command>\t<cwd>" lines on stdin down to the processes whose
+# working directory is inside $1
+function __processesUnder() {
+	dir="$1" awk -F'\t' 'NF == 3 && ($3 == ENVIRON["dir"] || index($3, ENVIRON["dir"] "/") == 1)'
+}
+
+# Summarises "<pid>\t<command>\t<cwd>" lines on stdin as a command name list,
+# e.g. "nvim, zsh"
+function __processNames() {
+	cut -f2 | sort -u | paste -sd, - | sed 's/,/, /g'
+}
+
+# Prints "$1 $2", pluralising $2 unless there is exactly one of them
+function __plural() {
+	if [[ "$1" == "1" ]]; then
+		print -r -- "$1 $2"
+	else
+		print -r -- "$1 ${2}s"
+	fi
+}
+
+# Works out what would be lost by deleting each worktree named in $@, filling in
+# active_map, dirty_map, unpushed_map and a short risk_map summary for each.
+# zsh scopes dynamically, so these arrays and $all_procs, $top_level and
+# $worktree_root are the caller's.
+function __collectWorktreeRisks() {
+	local branch worktree
+	local -a parts
+	for branch in "$@"; do
+		worktree="$worktree_root/$branch"
+		parts=()
+
+		active_map[$branch]="$(print -r -- "$all_procs" | __processesUnder "$worktree")"
+		if [[ -n "${active_map[$branch]}" ]]; then
+			parts+=("IN USE ($(print -r -- "${active_map[$branch]}" | __processNames))")
+		fi
+
+		# Anything git would refuse to throw away, were rm -rf not doing it
+		dirty_map[$branch]="$(git -C "$worktree" status --porcelain 2>/dev/null | grep -c . | tr -d ' ')"
+		if [[ "${dirty_map[$branch]}" == "0" ]]; then
+			dirty_map[$branch]=""
+		else
+			parts+=("DIRTY")
+		fi
+
+		# Commits reachable from no other branch and no remote, so deleting the
+		# branch is the last thing standing between them and the reflog. This is
+		# stricter than git branch -d, which only consults the upstream or HEAD.
+		unpushed_map[$branch]="$(git -C "$top_level" rev-list --count "$branch" --not --exclude="$branch" --branches --remotes 2>/dev/null)"
+		if [[ -z "${unpushed_map[$branch]}" || "${unpushed_map[$branch]}" == "0" ]]; then
+			unpushed_map[$branch]=""
+		else
+			parts+=("${unpushed_map[$branch]} UNPUSHED")
+		fi
+
+		risk_map[$branch]="${(j:, :)parts}"
+	done
+}
+
+# Prints the indented reasons that $1 is unsafe to delete, one per line, for
+# both the picker preview and the report before deleting. Reads the caller's
+# maps by dynamic scope, as above.
+function __renderWorktreeRisks() {
+	local branch="$1" pid cmd cwd
+	if [[ -n "${active_map[$branch]}" ]]; then
+		print -r -- "${active_map[$branch]}" | while IFS=$'\t' read -r pid cmd cwd; do
+			printf '     %-20s pid %-7s %s\n' "$cmd" "$pid" "$cwd"
+		done
+	fi
+	if [[ -n "${dirty_map[$branch]}" ]]; then
+		printf '     %-20s %s\n' "DIRTY" "$(__plural "${dirty_map[$branch]}" "uncommitted or untracked file")"
+	fi
+	if [[ -n "${unpushed_map[$branch]}" ]]; then
+		printf '     %-20s %s\n' "UNPUSHED" "$(__plural "${unpushed_map[$branch]}" "commit") on no other branch or remote"
+	fi
+}
+
 # List all branches inside the projects to remove
+# Worktrees with a process still running inside them, uncommitted changes, or
+# commits held nowhere else are reported and skipped. Pass -f to be asked about
+# those instead, rather than skipping them.
 function gitWorktreeCleanup {
+	local force=0
+	local skipped=0
+
+	while getopts "f" opt; do
+		case $opt in
+			f)
+				force=1
+				;;
+			*)
+				echo "usage: gitWorktreeCleanup [-f]"
+				return 1
+				;;
+		esac
+	done
+	shift $((OPTIND-1))
+
 	top_level="$(cd "$(pwd | awk -v FS="_worktrees_git/" '{print $1}')" && git rev-parse --show-toplevel)"
 	if ! [[ -d "$top_level/_worktrees_git" ]]; then
 		echo "Error: No worktree directory"
 		return 2;
 	fi
-	git_branches=$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf -m --header "Worktree Cleanup (TAB to select multiple)" --preview "cd $top_level/_worktrees_git/{} && git log")
+	# A single process scan covers every worktree, so marking them up below is
+	# string matching rather than one scan each
+	local worktree_root all_procs
+	local can_check=1
+	worktree_root="$(cd "$top_level/_worktrees_git" && pwd -P)"
+	if ! all_procs="$(__worktreeProcesses "$worktree_root")"; then
+		can_check=0
+		print -P "%B%F{red}Warning: cannot check for running processes, install lsof to have worktrees still in use flagged%f%b"
+	fi
+
+	# Build the picker list rather than piping find straight into fzf, so that
+	# anything unsafe is already marked before it can be chosen
+	local -A active_map dirty_map unpushed_map risk_map
+	local -a fzf_lines safe_lines unsafe_lines worktree_branches
+	local branch detail
+	worktree_branches=(${(f)"$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18-)"})
+	worktree_branches=(${worktree_branches:#})
+	__collectWorktreeRisks "${worktree_branches[@]}"
+	for branch in "${worktree_branches[@]}"; do
+		if [[ -n "${risk_map[$branch]}" ]]; then
+			# The reasons go in a third field that --with-nth hides from the
+			# list and only the preview window expands, keeping the lines short.
+			# Newlines are escaped because a field cannot span lines, and the
+			# leading one keeps fzf from trimming the first line's indent away.
+			detail="$(__renderWorktreeRisks "$branch")"
+			detail="${detail//\\/\\\\}"
+			unsafe_lines+=($'\e[1;31m'"$branch"$'\t✗\e[0m\t'"\\n${detail//$'\n'/\\n}")
+		else
+			safe_lines+=("$branch"$'\t'$'\t')
+		fi
+	done
+	# fzf draws the first line at the bottom next to the prompt and grows
+	# upwards, so listing the safe worktrees first is what puts the unsafe ones
+	# at the top of the screen, away from where the cursor starts
+	fzf_lines=("${safe_lines[@]}" "${unsafe_lines[@]}")
+
+	if [[ ${#fzf_lines[@]} -eq 0 ]]; then
+		echo "Error: No worktrees found"
+		return 2;
+	fi
+
+	git_branches=$(print -rl -- "${fzf_lines[@]}" | fzf -m --ansi --delimiter=$'\t' --with-nth=1,2 --tabstop=20 --header "Worktree Cleanup (TAB to select multiple)" --preview "[ -n {3} ] && { printf '\033[1;31m!! NOT SAFE TO DELETE\033[0m\n%b\n' {3}; printf '%*s\n\n' \${FZF_PREVIEW_COLUMNS:-40} '' | sed 's/ /─/g'; }; cd $worktree_root/{1} && git log")
 	if [[ "$git_branches" == '' ]]; then
 		echo "Error: No branches selected for cleanup"
 		return 3;
 	fi
 
-	# Convert newline-separated branches to array
-	branches_array=(${(f)git_branches})
+	# fzf returns whole lines, the branch name is everything before the tab
+	branches_array=(${${(f)git_branches}%%$'\t'*})
 
-	# Show confirmation with all selected branches
+	# The list above can sit on screen for a while, so check the selection again
+	# for anything that changed in the meantime before acting on it
+	if [[ $can_check -eq 1 ]]; then
+		all_procs="$(__worktreeProcesses "$worktree_root")"
+	fi
+	__collectWorktreeRisks "${branches_array[@]}"
+
+	# Show confirmation with all selected branches, flagging the unsafe ones
 	echo "Selected branches for cleanup:"
 	for branch in "${branches_array[@]}"; do
-		echo "  - $branch"
+		if [[ -n "${risk_map[$branch]}" ]]; then
+			print -P "  - $branch %B%F{red}(${risk_map[$branch]})%f%b"
+		else
+			echo "  - $branch"
+		fi
 	done
 	if [[ ${#branches_array[@]} -eq 1 ]]; then
 		read -q "choice?Are you sure that you want to cleanup this branch? [y/N]" || return 1;
@@ -236,12 +426,47 @@ function gitWorktreeCleanup {
 			continue
 		fi
 
+		if [[ -n "${risk_map[$git_branch]}" ]]; then
+			print -P "\n%B%F{red}!! $git_branch is not safe to delete:%f%b"
+			__renderWorktreeRisks "$git_branch"
+
+			# One prompt covers every reason, rather than one prompt per reason
+			if [[ $force -eq 0 ]]; then
+				print -P "%F{red}   Skipping $git_branch - rerun with -f to delete it anyway%f"
+				skipped=$((skipped + 1))
+				continue
+			fi
+
+			if ! read -q "choice?   Delete $git_branch anyway? [y/N]"; then
+				echo "\n   Skipping $git_branch"
+				skipped=$((skipped + 1))
+				continue
+			fi
+			echo ""
+		fi
+
+		# git worktree remove keeps the worktree bookkeeping straight and makes
+		# a separate prune unnecessary. --force is safe here only because the
+		# checks above already covered what git would have refused over.
 		echo "\nCleaning up $chosen_dir"
-		rm -rf "$chosen_dir"
-		echo "Pruning worktree references for $git_branch"
-		git worktree prune
+		if ! git -C "$top_level" worktree remove --force "$chosen_dir"; then
+			echo "Falling back to removing $chosen_dir by hand"
+			rm -rf "$chosen_dir"
+			git -C "$top_level" worktree prune
+		fi
 		echo "Cleaning up branch $git_branch"
-		git branch -D "$git_branch"
+		git -C "$top_level" branch -D "$git_branch"
 	done
+
+	# -f can delete the directory the shell is sitting in, which leaves the
+	# shell with no working directory at all
+	if ! [[ -d "$PWD" ]]; then
+		echo "\nWorking directory was deleted, moving to $top_level"
+		cd "$top_level"
+	fi
+
+	if [[ $skipped -gt 0 ]]; then
+		print -P "\n%B%F{red}Skipped $skipped worktree(s) that were not safe to delete%f%b"
+	fi
 	return 0;
 }
