@@ -1,0 +1,39 @@
+shell/git_extras.sh
+  s_bd2c75b611154d::t_f6ad3478b2089a 347-357,377,382-387,394-395,399-401
+  s_bd2c75b611154d::t_0afee518c26a67 432,434-447,458,460-468,470
+  s_bd2c75b611154d::t_2c0738a743b3cc 369-370
+  s_bd2c75b611154d::t_2645113231b5ab 169
+  s_bd2c75b611154d::t_81376cf88e0c86 397-398,402,404,407-408
+  s_bd2c75b611154d::t_21f9750f8cf9b7 360,366,374,376,378-381
+  s_bd2c75b611154d::t_d10ca6e58ef9d0 469
+  s_bd2c75b611154d::t_cff2c0b775f740 207-208,210,213-231,241-253
+  s_bd2c75b611154d::t_a95dabc0c8af7a 409-411
+  s_bd2c75b611154d::t_9522d776a168d1 388
+  s_bd2c75b611154d::t_7eba3bbf450456 429-430,433,448-450,452-456
+  s_bd2c75b611154d::t_d2a5995438b869 201-206,209,211-212,232-240,254-255,326-341
+  s_bd2c75b611154d::t_a33ece7a925164 322-324
+  s_bd2c75b611154d::t_9291dee8b4a049 373
+  s_bd2c75b611154d::t_5fb0ec3445e973 265-302
+  s_bd2c75b611154d::t_df75b5c644e859 431
+  s_bd2c75b611154d::t_785213a38392b0 303-320
+  s_bd2c75b611154d::t_452627eb5f1cda 361,367-368,371-372,375
+  s_bd2c75b611154d::t_3cc3199444f8bc 256-264
+  s_bd2c75b611154d::t_79a41a38523214 358-359,362-365
+  s_bd2c75b611154d::t_462795366c2a28 396
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "dfd2617130683c9ab4547aba578801522ad7d6bc",
+  "prompts": {},
+  "sessions": {
+    "s_bd2c75b611154d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d2a3719-2e51-430a-aa04-005e1c3b28ca",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
