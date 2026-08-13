@@ -20,3 +20,11 @@ ln -sf "$SKILLS_SRC/handoff/SKILL.md" "$CLAUDE_SKILLS_DIR/handoff/SKILL.md"
 # github-review
 mkdir -p "$CLAUDE_SKILLS_DIR/github-review"
 ln -sf "$SKILLS_SRC/github-review/SKILL.md" "$CLAUDE_SKILLS_DIR/github-review/SKILL.md"
+
+# commit-message
+mkdir -p "$CLAUDE_SKILLS_DIR/commit-message"
+ln -sf "$SKILLS_SRC/commit-message/SKILL.md" "$CLAUDE_SKILLS_DIR/commit-message/SKILL.md"
+
+# allow-commit
+mkdir -p "$CLAUDE_SKILLS_DIR/allow-commit"
+ln -sf "$SKILLS_SRC/allow-commit/SKILL.md" "$CLAUDE_SKILLS_DIR/allow-commit/SKILL.md"
