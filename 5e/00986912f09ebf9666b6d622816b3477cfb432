@@ -1,0 +1,29 @@
+shell/view_git_unstaged_file.sh
+  s_085728c2cdd972::t_1f6a99fb144803 1,9-11,17-21,27,30-31
+shell/git_extras.sh
+  s_085728c2cdd972::t_b7ec1667c6d8cd 164,168
+  s_085728c2cdd972::t_2c54f671042b55 108,117-119
+  s_085728c2cdd972::t_66577b4bc3b678 32,41,45-46,49,64,73,78-80
+  s_085728c2cdd972::t_1c5d62b10b6c23 65-66,72,74-76
+  s_085728c2cdd972::t_e8808de8e83954 33-34,40,42-43
+  s_085728c2cdd972::t_e9f02b7649eb53 140-141,150-151
+  s_085728c2cdd972::t_d0d639407c413b 176
+  s_085728c2cdd972::t_b2363765bfcdc9 8-15
+  s_085728c2cdd972::t_e0f521e1238484 16,20-23,25-26,30-31,35-39,44,47-48,50-51,55-57,62-63,67-71,77,81-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "5e00986912f09ebf9666b6d622816b3477cfb432",
+  "prompts": {},
+  "sessions": {
+    "s_085728c2cdd972": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36b58d7f-a71f-46b5-901f-974a89544d5d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
