@@ -1,8 +1,7 @@
 # git_extras.sh contains functions to help working with git
 # __formatGitStatus returns formatted output of git status unstaged changes
 # gitViewAndStage fuzzy choose unstage change to add, with inline preview
-# getDiffByList fuzzy choose unstaged change, view nice formatted output and set $chosen_file to this file
-# addLastDiffFile git add $chosen_file if set
+# gitUnstageFiles fuzzy choose staged change to unstage, with inline preview
 # getUpdateWithRebase pull latest changes and automatically rebase this branch (assuming no conflicts)
 
 # Both formatters below read `git status --porcelain -z`. The -z form is what
@@ -93,8 +92,8 @@ function checkoutPrimaryGitBranch {
 	fi
 }
 
-# Similar to getDiffByList but views the output in bat inline and
-# selecting an option automatically calls 'git add' on it
+# Fuzzy choose unstaged changes, viewing each one in bat or delta alongside
+# the list, and selecting an option automatically calls 'git add' on it
 function gitViewAndStage() {
   # Check if we're in a git repo
   git branch --show-current &>/dev/null || { echo "Error: not a git directory"; return 1; }
@@ -105,7 +104,20 @@ function gitViewAndStage() {
     return 0
   fi
 
-  chosen_files=$(__formatGitStatus | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview)" --preview-window=right,70% --bind 'ctrl-u:preview-up,ctrl-d:preview-down,ctrl-b:preview-page-up,ctrl-f:preview-page-down' --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
+  # ctrl-o runs the same script over the whole screen instead of the preview
+  # window, for when 70% of it is too narrow to read a side by side diff in.
+  # Clearing FZF_PREVIEW_COLUMNS is what widens it: fzf exports the width of
+  # the preview window to every child it spawns, and the script falls back to
+  # the width of the terminal when it is not set. Paging here rather than
+  # leaving bat and delta to do it themselves keeps the screen up for a short
+  # file too, as both of them hand less --quit-if-one-screen
+  local -a fzf_binds
+  fzf_binds=(
+    'ctrl-u:preview-up' 'ctrl-d:preview-down'
+    'ctrl-b:preview-page-up' 'ctrl-f:preview-page-down'
+    'ctrl-o:execute(FZF_PREVIEW_COLUMNS= $HOME/.dotfiles/shell/view_git_unstaged_file.sh {} | less -R)'
+  )
+  chosen_files=$(__formatGitStatus | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview, ctrl-o to read it full screen)" --preview-window=right,70% --bind "${(j:,:)fzf_binds}" --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
   if [ -z "$chosen_files" ]; then
     return
   else
@@ -113,6 +125,7 @@ function gitViewAndStage() {
     files_array=(${(f)chosen_files})
 
     # Stage each selected file
+    local file file_path
     for file in "${files_array[@]}"; do
       file_path="${file#*$'\t'}"
       git add -- "$file_path"
@@ -146,6 +159,7 @@ function gitUnstageFiles() {
     files_array=(${(f)chosen_files})
 
     # Unstage each selected file
+    local file file_path
     for file in "${files_array[@]}"; do
       file_path="${file#*$'\t'}"
       git reset HEAD -- "$file_path"
@@ -157,27 +171,6 @@ function gitUnstageFiles() {
     unset chosen_files
     unset files_array
     unset staged_files
-  fi
-}
-
-function getDiffByList() {
-  chosen_file=$(__formatGitStatus | fzf --delimiter=$'\t' --with-nth 2)
-  if [ -z "$chosen_file" ]; then
-    return
-  fi
-  file_path="${chosen_file#*$'\t'}"
-  ~/.dotfiles/shell/view_git_unstaged_file.sh "$chosen_file"
-  unset chosen_file
-}
-
-function addLastDiffFile() {
-  if [[ -v file_path ]];
-  then
-    git add -- "$file_path"
-    unset file_path
-  else
-    echo "No previous file diffed"
-    return 1
   fi
 }
 

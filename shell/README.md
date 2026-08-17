@@ -21,11 +21,11 @@ and painless.
 The `git_extras.sh` file contains shell functions to wrap up git functionality I use a lot, mainly to do with staging
 files ready for commit.
 
-* `gitViewAndStage` use fzf with a bat preview to view unstaged files, selecting them stages them. Aliased to `gvs` in
-		the `.zshrc`.
-* `getDiffByList` use fzf to preview unstaged files, selecting them outputs the file and saves the filename to
-		`$chosen_file`. Aliased to `gdl` in the `.zshrc`.
-* `addLastDiffFile` stages the filename from `$chosen_file`. Aliases to `gal` in the `.zshrc`.
+* `gitViewAndStage` use fzf with a bat preview to view unstaged files, selecting them stages them. `ctrl-o` reopens the
+		file being previewed over the whole screen and in a pager, for when the preview window is too narrow to read.
+		Aliased to `gvs` in the `.zshrc`.
+* `gitUnstageFiles` the same for files that are already staged, selecting them unstages them. Aliased to `gus` in the
+		`.zshrc`.
 
 ### File Extras
 

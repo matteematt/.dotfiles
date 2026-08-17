@@ -1,5 +1,5 @@
 #!/bin/sh
-# Used in gitViewAndStage and getDiffByList
+# Used in gitViewAndStage, both for its preview window and for its ctrl-o
 # Prints unstaged git file according to the git status
 # Untracked file - view file
 # Modified file - view diff
@@ -10,8 +10,8 @@
 # M	~/test.txt
 # R	~/my banana.txt
 
-# if $FZF_PREVIEW_COLUMNS doesn't exist set it to be tput cols
-# this is dependent on whether it runs via gitViewAndStage or getDiffByList
+# fzf sets $FZF_PREVIEW_COLUMNS to the width of the preview window, so falling
+# back to tput cols is what fills the screen when ctrl-o clears it instead
 FZF_PREVIEW_COLUMNS=${FZF_PREVIEW_COLUMNS:-$(tput cols)}
 
 # A tab is what separates the two, as a path is allowed to contain spaces.

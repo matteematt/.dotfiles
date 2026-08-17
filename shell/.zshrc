@@ -224,10 +224,6 @@ source ~/.dotfiles/shell/ai.sh
 source ~/.dotfiles/shell/file_extras.sh
 source ~/.dotfiles/shell/lib/lib.sh
 
-#git diff list
-alias gdl="getDiffByList"
-#git add last
-alias gal="addLastDiffFile"
 #git update rebase
 alias gur="getUpdateWithRebase"
 # move (file(s) here and) print new path(s)
