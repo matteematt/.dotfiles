@@ -5,52 +5,81 @@
 # addLastDiffFile git add $chosen_file if set
 # getUpdateWithRebase pull latest changes and automatically rebase this branch (assuming no conflicts)
 
+# Both formatters below read `git status --porcelain -z`. The -z form is what
+# makes a path containing a space survive: its records are NUL separated and
+# its paths are never quoted or escaped, unlike those of the human readable
+# output and of plain --porcelain. It is also unaffected by the locale.
+# Each record is "XY <path>", X being the state of the file in the index and Y
+# its state in the working tree, so the path starts at offset 3. A rename or a
+# copy is followed by a second record holding the original path, which is not
+# an entry in its own right and so is skipped.
+
 # Unfortunately can't work out if a file is renamed before the "new" file
 # is checked in and the "deleted" file is checked in
 # If in a git directory returns git status formatted with
-# M x - for file x modified
-# R x - for file x deleted
-# U x - for untracked file x
-# D x - for untracked directory x
+# M<tab>x - for file x modified
+# R<tab>x - for file x deleted
+# U<tab>x - for untracked file x
+# D<tab>x - for untracked directory x
 # for all *unstaged* files
+# The code and the path are separated by a tab rather than a space, as a path
+# is allowed to contain spaces but not tabs in any name worth supporting
 # returns exit code 1 if this is not a git directory
 function __formatGitStatus() {
   git branch --show-current &>/dev/null || { echo "Error: not a git directory";return 1; }
-  formatted=$(git status | awk 'BEGIN {parseMode=0} \
-  { \
-    if (parseMode==1) { \
-      if (match($0,/^\s+deleted:\s*(.+)/)) {print "R " $2}; \
-      if (match($0,/^\s+modified:\s*(.+)/)) {print "M " $2}; \
-    }; \
-    if (parseMode==2) { \
-      if (match($0,/^\s+(.)\//)) {print "D " $1;} \
-      else if (match($0,/^\s+(.)/)) {print "U " $1;} \
-    }; \
-    if ($0 ~ /Changes not staged for commit/) {parseMode=1}; \
-    if ($0 ~ /to include in what will be committed/) {parseMode=2}; \
-  }')
-  echo "$formatted"
+
+  local -a entries
+  local porcelain entry entry_path skip=0
+  porcelain="$(git status --porcelain -z)"
+  entries=(${(0)porcelain})
+  for entry in "${entries[@]}"; do
+    if [[ $skip -eq 1 ]]; then
+      skip=0
+      continue
+    fi
+    [[ "${entry[1]}" == [RC] ]] && skip=1
+    entry_path="${entry:3}"
+    # The working tree letter, so an untracked file reads "?", and a file both
+    # staged and edited since reads "M" here as well as in the staged listing
+    case "${entry[2]}" in
+      "M"|"T") printf 'M\t%s\n' "$entry_path" ;;
+      "D") printf 'R\t%s\n' "$entry_path" ;;
+      # git collapses a wholly untracked directory into a single entry with a
+      # trailing slash, which is what separates D from U
+      "?") [[ "$entry_path" == */ ]] && printf 'D\t%s\n' "$entry_path" || printf 'U\t%s\n' "$entry_path" ;;
+    esac
+  done
 }
 
 # Returns git status formatted with
-# M x - for file x modified
-# R x - for file x deleted
-# A x - for file x added
+# M<tab>x - for file x modified
+# R<tab>x - for file x deleted
+# A<tab>x - for file x added
 # for all *staged* files
 # returns exit code 1 if this is not a git directory
 function __formatStagedGitStatus() {
   git branch --show-current &>/dev/null || { echo "Error: not a git directory";return 1; }
-  formatted=$(git status | awk 'BEGIN {parseMode=0} \
-  { \
-    if (parseMode==1) { \
-      if (match($0,/^\s+deleted:\s*(.+)/)) {print "R " $2}; \
-      if (match($0,/^\s+modified:\s*(.+)/)) {print "M " $2}; \
-      if (match($0,/^\s+new file:\s*(.+)/)) {print "A " $2}; \
-    }; \
-    if ($0 ~ /Changes to be committed/) {parseMode=1}; \
-    if ($0 ~ /Changes not staged for commit/) {parseMode=0}; \
-  }')
-  echo "$formatted"
+
+  local -a entries
+  local porcelain entry entry_path skip=0
+  porcelain="$(git status --porcelain -z)"
+  entries=(${(0)porcelain})
+  for entry in "${entries[@]}"; do
+    if [[ $skip -eq 1 ]]; then
+      skip=0
+      continue
+    fi
+    [[ "${entry[1]}" == [RC] ]] && skip=1
+    entry_path="${entry:3}"
+    # The index letter, so "?" for an untracked file falls through and is left
+    # out, as is a rename: unstaging only the new path would leave the
+    # deletion of the old one behind
+    case "${entry[1]}" in
+      "M"|"T") printf 'M\t%s\n' "$entry_path" ;;
+      "D") printf 'R\t%s\n' "$entry_path" ;;
+      "A") printf 'A\t%s\n' "$entry_path" ;;
+    esac
+  done
 }
 
 function checkoutPrimaryGitBranch {
@@ -76,7 +105,7 @@ function gitViewAndStage() {
     return 0
   fi
 
-  chosen_files=$(__formatGitStatus | fzf -m --with-nth 2 --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview)" --preview-window=right,70% --bind 'ctrl-u:preview-up,ctrl-d:preview-down,ctrl-b:preview-page-up,ctrl-f:preview-page-down' --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
+  chosen_files=$(__formatGitStatus | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview)" --preview-window=right,70% --bind 'ctrl-u:preview-up,ctrl-d:preview-down,ctrl-b:preview-page-up,ctrl-f:preview-page-down' --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
   if [ -z "$chosen_files" ]; then
     return
   else
@@ -85,9 +114,9 @@ function gitViewAndStage() {
 
     # Stage each selected file
     for file in "${files_array[@]}"; do
-      file_path=$(echo "$file" | cut -d" " -f2)
-      git add "$file_path"
-			echo "Staged: $file_path"
+      file_path="${file#*$'\t'}"
+      git add -- "$file_path"
+      echo "Staged: $file_path"
     done
 
     unset chosen_files
@@ -108,7 +137,8 @@ function gitUnstageFiles() {
     return 0
   fi
 
-  chosen_files=$(echo "$staged_files" | fzf -m --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached "$(echo {} | cut -d" " -f2-)"')
+  # printf rather than echo, as echo would expand a backslash in a file name
+  chosen_files=$(echo "$staged_files" | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached -- "$(printf "%s" {} | cut -f2-)"')
   if [ -z "$chosen_files" ]; then
     return
   else
@@ -117,8 +147,8 @@ function gitUnstageFiles() {
 
     # Unstage each selected file
     for file in "${files_array[@]}"; do
-      file_path=$(echo "$file" | cut -d" " -f2)
-      git reset HEAD "$file_path"
+      file_path="${file#*$'\t'}"
+      git reset HEAD -- "$file_path"
       if [[ ${#files_array[@]} -gt 1 ]]; then
         echo "Unstaged: $file_path"
       fi
@@ -131,11 +161,11 @@ function gitUnstageFiles() {
 }
 
 function getDiffByList() {
-  chosen_file=$(__formatGitStatus | fzf --with-nth 2)
+  chosen_file=$(__formatGitStatus | fzf --delimiter=$'\t' --with-nth 2)
   if [ -z "$chosen_file" ]; then
     return
   fi
-  file_path=$(echo "$chosen_file" | cut -d" " -f2)
+  file_path="${chosen_file#*$'\t'}"
   ~/.dotfiles/shell/view_git_unstaged_file.sh "$chosen_file"
   unset chosen_file
 }
@@ -143,7 +173,7 @@ function getDiffByList() {
 function addLastDiffFile() {
   if [[ -v file_path ]];
   then
-    git add "$file_path"
+    git add -- "$file_path"
     unset file_path
   else
     echo "No previous file diffed"
