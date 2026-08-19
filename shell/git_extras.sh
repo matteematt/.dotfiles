@@ -25,6 +25,7 @@
 # R<tab>x - for file x deleted
 # U<tab>x - for untracked file x
 # D<tab>x - for untracked directory x
+# C<tab>x - for file x unmerged, ie left conflicted by a merge
 # for all *unstaged* files
 # The code and the path are separated by a tab rather than a space, as a path
 # is allowed to contain spaces but not tabs in any name worth supporting
@@ -43,6 +44,15 @@ function __formatGitStatus() {
     fi
     [[ "${entry[1]}" == [RC] ]] && skip=1
     entry_path="${entry:3}"
+    # An unmerged path carries a U on one side, or is AA or DD which spell the
+    # state without one. `git add` is what resolves any of them, so they all
+    # belong in this listing whichever side of the merge changed the file, and
+    # they have to be caught before the letters below read as something else:
+    # DD would pass for a deletion and AA for a staged addition
+    if [[ "${entry[1,2]}" == (*U*|AA|DD) ]]; then
+      printf 'C\t%s\n' "$entry_path"
+      continue
+    fi
     # The working tree letter, so an untracked file reads "?", and a file both
     # staged and edited since reads "M" here as well as in the staged listing
     case "${entry[2]}" in
@@ -75,6 +85,11 @@ function __formatStagedGitStatus() {
     fi
     [[ "${entry[1]}" == [RC] ]] && skip=1
     entry_path="${entry:3}"
+    # Unmerged paths are left out. They do read as staged, an A or a D on one
+    # side, but `git reset HEAD` on one of them resolves the conflict to the
+    # HEAD version rather than unstaging anything, throwing the other side of
+    # the merge away silently. gitViewAndStage lists them instead
+    [[ "${entry[1,2]}" == (*U*|AA|DD) ]] && continue
     # The index letter, so "?" for an untracked file falls through and is left
     # out, as is a rename: unstaging only the new path would leave the
     # deletion of the old one behind
@@ -138,7 +153,7 @@ function gitViewAndStage() {
     for file in "${files_array[@]}"; do
       file_path="${file#*$'\t'}"
       git -C "$root" add -- "$file_path"
-      echo "Staged: $file_path"
+      print -r -- "Staged: $file_path"
     done
 
     unset chosen_files
@@ -163,10 +178,11 @@ function gitUnstageFiles() {
   local root
   root="$(git rev-parse --show-toplevel)"
 
-  # printf rather than echo, as echo would expand a backslash in a file name
+  # print -r and printf rather than echo, which would expand a backslash in a
+  # file name into whatever it looks like an escape for
   local preview_cmd
   preview_cmd="git -C ${(q)root} diff --cached -- \"\$(printf '%s' {} | cut -f2-)\""
-  chosen_files=$(echo "$staged_files" | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview "$preview_cmd")
+  chosen_files=$(print -r -- "$staged_files" | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview "$preview_cmd")
   if [ -z "$chosen_files" ]; then
     return
   else
@@ -179,7 +195,7 @@ function gitUnstageFiles() {
       file_path="${file#*$'\t'}"
       git -C "$root" reset HEAD -- "$file_path"
       if [[ ${#files_array[@]} -gt 1 ]]; then
-        echo "Unstaged: $file_path"
+        print -r -- "Unstaged: $file_path"
       fi
     done
 

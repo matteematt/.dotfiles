@@ -23,9 +23,11 @@ files ready for commit.
 
 * `gitViewAndStage` use fzf with a bat preview to view unstaged files, selecting them stages them. `ctrl-o` reopens the
 		file being previewed over the whole screen and in a pager, for when the preview window is too narrow to read.
-		Aliased to `gvs` in the `.zshrc`.
-* `gitUnstageFiles` the same for files that are already staged, selecting them unstages them. Aliased to `gus` in the
-		`.zshrc`.
+		Files left unmerged by a conflicted merge are listed here too, as staging one is what resolves it. Aliased to `gvs`
+		in the `.zshrc`.
+* `gitUnstageFiles` the same for files that are already staged, selecting them unstages them. Unmerged files are left out,
+		as unstaging one would resolve the conflict to the `HEAD` version rather than unstage anything. Aliased to `gus` in
+		the `.zshrc`.
 
 ### File Extras
 
@@ -46,6 +48,8 @@ that it works when called from a subdirectory.
 * Untracked files are viewed to standard output
 * Modified files are viewed by the diff of their unstaged changes
 * Deleted files print a message saying the file has been deleted or renamed
+* Unmerged files name which side of the merge changed them, then show the diff of both sides where git has one and the
+		surviving content where it does not
 * Unknown file status prints error message
 
 The `switch_branch.sh` script is one of the fzf examples, and uses the core utils with fzf and git to make switching to
