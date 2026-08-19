@@ -1,6 +1,7 @@
 #!/bin/sh
-# Used in gitViewAndStage, both for its preview window and for its ctrl-o
-# Prints unstaged git file according to the git status
+# Used in gitViewAndStage and gitUnstageFiles, both for their preview windows
+# and for their ctrl-o
+# Prints a git file according to the status code it is given
 # Untracked file - view file
 # Modified file - view diff, or size change if git calls the file binary
 # Deleted file - says the file is deleted or renamed
@@ -11,14 +12,24 @@
 # M	src/test.txt
 # R	src/my banana.txt
 
+# A second argument of "staged" views the index against HEAD rather than the
+# working tree against the index. Every staged code is then the same view, the
+# diff of what is staged, as an addition and a deletion are both changes to the
+# index and git has a diff for each
+if [ "$2" = "staged" ]; then
+  cached=--cached
+else
+  cached=
+fi
+
 # fzf sets $FZF_PREVIEW_COLUMNS to the width of the preview window, so falling
 # back to tput cols is what fills the screen when ctrl-o clears it instead
 FZF_PREVIEW_COLUMNS=${FZF_PREVIEW_COLUMNS:-$(tput cols)}
 
 # `git status --porcelain` reports its paths from the repository root rather
 # than from the caller, which is what lets a listing read the same way
-# whichever directory gitViewAndStage was run in, so move there before using
-# one: a path like src/main.c means nothing from inside src itself
+# whichever directory the picker was run in, so move there before using one:
+# a path like src/main.c means nothing from inside src itself
 cd "$(git rev-parse --show-toplevel)" || exit 1
 
 # The path is taken from git and handed straight back to it as a pathspec,
@@ -31,16 +42,16 @@ viewWorkingTreeFile() {
   bat --theme="OneHalfDark" --style=numbers,changes --color always "$1"
 }
 
-# Views the unstaged changes to a file, or the change in its size where git
-# calls the file binary, as --text would spill the bytes of one over the
-# terminal. Binary reads as - and - where git otherwise counts changed lines,
-# and one line is enough to ask: an unmerged path is counted once per side of
-# the merge
+# Views the changes to a file, or the change in its size where git calls the
+# file binary, as --text would spill the bytes of one over the terminal. Binary
+# reads as - and - where git otherwise counts changed lines, and one line is
+# enough to ask: an unmerged path is counted once per side of the merge.
+# $cached is left unquoted as it is either --cached or nothing at all
 viewFileDiff() {
-  if [ "`git diff --numstat -- "$1" | head -n 1 | cut -f1`" = "-" ]; then
-    git diff --stat -- "$1"
+  if [ "`git diff $cached --numstat -- "$1" | head -n 1 | cut -f1`" = "-" ]; then
+    git diff $cached --stat -- "$1"
   else
-    git diff --text -- "$1" | delta "-w$FZF_PREVIEW_COLUMNS"
+    git diff $cached --text -- "$1" | delta "-w$FZF_PREVIEW_COLUMNS"
   fi
 }
 
@@ -49,6 +60,12 @@ viewFileDiff() {
 # with no quoting of its own to undo
 status_code=`printf '%s' "$1" | cut -f1`
 file_path=`printf '%s' "$1" | cut -f2-`
+
+if [ -n "$cached" ]; then
+  viewFileDiff "$file_path"
+  exit
+fi
+
 case "$status_code" in
   "U")
     viewWorkingTreeFile "$file_path"
@@ -95,4 +112,3 @@ case "$status_code" in
     echo "Unknown git status $status_code"
     ;;
 esac
-
