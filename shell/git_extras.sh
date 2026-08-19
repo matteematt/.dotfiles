@@ -1,5 +1,7 @@
 # git_extras.sh contains functions to help working with git
 # __formatGitStatus returns formatted output of git status unstaged changes
+# __formatStagedGitStatus the same for the changes that are already staged
+# __gitFilePicker fuzzy choose from either listing, with an inline preview
 # gitViewAndStage fuzzy choose unstage change to add, with inline preview
 # gitUnstageFiles fuzzy choose staged change to unstage, with inline preview
 # getUpdateWithRebase pull latest changes and automatically rebase this branch (assuming no conflicts)
@@ -12,6 +14,11 @@
 # its state in the working tree, so the path starts at offset 3. A rename or a
 # copy is followed by a second record holding the original path, which is not
 # an entry in its own right and so is skipped.
+#
+# The paths are relative to the repository root rather than to the caller, so a
+# listing reads the same way whichever directory it was run in. That means
+# every command consuming one has to run from the root itself, which is what
+# the `git -C "$root"` calls below and the cd in view_git_file.sh do.
 
 # Unfortunately can't work out if a file is renamed before the "new" file
 # is checked in and the "deleted" file is checked in
@@ -20,6 +27,7 @@
 # R<tab>x - for file x deleted
 # U<tab>x - for untracked file x
 # D<tab>x - for untracked directory x
+# C<tab>x - for file x unmerged, ie left conflicted by a merge
 # for all *unstaged* files
 # The code and the path are separated by a tab rather than a space, as a path
 # is allowed to contain spaces but not tabs in any name worth supporting
@@ -38,6 +46,15 @@ function __formatGitStatus() {
     fi
     [[ "${entry[1]}" == [RC] ]] && skip=1
     entry_path="${entry:3}"
+    # An unmerged path carries a U on one side, or is AA or DD which spell the
+    # state without one. `git add` is what resolves any of them, so they all
+    # belong in this listing whichever side of the merge changed the file, and
+    # they have to be caught before the letters below read as something else:
+    # DD would pass for a deletion and AA for a staged addition
+    if [[ "${entry[1,2]}" == (*U*|AA|DD) ]]; then
+      printf 'C\t%s\n' "$entry_path"
+      continue
+    fi
     # The working tree letter, so an untracked file reads "?", and a file both
     # staged and edited since reads "M" here as well as in the staged listing
     case "${entry[2]}" in
@@ -70,6 +87,11 @@ function __formatStagedGitStatus() {
     fi
     [[ "${entry[1]}" == [RC] ]] && skip=1
     entry_path="${entry:3}"
+    # Unmerged paths are left out. They do read as staged, an A or a D on one
+    # side, but `git reset HEAD` on one of them resolves the conflict to the
+    # HEAD version rather than unstaging anything, throwing the other side of
+    # the merge away silently. gitViewAndStage lists them instead
+    [[ "${entry[1,2]}" == (*U*|AA|DD) ]] && continue
     # The index letter, so "?" for an untracked file falls through and is left
     # out, as is a rename: unstaging only the new path would leave the
     # deletion of the old one behind
@@ -92,49 +114,85 @@ function checkoutPrimaryGitBranch {
 	fi
 }
 
+# Fuzzy choose from a listing one of the formatters above printed, printing the
+# lines chosen. $1 is the listing, $2 the header, and $3 is "staged" to have the
+# viewer script show the index against HEAD rather than the working tree
+# ctrl-o runs the viewer over the whole screen instead of the preview window,
+# for when 70% of it is too narrow to read a side by side diff in. Clearing
+# FZF_PREVIEW_COLUMNS is what widens it: fzf exports the width of the preview
+# window to every child it spawns, and the viewer falls back to the width of
+# the terminal when it is not set. Paging here rather than leaving bat and delta
+# to do it themselves keeps the screen up for a short file too, as both of them
+# hand less --quit-if-one-screen
+function __gitFilePicker() {
+  local listing="$1" header="$2" side="$3"
+  # Left for the shell fzf runs its preview in to expand, as the path is of no
+  # use to this one
+  local viewer='$HOME/.dotfiles/shell/view_git_file.sh'
+  local -a fzf_binds
+  fzf_binds=(
+    'ctrl-u:preview-up' 'ctrl-d:preview-down'
+    'ctrl-b:preview-page-up' 'ctrl-f:preview-page-down'
+    "ctrl-o:execute(FZF_PREVIEW_COLUMNS= $viewer {} $side | less -R)"
+  )
+  # The status letter is worth a column of its own: without it a conflict is
+  # indistinguishable from a plain modification until the preview draws.
+  # print -r rather than echo, which would expand a backslash in a file name
+  # into whatever it looks like an escape for
+  print -r -- "$listing" | fzf -m --delimiter=$'\t' --with-nth '{1}  {2}' \
+    --header "$header" --preview-window=right,70% \
+    --bind "${(j:,:)fzf_binds}" --preview "$viewer {} $side"
+}
+
 # Fuzzy choose unstaged changes, viewing each one in bat or delta alongside
 # the list, and selecting an option automatically calls 'git add' on it
 function gitViewAndStage() {
   # Check if we're in a git repo
   git branch --show-current &>/dev/null || { echo "Error: not a git directory"; return 1; }
 
-  # Check if working tree is clean (including untracked files)
-  if [ -z "$(git status --porcelain)" ]; then
-    echo "Working tree is clean - nothing to stage"
+  # Check there is anything to stage, which has to be asked of the listing
+  # rather than of `git status`: a dirty tree is no guarantee of an entry in it,
+  # as a staged rename is a change the listing deliberately has nothing to say
+  # about, and fzf opening on nothing at all reads as a bug
+  local unstaged_files
+  unstaged_files="$(__formatGitStatus)"
+  if [ -z "$unstaged_files" ]; then
+    echo "No unstaged files to stage"
     return 0
   fi
 
-  # ctrl-o runs the same script over the whole screen instead of the preview
-  # window, for when 70% of it is too narrow to read a side by side diff in.
-  # Clearing FZF_PREVIEW_COLUMNS is what widens it: fzf exports the width of
-  # the preview window to every child it spawns, and the script falls back to
-  # the width of the terminal when it is not set. Paging here rather than
-  # leaving bat and delta to do it themselves keeps the screen up for a short
-  # file too, as both of them hand less --quit-if-one-screen
-  local -a fzf_binds
-  fzf_binds=(
-    'ctrl-u:preview-up' 'ctrl-d:preview-down'
-    'ctrl-b:preview-page-up' 'ctrl-f:preview-page-down'
-    'ctrl-o:execute(FZF_PREVIEW_COLUMNS= $HOME/.dotfiles/shell/view_git_unstaged_file.sh {} | less -R)'
-  )
-  chosen_files=$(__formatGitStatus | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview, ctrl-o to read it full screen)" --preview-window=right,70% --bind "${(j:,:)fzf_binds}" --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
+  # Where the paths __formatGitStatus prints are relative to
+  local root
+  root="$(git rev-parse --show-toplevel)"
+
+  # The paths are pathspecs handed straight back to git, where a * or a [ in a
+  # name would otherwise read as a wildcard and match something else entirely.
+  # Exported, so the preview and its ctrl-o are covered as well
+  local -x GIT_LITERAL_PATHSPECS=1
+
+  local chosen_files
+  chosen_files="$(__gitFilePicker "$unstaged_files" "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview, ctrl-o to read it full screen)")"
   if [ -z "$chosen_files" ]; then
     return
-  else
-    # Convert newline-separated files to array
-    files_array=(${(f)chosen_files})
-
-    # Stage each selected file
-    local file file_path
-    for file in "${files_array[@]}"; do
-      file_path="${file#*$'\t'}"
-      git add -- "$file_path"
-      echo "Staged: $file_path"
-    done
-
-    unset chosen_files
-    unset files_array
   fi
+
+  # Convert newline-separated files to array
+  local -a files_array
+  files_array=(${(f)chosen_files})
+
+  # Stage each selected file
+  local file file_code file_path
+  for file in "${files_array[@]}"; do
+    file_code="${file%%$'\t'*}"
+    file_path="${file#*$'\t'}"
+    git -C "$root" add -- "$file_path"
+    print -r -- "Staged: $file_path"
+    # Staging a conflict with its markers still in place is almost never what
+    # was meant, and nothing else says so before it reaches a commit
+    if [[ "$file_code" == "C" ]] && grep -qE '^(<<<<<<<|>>>>>>>) ' "$root/$file_path" 2>/dev/null; then
+      print -r -- "  warning: $file_path still has conflict markers in it"
+    fi
+  done
 }
 
 # Similar to gitViewAndStage but for unstaging files that are already staged
@@ -144,34 +202,39 @@ function gitUnstageFiles() {
   git branch --show-current &>/dev/null || { echo "Error: not a git directory"; return 1; }
 
   # Check if there are any staged files to unstage
-  staged_files=$(__formatStagedGitStatus)
+  local staged_files
+  staged_files="$(__formatStagedGitStatus)"
   if [ -z "$staged_files" ]; then
     echo "No staged files to unstage"
     return 0
   fi
 
-  # printf rather than echo, as echo would expand a backslash in a file name
-  chosen_files=$(echo "$staged_files" | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached -- "$(printf "%s" {} | cut -f2-)"')
+  # Where the paths __formatStagedGitStatus prints are relative to
+  local root
+  root="$(git rev-parse --show-toplevel)"
+
+  # As in gitViewAndStage, so that a * or a [ in a name stays a character
+  local -x GIT_LITERAL_PATHSPECS=1
+
+  local chosen_files
+  chosen_files="$(__gitFilePicker "$staged_files" "File Unstaging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview, ctrl-o to read it full screen)" staged)"
   if [ -z "$chosen_files" ]; then
     return
-  else
-    # Convert newline-separated files to array
-    files_array=(${(f)chosen_files})
-
-    # Unstage each selected file
-    local file file_path
-    for file in "${files_array[@]}"; do
-      file_path="${file#*$'\t'}"
-      git reset HEAD -- "$file_path"
-      if [[ ${#files_array[@]} -gt 1 ]]; then
-        echo "Unstaged: $file_path"
-      fi
-    done
-
-    unset chosen_files
-    unset files_array
-    unset staged_files
   fi
+
+  # Convert newline-separated files to array
+  local -a files_array
+  files_array=(${(f)chosen_files})
+
+  # Unstage each selected file
+  local file file_path
+  for file in "${files_array[@]}"; do
+    file_path="${file#*$'\t'}"
+    # -q as git otherwise reprints every unstaged change in the repository on
+    # each pass through the loop, drowning out which file this one dealt with
+    git -C "$root" reset -q HEAD -- "$file_path"
+    print -r -- "Unstaged: $file_path"
+  done
 }
 
 function gitWorktreeCheckout() {

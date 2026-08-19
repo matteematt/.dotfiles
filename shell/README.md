@@ -21,11 +21,16 @@ and painless.
 The `git_extras.sh` file contains shell functions to wrap up git functionality I use a lot, mainly to do with staging
 files ready for commit.
 
-* `gitViewAndStage` use fzf with a bat preview to view unstaged files, selecting them stages them. `ctrl-o` reopens the
-		file being previewed over the whole screen and in a pager, for when the preview window is too narrow to read.
-		Aliased to `gvs` in the `.zshrc`.
-* `gitUnstageFiles` the same for files that are already staged, selecting them unstages them. Aliased to `gus` in the
-		`.zshrc`.
+Both pickers below share `__gitFilePicker`, so they behave the same: each line is prefixed with its status letter,
+`ctrl-u`/`ctrl-d` and `ctrl-b`/`ctrl-f` scroll the preview, and `ctrl-o` reopens the file being previewed over the whole
+screen and in a pager, for when the preview window is too narrow to read.
+
+* `gitViewAndStage` use fzf with a bat preview to view unstaged files, selecting them stages them. Files left unmerged by
+		a conflicted merge are listed here too, as staging one is what resolves it, and staging one that still has conflict
+		markers in it prints a warning. Aliased to `gvs` in the `.zshrc`.
+* `gitUnstageFiles` the same for files that are already staged, previewing what each one has staged, and selecting them
+		unstages them. Unmerged files are left out, as unstaging one would resolve the conflict to the `HEAD` version rather
+		than unstage anything. Aliased to `gus` in the `.zshrc`.
 
 ### File Extras
 
@@ -37,14 +42,22 @@ The `file_extras.sh` file contains shell functions to help with everyday file op
 
 ## Scripts
 
-### View Unstaged File
+### View Git File
 
-The `view_git_unstaged_file.sh` script outputs a file name in a certain way depending on the git status of the file.
+The `view_git_file.sh` script outputs a file in a certain way depending on the git status code it is given. It takes the
+path relative to the repository root, as `git status --porcelain` prints it, and runs from the root itself so that it
+works when called from a subdirectory.
 
 * Untracked files are viewed to standard output
-* Modified files are viewed by their diff compared to master
+* Modified files are viewed by the diff of their unstaged changes, or by the change in their size where git calls the
+		file binary
 * Deleted files print a message saying the file has been deleted or renamed
+* Unmerged files name which side of the merge changed them, then show the diff of both sides where git has one and the
+		surviving content where it does not
 * Unknown file status prints error message
+
+A second argument of `staged` views the index against `HEAD` instead, where every status code is the same view: the diff
+of what the file has staged, whether that is a modification, an addition or a deletion.
 
 The `switch_branch.sh` script is one of the fzf examples, and uses the core utils with fzf and git to make switching to
 available branches easy.
