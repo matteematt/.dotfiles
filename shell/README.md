@@ -39,10 +39,12 @@ The `file_extras.sh` file contains shell functions to help with everyday file op
 
 ### View Unstaged File
 
-The `view_git_unstaged_file.sh` script outputs a file name in a certain way depending on the git status of the file.
+The `view_git_unstaged_file.sh` script outputs a file name in a certain way depending on the git status of the file. It
+takes the path relative to the repository root, as `git status --porcelain` prints it, and runs from the root itself so
+that it works when called from a subdirectory.
 
 * Untracked files are viewed to standard output
-* Modified files are viewed by their diff compared to master
+* Modified files are viewed by the diff of their unstaged changes
 * Deleted files print a message saying the file has been deleted or renamed
 * Unknown file status prints error message
 

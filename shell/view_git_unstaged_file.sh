@@ -7,12 +7,18 @@
 # else prints error message
 
 # Expected input examples, a status code and a path separated by a tab
-# M	~/test.txt
-# R	~/my banana.txt
+# M	src/test.txt
+# R	src/my banana.txt
 
 # fzf sets $FZF_PREVIEW_COLUMNS to the width of the preview window, so falling
 # back to tput cols is what fills the screen when ctrl-o clears it instead
 FZF_PREVIEW_COLUMNS=${FZF_PREVIEW_COLUMNS:-$(tput cols)}
+
+# `git status --porcelain` reports its paths from the repository root rather
+# than from the caller, which is what lets a listing read the same way
+# whichever directory gitViewAndStage was run in, so move there before using
+# one: a path like src/main.c means nothing from inside src itself
+cd "$(git rev-parse --show-toplevel)" || exit 1
 
 # A tab is what separates the two, as a path is allowed to contain spaces.
 # fzf already quotes the line it passes in, so it arrives as a single argument

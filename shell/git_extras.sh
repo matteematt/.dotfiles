@@ -12,6 +12,11 @@
 # its state in the working tree, so the path starts at offset 3. A rename or a
 # copy is followed by a second record holding the original path, which is not
 # an entry in its own right and so is skipped.
+#
+# The paths are relative to the repository root rather than to the caller, so a
+# listing reads the same way whichever directory it was run in. That means
+# every command consuming one has to run from the root itself, which is what
+# the `git -C "$root"` calls below and the cd in view_git_unstaged_file.sh do.
 
 # Unfortunately can't work out if a file is renamed before the "new" file
 # is checked in and the "deleted" file is checked in
@@ -104,6 +109,10 @@ function gitViewAndStage() {
     return 0
   fi
 
+  # Where the paths __formatGitStatus prints are relative to
+  local root
+  root="$(git rev-parse --show-toplevel)"
+
   # ctrl-o runs the same script over the whole screen instead of the preview
   # window, for when 70% of it is too narrow to read a side by side diff in.
   # Clearing FZF_PREVIEW_COLUMNS is what widens it: fzf exports the width of
@@ -128,7 +137,7 @@ function gitViewAndStage() {
     local file file_path
     for file in "${files_array[@]}"; do
       file_path="${file#*$'\t'}"
-      git add -- "$file_path"
+      git -C "$root" add -- "$file_path"
       echo "Staged: $file_path"
     done
 
@@ -150,8 +159,14 @@ function gitUnstageFiles() {
     return 0
   fi
 
+  # Where the paths __formatStagedGitStatus prints are relative to
+  local root
+  root="$(git rev-parse --show-toplevel)"
+
   # printf rather than echo, as echo would expand a backslash in a file name
-  chosen_files=$(echo "$staged_files" | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview 'git diff --cached -- "$(printf "%s" {} | cut -f2-)"')
+  local preview_cmd
+  preview_cmd="git -C ${(q)root} diff --cached -- \"\$(printf '%s' {} | cut -f2-)\""
+  chosen_files=$(echo "$staged_files" | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Unstaging (TAB to select multiple)" --preview-window=right,70% --preview "$preview_cmd")
   if [ -z "$chosen_files" ]; then
     return
   else
@@ -162,7 +177,7 @@ function gitUnstageFiles() {
     local file file_path
     for file in "${files_array[@]}"; do
       file_path="${file#*$'\t'}"
-      git reset HEAD -- "$file_path"
+      git -C "$root" reset HEAD -- "$file_path"
       if [[ ${#files_array[@]} -gt 1 ]]; then
         echo "Unstaged: $file_path"
       fi
