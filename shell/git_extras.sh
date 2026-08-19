@@ -118,15 +118,25 @@ function gitViewAndStage() {
   # Check if we're in a git repo
   git branch --show-current &>/dev/null || { echo "Error: not a git directory"; return 1; }
 
-  # Check if working tree is clean (including untracked files)
-  if [ -z "$(git status --porcelain)" ]; then
-    echo "Working tree is clean - nothing to stage"
+  # Check there is anything to stage, which has to be asked of the listing
+  # rather than of `git status`: a dirty tree is no guarantee of an entry in it,
+  # as a staged rename is a change the listing deliberately has nothing to say
+  # about, and fzf opening on nothing at all reads as a bug
+  local unstaged_files
+  unstaged_files="$(__formatGitStatus)"
+  if [ -z "$unstaged_files" ]; then
+    echo "No unstaged files to stage"
     return 0
   fi
 
   # Where the paths __formatGitStatus prints are relative to
   local root
   root="$(git rev-parse --show-toplevel)"
+
+  # The paths are pathspecs handed straight back to git, where a * or a [ in a
+  # name would otherwise read as a wildcard and match something else entirely.
+  # Exported, so the preview and its ctrl-o are covered as well
+  local -x GIT_LITERAL_PATHSPECS=1
 
   # ctrl-o runs the same script over the whole screen instead of the preview
   # window, for when 70% of it is too narrow to read a side by side diff in.
@@ -141,7 +151,9 @@ function gitViewAndStage() {
     'ctrl-b:preview-page-up' 'ctrl-f:preview-page-down'
     'ctrl-o:execute(FZF_PREVIEW_COLUMNS= $HOME/.dotfiles/shell/view_git_unstaged_file.sh {} | less -R)'
   )
-  chosen_files=$(__formatGitStatus | fzf -m --delimiter=$'\t' --with-nth 2 --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview, ctrl-o to read it full screen)" --preview-window=right,70% --bind "${(j:,:)fzf_binds}" --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
+  # The status letter is worth a column of its own: without it a conflict is
+  # indistinguishable from a plain modification until the preview draws
+  chosen_files=$(print -r -- "$unstaged_files" | fzf -m --delimiter=$'\t' --with-nth '{1}  {2}' --header "File Staging (TAB to select multiple, ctrl-u/ctrl-d to scroll preview, ctrl-o to read it full screen)" --preview-window=right,70% --bind "${(j:,:)fzf_binds}" --preview '$HOME/.dotfiles/shell/view_git_unstaged_file.sh {}')
   if [ -z "$chosen_files" ]; then
     return
   else
@@ -149,11 +161,17 @@ function gitViewAndStage() {
     files_array=(${(f)chosen_files})
 
     # Stage each selected file
-    local file file_path
+    local file file_code file_path
     for file in "${files_array[@]}"; do
+      file_code="${file%%$'\t'*}"
       file_path="${file#*$'\t'}"
       git -C "$root" add -- "$file_path"
       print -r -- "Staged: $file_path"
+      # Staging a conflict with its markers still in place is almost never what
+      # was meant, and nothing else says so before it reaches a commit
+      if [[ "$file_code" == "C" ]] && grep -qE '^(<<<<<<<|>>>>>>>) ' "$root/$file_path" 2>/dev/null; then
+        print -r -- "  warning: $file_path still has conflict markers in it"
+      fi
     done
 
     unset chosen_files
@@ -177,6 +195,9 @@ function gitUnstageFiles() {
   # Where the paths __formatStagedGitStatus prints are relative to
   local root
   root="$(git rev-parse --show-toplevel)"
+
+  # As in gitViewAndStage, so that a * or a [ in a name stays a character
+  local -x GIT_LITERAL_PATHSPECS=1
 
   # print -r and printf rather than echo, which would expand a backslash in a
   # file name into whatever it looks like an escape for

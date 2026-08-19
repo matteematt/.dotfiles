@@ -2,7 +2,7 @@
 # Used in gitViewAndStage, both for its preview window and for its ctrl-o
 # Prints unstaged git file according to the git status
 # Untracked file - view file
-# Modified file - view diff
+# Modified file - view diff, or size change if git calls the file binary
 # Deleted file - says the file is deleted or renamed
 # Unmerged file - names the conflict and views the diff of both sides
 # else prints error message
@@ -21,9 +21,27 @@ FZF_PREVIEW_COLUMNS=${FZF_PREVIEW_COLUMNS:-$(tput cols)}
 # one: a path like src/main.c means nothing from inside src itself
 cd "$(git rev-parse --show-toplevel)" || exit 1
 
+# The path is taken from git and handed straight back to it as a pathspec,
+# where a * or a [ in a name would otherwise read as a wildcard and match
+# something else entirely
+export GIT_LITERAL_PATHSPECS=1
+
 # Views a file as it stands in the working tree
 viewWorkingTreeFile() {
   bat --theme="OneHalfDark" --style=numbers,changes --color always "$1"
+}
+
+# Views the unstaged changes to a file, or the change in its size where git
+# calls the file binary, as --text would spill the bytes of one over the
+# terminal. Binary reads as - and - where git otherwise counts changed lines,
+# and one line is enough to ask: an unmerged path is counted once per side of
+# the merge
+viewFileDiff() {
+  if [ "`git diff --numstat -- "$1" | head -n 1 | cut -f1`" = "-" ]; then
+    git diff --stat -- "$1"
+  else
+    git diff --text -- "$1" | delta "-w$FZF_PREVIEW_COLUMNS"
+  fi
 }
 
 # A tab is what separates the two, as a path is allowed to contain spaces.
@@ -36,7 +54,7 @@ case "$status_code" in
     viewWorkingTreeFile "$file_path"
     ;;
   "M")
-		git diff --text -- "$file_path" | delta "-w$FZF_PREVIEW_COLUMNS"
+    viewFileDiff "$file_path"
     ;;
   "D")
     printf 'New Dir %s\n\n' "$file_path"
@@ -68,7 +86,7 @@ case "$status_code" in
     elif [ "$view" = "diff" ]; then
       # delta renders the combined diff as one pane per side of the merge,
       # which reads better than the raw conflict markers
-      git diff --text -- "$file_path" | delta "-w$FZF_PREVIEW_COLUMNS"
+      viewFileDiff "$file_path"
     else
       viewWorkingTreeFile "$file_path"
     fi

@@ -23,8 +23,9 @@ files ready for commit.
 
 * `gitViewAndStage` use fzf with a bat preview to view unstaged files, selecting them stages them. `ctrl-o` reopens the
 		file being previewed over the whole screen and in a pager, for when the preview window is too narrow to read.
-		Files left unmerged by a conflicted merge are listed here too, as staging one is what resolves it. Aliased to `gvs`
-		in the `.zshrc`.
+		Files left unmerged by a conflicted merge are listed here too, as staging one is what resolves it, and staging one
+		that still has conflict markers in it prints a warning. Each line is prefixed with its status letter so that a
+		conflict is not mistaken for a plain modification. Aliased to `gvs` in the `.zshrc`.
 * `gitUnstageFiles` the same for files that are already staged, selecting them unstages them. Unmerged files are left out,
 		as unstaging one would resolve the conflict to the `HEAD` version rather than unstage anything. Aliased to `gus` in
 		the `.zshrc`.
@@ -46,7 +47,8 @@ takes the path relative to the repository root, as `git status --porcelain` prin
 that it works when called from a subdirectory.
 
 * Untracked files are viewed to standard output
-* Modified files are viewed by the diff of their unstaged changes
+* Modified files are viewed by the diff of their unstaged changes, or by the change in their size where git calls the
+		file binary
 * Deleted files print a message saying the file has been deleted or renamed
 * Unmerged files name which side of the merge changed them, then show the diff of both sides where git has one and the
 		surviving content where it does not
