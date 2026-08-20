@@ -1,0 +1,19 @@
+shell/git_extras.sh
+  s_be4e4e30a1182e::t_f506e557816c16 351-405,407-416,421-422,428-445,453-472,476-484,489-514,522-530,535-537,541-545,549,581-582,584-586,591-597,600,602-612,617,624,643-653,671-677,716-718
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "0c10653fef7fe9a462481ee93f81913ae3454b60",
+  "prompts": {},
+  "sessions": {
+    "s_be4e4e30a1182e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "545c4681-4bfb-4e9b-9d6b-3973c5549a83",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
