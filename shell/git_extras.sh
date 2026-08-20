@@ -348,47 +348,291 @@ function __plural() {
 	fi
 }
 
+# Untracked paths matching this read as work rather than as run output. A file
+# stays untracked until it is added, so "untracked" alone cannot mean "junk":
+# a thousand lines of brand new code look exactly like a stray log to git.
+# Deliberately only unambiguous code extensions - json, yaml and csv are far
+# more often an export or a fixture dump than something worth keeping.
+: ${WORKTREE_SOURCE_GLOB:='*.(ts|tsx|mts|cts|js|jsx|mjs|cjs|kt|kts|java|py|rb|go|rs|c|h|cc|cpp|hpp|cs|swift|sh|zsh|bash|sql|gradle|tf|html)'}
+
+# Frames for the scan progress line. Advanced one worktree at a time rather than
+# on a timer, so nothing has to run in the background just to animate.
+__wt_spin_frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+# Overwrites a single status line on stderr, so the pause before fzf appears is
+# accounted for instead of looking like a hang. Frame $1, message $2. Silent
+# when stderr is not a terminal, keeping captured output clean.
+function __worktreeProgress() {
+	[[ -t 2 ]] || return 0
+	printf '\r\033[2K%s %s' "${__wt_spin_frames[$1]}" "$2" >&2
+}
+
+# Clears the progress line, so whatever prints next starts on a blank one
+function __worktreeProgressClear() {
+	[[ -t 2 ]] || return 0
+	printf '\r\033[2K' >&2
+}
+
+# Fetches every recently merged pull request as raw JSON, for __joinMergedPrFetch
+# to index and for the picker's preview to read bodies out of. Returns 1 when
+# there is no way to ask, so that the caller can leave its own verdict standing
+# rather than read "no output" as "nothing has ever been merged".
+#
+# Measured against this repository, the cost is almost all in how many pull
+# requests are asked for rather than which fields: at a 500 window these fields
+# take about 6.8s, at 300 about 3.8s, at 150 about 1.9s. title, mergedAt and
+# body are close to free on top of the two needed to match a branch at all;
+# mergedBy roughly doubles it. latestReviews, the only field that names an
+# approver rather than whoever pressed merge, is not affordable at any useful
+# window - it took a 500 fetch past 11s - so it is deliberately not asked for.
+#
+# The window only has to reach back to the oldest worktree still on disk, which
+# is why the default is not larger. A worktree whose pull request falls outside
+# it reads as unpushed again, which is the old false positive rather than a risk
+# of losing anything - raise WORKTREE_MERGED_PR_LIMIT if you keep worktrees for
+# longer than a few hundred merges.
+function __mergedPrHeads() {
+	command -v gh >/dev/null 2>&1 || return 1
+	(cd "$top_level" && gh pr list --state merged \
+		--limit "${WORKTREE_MERGED_PR_LIMIT:-300}" \
+		--json number,headRefOid,title,mergedAt,mergedBy,body 2>/dev/null)
+}
+
+# Starts the pull request lookup in the background, so that the round trip to
+# GitHub overlaps the local git scan instead of following it. The scan is the
+# slower half locally but the network call is the slower half overall, so
+# running them together takes roughly the longer of the two rather than the sum.
+# Sets the caller's merged_pr_file, which doubles as the "a fetch is running"
+# flag that __joinMergedPrFetch checks.
+#
+# An interactive shell would otherwise announce the job twice - "[2] 12345" on
+# starting it and "[2] + done" on reaping it - straight over the progress line.
+# Backgrounding inside a subshell is what stops both: the job then belongs to
+# that subshell rather than to the interactive one, so nothing ever reports it,
+# whatever job control is set to. The subshell exits at once and the worker is
+# reparented, hence passing its pid out through a file for the timeout below,
+# and its exit status through another - there is no job left here to wait for.
+function __startMergedPrFetch() {
+	setopt local_options no_monitor no_notify
+	[[ -z "$merged_pr_file" ]] || return 0
+	merged_pr_file="$(mktemp "${TMPDIR:-/tmp}/worktreeMergedPrs.XXXXXX")" || return 0
+	(
+		{ __mergedPrHeads >"$merged_pr_file"; print -r -- $? >"$merged_pr_file.rc" } 2>/dev/null &
+		print -r -- $! >"$merged_pr_file.pid"
+	)
+}
+
+# Waits for __startMergedPrFetch and reads the result into the caller's cache,
+# animating the wait if there is any left to do. Warns once when gh could not
+# answer, so that an unpushed verdict left standing is explained rather than
+# silently over-strict.
+function __joinMergedPrFetch() {
+	local -i frame=0
+	[[ -z "$merged_heads_loaded" ]] || return 0
+	merged_heads_loaded=1
+
+	# No background fetch means nobody started one, so ask now rather than leave
+	# the lookup quietly switched off and every merged branch reading unpushed
+	if [[ -z "$merged_pr_file" ]]; then
+		__worktreeProgress 1 "asking GitHub which branches are merged"
+		if ! merged_heads="$(__mergedPrHeads)"; then
+			merged_heads=""
+			__worktreeProgressClear
+			print -P "%F{yellow}Warning: cannot ask GitHub which branches are merged, so squash-merged branches will still read as unpushed%f" >&2
+		fi
+		return 0
+	fi
+
+	# The status file appears only after the output is complete, so seeing it is
+	# proof the data is whole. Bounded, because a wedged request would otherwise
+	# hold the picker back indefinitely - wait would have done exactly that.
+	local -i deciseconds=$(( ${WORKTREE_MERGED_PR_TIMEOUT:-20} * 10 ))
+	while [[ ! -e "$merged_pr_file.rc" ]]; do
+		if (( frame >= deciseconds )); then
+			[[ -s "$merged_pr_file.pid" ]] && kill "$(<"$merged_pr_file.pid")" 2>/dev/null
+			break
+		fi
+		__worktreeProgress $(( frame % ${#__wt_spin_frames} + 1 )) "asking GitHub which branches are merged"
+		(( frame++ ))
+		sleep 0.1
+	done
+
+	if [[ -e "$merged_pr_file.rc" && "$(<"$merged_pr_file.rc")" == "0" ]] &&
+		command -v jq >/dev/null 2>&1; then
+		# Scalars only, one line per pull request. The body stays in the file,
+		# where the preview reads it from without holding every body in memory.
+		merged_heads="$(jq -r '.[] | [ .headRefOid, (.number|tostring),
+			((.mergedAt // "")[0:10]), (.mergedBy.login // ""),
+			(.title // "" | gsub("\t"; " ")) ] | @tsv' "$merged_pr_file" 2>/dev/null)"
+	else
+		merged_heads=""
+		__worktreeProgressClear
+		print -P "%F{yellow}Warning: cannot ask GitHub which branches are merged, so squash-merged branches will still read as unpushed%f" >&2
+	fi
+	# The data file outlives this, because the preview reads bodies out of it.
+	# gitWorktreeCleanup removes it however it exits.
+	rm -f "$merged_pr_file.rc" "$merged_pr_file.pid"
+}
+
+# Records the pull request each branch in $@ was merged as in merged_map, and
+# clears the unpushed verdict for any whose tip is that pull request's head.
+#
+# Squash merging replays a branch as a single new commit, and GitHub then
+# deletes the remote head, so the originals end up on no branch and no remote
+# and stay that way for ever. The reachability count below therefore flags every
+# squash-merged branch permanently, and no amount of local history can clear it -
+# hence asking GitHub. Matching is on the commit alone, so it holds whatever the
+# pull request was merged into: nothing here assumes a base branch name.
+function __markMergedPrs() {
+	local branch tip
+	local -a hit fields
+
+	__joinMergedPrFetch
+	[[ -n "$merged_heads" ]] || return 0
+
+	for branch in "$@"; do
+		tip="$(git -C "$top_level" rev-parse --verify --quiet "$branch")" || continue
+		hit=(${(M)${(f)merged_heads}:#${tip}$'\t'*})
+		[[ ${#hit} -gt 0 ]] || continue
+		fields=("${(@ps:\t:)hit[1]}")
+		merged_map[$branch]="${fields[2]}"
+		merged_at_map[$branch]="${fields[3]}"
+		merged_by_map[$branch]="${fields[4]}"
+		merged_title_map[$branch]="${fields[5]}"
+		# Its commits are in the trunk under a new hash, so they are not lost
+		unpushed_map[$branch]=""
+	done
+}
+
 # Works out what would be lost by deleting each worktree named in $@, filling in
-# active_map, dirty_map, unpushed_map and a short risk_map summary for each.
+# active_map, tracked_map, untracked_map, newsource_map, unpushed_map and
+# merged_map, plus a short risk_map summary and a level_map grade of "blocked",
+# "untracked" or "" for each.
+#
+# A running process, a change to a tracked file, an untracked file that reads as
+# code, or a commit held nowhere else all block a delete. Untracked files that
+# do not read as code are graded apart, because they are nearly always run
+# output - logs, screenshots, exported projects - and counting those as equally
+# serious is what gets the flag that matters ignored.
+#
 # zsh scopes dynamically, so these arrays and $all_procs, $top_level and
 # $worktree_root are the caller's.
 function __collectWorktreeRisks() {
 	local branch worktree
-	local -a parts
+	local -i scanned=0
+	local -a parts porcelain tracked untracked newsource excludes
+
+	# Excluding only $branch is right when weighing one worktree on its own, but
+	# wrong for a whole selection: two worktrees sitting on the same commit would
+	# each cite the other as proof it is held somewhere, both read as safe, and
+	# deleting both strand it. So when the set goes together, every branch in the
+	# set drops out of the reachability check. Set deleting_as_group for that.
+	if [[ -n "$deleting_as_group" ]]; then
+		for branch in "$@"; do excludes+=(--exclude="$branch"); done
+	fi
+
 	for branch in "$@"; do
+		# Two git calls per worktree adds up over a couple of dozen of them, so
+		# say so rather than leaving a silent pause before the picker
+		(( scanned++ ))
+		[[ $# -gt 3 ]] && __worktreeProgress \
+			$(( (scanned - 1) % ${#__wt_spin_frames} + 1 )) "checking worktrees ($scanned/$#)"
 		worktree="$worktree_root/$branch"
-		parts=()
 
 		active_map[$branch]="$(print -r -- "$all_procs" | __processesUnder "$worktree")"
-		if [[ -n "${active_map[$branch]}" ]]; then
-			parts+=("IN USE ($(print -r -- "${active_map[$branch]}" | __processNames))")
-		fi
 
-		# Anything git would refuse to throw away, were rm -rf not doing it
-		dirty_map[$branch]="$(git -C "$worktree" status --porcelain 2>/dev/null | grep -c . | tr -d ' ')"
-		if [[ "${dirty_map[$branch]}" == "0" ]]; then
-			dirty_map[$branch]=""
-		else
-			parts+=("DIRTY")
-		fi
+		# Graded apart rather than counted together: a changed or staged file is
+		# work that exists only here, an untracked one is usually droppings. git
+		# quotes any path holding a newline, so one line really is one file.
+		porcelain=(${(f)"$(git -C "$worktree" status --porcelain 2>/dev/null)"})
+		porcelain=(${porcelain:#})
+		tracked=(${porcelain:#\?\?*})
+		untracked=(${(M)porcelain:#\?\?*})
+		untracked=(${untracked#\?\? })
+		# git quotes a path with a space or a metacharacter in it, and the quotes
+		# would stop the extension matching below
+		untracked=(${${untracked#\"}%\"})
+		newsource=(${(M)untracked:#${~WORKTREE_SOURCE_GLOB}})
+		tracked_map[$branch]=""
+		untracked_map[$branch]=""
+		newsource_map[$branch]=""
+		[[ ${#tracked} -gt 0 ]] && tracked_map[$branch]="${#tracked}"
+		[[ ${#untracked} -gt 0 ]] && untracked_map[$branch]="${#untracked}"
+		[[ ${#newsource} -gt 0 ]] && newsource_map[$branch]="${#newsource}"
 
 		# Commits reachable from no other branch and no remote, so deleting the
 		# branch is the last thing standing between them and the reflog. This is
 		# stricter than git branch -d, which only consults the upstream or HEAD.
-		unpushed_map[$branch]="$(git -C "$top_level" rev-list --count "$branch" --not --exclude="$branch" --branches --remotes 2>/dev/null)"
+		[[ -n "$deleting_as_group" ]] || excludes=(--exclude="$branch")
+		unpushed_map[$branch]="$(git -C "$top_level" rev-list --count "$branch" --not "${excludes[@]}" --branches --remotes 2>/dev/null)"
 		if [[ -z "${unpushed_map[$branch]}" || "${unpushed_map[$branch]}" == "0" ]]; then
 			unpushed_map[$branch]=""
-		else
+		fi
+		merged_map[$branch]=""
+		merged_at_map[$branch]=""
+		merged_by_map[$branch]=""
+		merged_title_map[$branch]=""
+	done
+
+	# Recognise squash merges before grading, so that a branch whose work is
+	# already in the trunk does not read the same as one holding the only copy
+	__markMergedPrs "$@"
+	__worktreeProgressClear
+
+	for branch in "$@"; do
+		parts=()
+		if [[ -n "${active_map[$branch]}" ]]; then
+			parts+=("IN USE ($(print -r -- "${active_map[$branch]}" | __processNames))")
+		fi
+		if [[ -n "${tracked_map[$branch]}" ]]; then
+			parts+=("${tracked_map[$branch]} MODIFIED")
+		fi
+		if [[ -n "${newsource_map[$branch]}" ]]; then
+			parts+=("${newsource_map[$branch]} NEW SOURCE")
+		fi
+		if [[ -n "${unpushed_map[$branch]}" ]]; then
 			parts+=("${unpushed_map[$branch]} UNPUSHED")
+		fi
+
+		if [[ ${#parts} -gt 0 ]]; then
+			level_map[$branch]="blocked"
+		elif [[ -n "${untracked_map[$branch]}" ]]; then
+			level_map[$branch]="untracked"
+			parts+=("${untracked_map[$branch]} UNTRACKED")
+		else
+			level_map[$branch]=""
 		fi
 
 		risk_map[$branch]="${(j:, :)parts}"
 	done
 }
 
-# Prints the indented reasons that $1 is unsafe to delete, one per line, for
-# both the picker preview and the report before deleting. Reads the caller's
-# maps by dynamic scope, as above.
+# Lists the first few untracked paths in worktree $1, indented to sit under the
+# UNTRACKED reason, so that run output can be told apart from something worth
+# keeping before it is thrown away
+function __worktreeUntrackedPreview() {
+	# Not named "path": zsh ties that to $PATH, and a local one blanks PATH for
+	# the whole function, so even git stops resolving
+	local branch="$1" limit="${WORKTREE_UNTRACKED_PREVIEW:-4}" entry
+	local -a paths
+	paths=(${(f)"$(git -C "$worktree_root/$branch" status --porcelain 2>/dev/null)"})
+	paths=(${(M)paths:#\?\?*})
+	paths=(${paths#\?\? })
+	[[ ${#paths} -gt 0 ]] || return 0
+	# Anything that reads as code goes first, so a truncated list still shows the
+	# files that are the reason for looking
+	paths=(${(M)paths:#${~WORKTREE_SOURCE_GLOB}} ${paths:#${~WORKTREE_SOURCE_GLOB}})
+	for entry in "${(@)paths[1,limit]}"; do
+		printf '     %-20s %s\n' "" "$entry"
+	done
+	if [[ ${#paths} -gt $limit ]]; then
+		printf '     %-20s %s\n' "" "... and $((${#paths} - limit)) more"
+	fi
+}
+
+# Prints the indented reasons that $1 would lose something by being deleted, one
+# per line, for both the picker preview and the report before deleting. Reads the
+# caller's maps by dynamic scope, as above.
 function __renderWorktreeRisks() {
 	local branch="$1" pid cmd cwd
 	if [[ -n "${active_map[$branch]}" ]]; then
@@ -396,21 +640,39 @@ function __renderWorktreeRisks() {
 			printf '     %-20s pid %-7s %s\n' "$cmd" "$pid" "$cwd"
 		done
 	fi
-	if [[ -n "${dirty_map[$branch]}" ]]; then
-		printf '     %-20s %s\n' "DIRTY" "$(__plural "${dirty_map[$branch]}" "uncommitted or untracked file")"
+	if [[ -n "${tracked_map[$branch]}" ]]; then
+		printf '     %-20s %s\n' "MODIFIED" "$(__plural "${tracked_map[$branch]}" "tracked file") changed or staged"
+	fi
+	if [[ -n "${newsource_map[$branch]}" ]]; then
+		printf '     %-20s %s\n' "NEW SOURCE" "$(__plural "${newsource_map[$branch]}" "untracked file") holding code rather than run output"
+	fi
+	if [[ -n "${untracked_map[$branch]}" ]]; then
+		printf '     %-20s %s\n' "UNTRACKED" "$(__plural "${untracked_map[$branch]}" "file") git is not tracking"
+		__worktreeUntrackedPreview "$branch"
 	fi
 	if [[ -n "${unpushed_map[$branch]}" ]]; then
 		printf '     %-20s %s\n' "UNPUSHED" "$(__plural "${unpushed_map[$branch]}" "commit") on no other branch or remote"
 	fi
+	if [[ -n "${merged_map[$branch]}" ]]; then
+		# Narrower than the reason column above, because the pull request title and
+		# body that follow are prose and read badly pushed a third of the way in.
+		# worktree_pr_detail.sh indents the body to match.
+		printf '     %-6s  %s\n' "MERGED" "PR #${merged_map[$branch]} on ${merged_at_map[$branch]:-an unknown date}${merged_by_map[$branch]:+, merged by ${merged_by_map[$branch]}}"
+		[[ -n "${merged_title_map[$branch]}" ]] &&
+			printf '     %-6s  %s\n' "" "${merged_title_map[$branch]}"
+	fi
 }
 
 # List all branches inside the projects to remove
-# Worktrees with a process still running inside them, uncommitted changes, or
-# commits held nowhere else are reported and skipped. Pass -f to be asked about
-# those instead, rather than skipping them.
+# Worktrees with a process still running inside them, changes to tracked files,
+# new source files, or commits held nowhere else are reported and skipped; pass
+# -f to be asked about those instead. A worktree carrying nothing but untracked
+# run output is graded apart and deleted with a note of what went with it,
+# because a branch whose only sin is a leftover log is not worth blocking on.
 function gitWorktreeCleanup {
 	local force=0
 	local skipped=0
+	local discarded=0
 
 	while getopts "f" opt; do
 		case $opt in
@@ -435,6 +697,21 @@ function gitWorktreeCleanup {
 	local worktree_root all_procs
 	local can_check=1
 	worktree_root="$(cd "$top_level/_worktrees_git" && pwd -P)"
+	# Declared before the fetch starts: a later `local` would shadow what
+	# __startMergedPrFetch set, silently costing the overlap and leaking its
+	# temporary file. Reused for the recheck, so a run makes one API call.
+	local merged_heads merged_heads_loaded merged_pr_file
+	# Off while the picker is built, on for the selection, where the question is
+	# what the whole set costs rather than what each worktree costs alone
+	local deleting_as_group
+	# Started before any local work so the network round trip overlaps it
+	__startMergedPrFetch
+	# The preview reads pull request bodies straight out of the fetched JSON, so
+	# it has to outlive the scan and go on every way out of here. The path is
+	# baked into the trap rather than read from the variable, which is a local
+	# and is already out of scope by the time the trap runs.
+	[[ -n "$merged_pr_file" ]] &&
+		trap "rm -f '$merged_pr_file' '$merged_pr_file.rc' '$merged_pr_file.pid'" EXIT
 	if ! all_procs="$(__worktreeProcesses "$worktree_root")"; then
 		can_check=0
 		print -P "%B%F{red}Warning: cannot check for running processes, install lsof to have worktrees still in use flagged%f%b"
@@ -442,36 +719,55 @@ function gitWorktreeCleanup {
 
 	# Build the picker list rather than piping find straight into fzf, so that
 	# anything unsafe is already marked before it can be chosen
-	local -A active_map dirty_map unpushed_map risk_map
-	local -a fzf_lines safe_lines unsafe_lines worktree_branches
+	local -A active_map tracked_map untracked_map newsource_map unpushed_map risk_map level_map
+	local -A merged_map merged_at_map merged_by_map merged_title_map
+	local -a fzf_lines safe_lines caution_lines unsafe_lines worktree_branches
 	local branch detail
 	worktree_branches=(${(f)"$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18-)"})
 	worktree_branches=(${worktree_branches:#})
 	__collectWorktreeRisks "${worktree_branches[@]}"
 	for branch in "${worktree_branches[@]}"; do
-		if [[ -n "${risk_map[$branch]}" ]]; then
-			# The reasons go in a third field that --with-nth hides from the
-			# list and only the preview window expands, keeping the lines short.
-			# Newlines are escaped because a field cannot span lines, and the
-			# leading one keeps fzf from trimming the first line's indent away.
-			detail="$(__renderWorktreeRisks "$branch")"
+		# The reasons go in a third field that --with-nth hides from the list
+		# and only the preview window expands, keeping the lines short.
+		# Newlines are escaped because a field cannot span lines, and the
+		# leading one keeps fzf from trimming the first line's indent away. A
+		# fourth field carries the grade, so the preview can pick its banner.
+		# Built for every grade, not just the unsafe ones: a clean worktree still
+		# has the pull request it was merged as worth reading
+		detail="$(__renderWorktreeRisks "$branch")"
+		if [[ -n "$detail" ]]; then
 			detail="${detail//\\/\\\\}"
-			unsafe_lines+=($'\e[1;31m'"$branch"$'\t✗\e[0m\t'"\\n${detail//$'\n'/\\n}")
-		else
-			safe_lines+=("$branch"$'\t'$'\t')
+			detail="\\n${detail//$'\n'/\\n}"
 		fi
+		# A fifth field carries the pull request number, so the preview can go and
+		# fetch the approver and body for just the one being looked at
+		case "${level_map[$branch]}" in
+			blocked)
+				unsafe_lines+=($'\e[1;31m'"$branch"$'\t✗\e[0m\t'"$detail"$'\tblocked\t'"${merged_map[$branch]}")
+				;;
+			untracked)
+				caution_lines+=($'\e[1;33m'"$branch"$'\t⚠\e[0m\t'"$detail"$'\tuntracked\t'"${merged_map[$branch]}")
+				;;
+			*)
+				safe_lines+=("$branch"$'\t'$'\t'"$detail"$'\tsafe\t'"${merged_map[$branch]}")
+				;;
+		esac
 	done
 	# fzf draws the first line at the bottom next to the prompt and grows
 	# upwards, so listing the safe worktrees first is what puts the unsafe ones
 	# at the top of the screen, away from where the cursor starts
-	fzf_lines=("${safe_lines[@]}" "${unsafe_lines[@]}")
+	fzf_lines=("${safe_lines[@]}" "${caution_lines[@]}" "${unsafe_lines[@]}")
 
 	if [[ ${#fzf_lines[@]} -eq 0 ]]; then
 		echo "Error: No worktrees found"
 		return 2;
 	fi
 
-	git_branches=$(print -rl -- "${fzf_lines[@]}" | fzf -m --ansi --delimiter=$'\t' --with-nth=1,2 --tabstop=20 --header "Worktree Cleanup (TAB to select multiple)" --preview "[ -n {3} ] && { printf '\033[1;31m!! NOT SAFE TO DELETE\033[0m\n%b\n' {3}; printf '%*s\n\n' \${FZF_PREVIEW_COLUMNS:-40} '' | sed 's/ /─/g'; }; cd $worktree_root/{1} && git log")
+	# Left for the preview shell to expand, as in __gitFilePicker
+	# Reads bodies out of the fetched JSON, keeping the preview local. Left for
+	# the preview shell to expand $HOME, as in __gitFilePicker
+	local pr_detail='$HOME/.dotfiles/shell/worktree_pr_detail.sh'
+	git_branches=$(print -rl -- "${fzf_lines[@]}" | fzf -m --ansi --delimiter=$'\t' --with-nth=1,2 --tabstop=20 --header "Worktree Cleanup (TAB to select multiple)" --preview "if [ {4} = blocked ]; then printf '\033[1;31m!! NOT SAFE TO DELETE\033[0m\n'; elif [ {4} = untracked ]; then printf '\033[1;33m!! UNTRACKED FILES ONLY - deleting this discards them\033[0m\n'; fi; if [ -n {3} ]; then printf '%b\n' {3}; fi; [ -n {5} ] && $pr_detail "$merged_pr_file" {5}; if [ -n {3} ]; then printf '\n'; printf '%*s\n\n' \${FZF_PREVIEW_COLUMNS:-40} '' | sed 's/ /─/g'; fi; cd $worktree_root/{1} && git log")
 	if [[ "$git_branches" == '' ]]; then
 		echo "Error: No branches selected for cleanup"
 		return 3;
@@ -485,16 +781,23 @@ function gitWorktreeCleanup {
 	if [[ $can_check -eq 1 ]]; then
 		all_procs="$(__worktreeProcesses "$worktree_root")"
 	fi
+	deleting_as_group=1
 	__collectWorktreeRisks "${branches_array[@]}"
 
 	# Show confirmation with all selected branches, flagging the unsafe ones
 	echo "Selected branches for cleanup:"
 	for branch in "${branches_array[@]}"; do
-		if [[ -n "${risk_map[$branch]}" ]]; then
-			print -P "  - $branch %B%F{red}(${risk_map[$branch]})%f%b"
-		else
-			echo "  - $branch"
-		fi
+		case "${level_map[$branch]}" in
+			blocked)
+				print -P "  - $branch %B%F{red}(${risk_map[$branch]})%f%b"
+				;;
+			untracked)
+				print -P "  - $branch %F{yellow}(${risk_map[$branch]})%f"
+				;;
+			*)
+				echo "  - $branch"
+				;;
+		esac
 	done
 	if [[ ${#branches_array[@]} -eq 1 ]]; then
 		read -q "choice?Are you sure that you want to cleanup this branch? [y/N]" || return 1;
@@ -512,7 +815,13 @@ function gitWorktreeCleanup {
 			continue
 		fi
 
-		if [[ -n "${risk_map[$git_branch]}" ]]; then
+		if [[ "${level_map[$git_branch]}" == "untracked" ]]; then
+			# Nothing tracked and nothing unmerged, so this is run output rather
+			# than work. Say what goes instead of making it another -f case.
+			print -P "\n%F{yellow}!! $git_branch carries untracked files, discarding them:%f"
+			__renderWorktreeRisks "$git_branch"
+			discarded=$((discarded + 1))
+		elif [[ -n "${level_map[$git_branch]}" ]]; then
 			print -P "\n%B%F{red}!! $git_branch is not safe to delete:%f%b"
 			__renderWorktreeRisks "$git_branch"
 
@@ -551,6 +860,9 @@ function gitWorktreeCleanup {
 		cd "$top_level"
 	fi
 
+	if [[ $discarded -gt 0 ]]; then
+		print -P "\n%F{yellow}Discarded untracked files from $discarded worktree(s)%f"
+	fi
 	if [[ $skipped -gt 0 ]]; then
 		print -P "\n%B%F{red}Skipped $skipped worktree(s) that were not safe to delete%f%b"
 	fi
