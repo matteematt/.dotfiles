@@ -373,15 +373,29 @@ function __worktreeProgressClear() {
 	printf '\r\033[2K' >&2
 }
 
-# Reports the head commit of every recently merged pull request as
-# "<sha> <number>" lines. Returns 1 when there is no way to ask, so that the
-# caller can leave its own verdict standing rather than read "no output" as
-# "nothing has ever been merged".
+# Fetches every recently merged pull request as raw JSON, for __joinMergedPrFetch
+# to index and for the picker's preview to read bodies out of. Returns 1 when
+# there is no way to ask, so that the caller can leave its own verdict standing
+# rather than read "no output" as "nothing has ever been merged".
+#
+# Measured against this repository, the cost is almost all in how many pull
+# requests are asked for rather than which fields: at a 500 window these fields
+# take about 6.8s, at 300 about 3.8s, at 150 about 1.9s. title, mergedAt and
+# body are close to free on top of the two needed to match a branch at all;
+# mergedBy roughly doubles it. latestReviews, the only field that names an
+# approver rather than whoever pressed merge, is not affordable at any useful
+# window - it took a 500 fetch past 11s - so it is deliberately not asked for.
+#
+# The window only has to reach back to the oldest worktree still on disk, which
+# is why the default is not larger. A worktree whose pull request falls outside
+# it reads as unpushed again, which is the old false positive rather than a risk
+# of losing anything - raise WORKTREE_MERGED_PR_LIMIT if you keep worktrees for
+# longer than a few hundred merges.
 function __mergedPrHeads() {
 	command -v gh >/dev/null 2>&1 || return 1
 	(cd "$top_level" && gh pr list --state merged \
-		--limit "${WORKTREE_MERGED_PR_LIMIT:-500}" --json number,headRefOid \
-		--jq '.[] | "\(.headRefOid) \(.number)"' 2>/dev/null)
+		--limit "${WORKTREE_MERGED_PR_LIMIT:-300}" \
+		--json number,headRefOid,title,mergedAt,mergedBy,body 2>/dev/null)
 }
 
 # Starts the pull request lookup in the background, so that the round trip to
@@ -443,15 +457,21 @@ function __joinMergedPrFetch() {
 		sleep 0.1
 	done
 
-	if [[ -e "$merged_pr_file.rc" && "$(<"$merged_pr_file.rc")" == "0" ]]; then
-		merged_heads="$(<"$merged_pr_file")"
+	if [[ -e "$merged_pr_file.rc" && "$(<"$merged_pr_file.rc")" == "0" ]] &&
+		command -v jq >/dev/null 2>&1; then
+		# Scalars only, one line per pull request. The body stays in the file,
+		# where the preview reads it from without holding every body in memory.
+		merged_heads="$(jq -r '.[] | [ .headRefOid, (.number|tostring),
+			((.mergedAt // "")[0:10]), (.mergedBy.login // ""),
+			(.title // "" | gsub("\t"; " ")) ] | @tsv' "$merged_pr_file" 2>/dev/null)"
 	else
 		merged_heads=""
 		__worktreeProgressClear
 		print -P "%F{yellow}Warning: cannot ask GitHub which branches are merged, so squash-merged branches will still read as unpushed%f" >&2
 	fi
-	rm -f "$merged_pr_file" "$merged_pr_file.rc" "$merged_pr_file.pid"
-	merged_pr_file=""
+	# The data file outlives this, because the preview reads bodies out of it.
+	# gitWorktreeCleanup removes it however it exits.
+	rm -f "$merged_pr_file.rc" "$merged_pr_file.pid"
 }
 
 # Records the pull request each branch in $@ was merged as in merged_map, and
@@ -465,16 +485,20 @@ function __joinMergedPrFetch() {
 # pull request was merged into: nothing here assumes a base branch name.
 function __markMergedPrs() {
 	local branch tip
-	local -a hit
+	local -a hit fields
 
 	__joinMergedPrFetch
 	[[ -n "$merged_heads" ]] || return 0
 
 	for branch in "$@"; do
 		tip="$(git -C "$top_level" rev-parse --verify --quiet "$branch")" || continue
-		hit=(${(M)${(f)merged_heads}:#$tip *})
+		hit=(${(M)${(f)merged_heads}:#${tip}$'\t'*})
 		[[ ${#hit} -gt 0 ]] || continue
-		merged_map[$branch]="${hit[1]##* }"
+		fields=("${(@ps:\t:)hit[1]}")
+		merged_map[$branch]="${fields[2]}"
+		merged_at_map[$branch]="${fields[3]}"
+		merged_by_map[$branch]="${fields[4]}"
+		merged_title_map[$branch]="${fields[5]}"
 		# Its commits are in the trunk under a new hash, so they are not lost
 		unpushed_map[$branch]=""
 	done
@@ -545,6 +569,9 @@ function __collectWorktreeRisks() {
 			unpushed_map[$branch]=""
 		fi
 		merged_map[$branch]=""
+		merged_at_map[$branch]=""
+		merged_by_map[$branch]=""
+		merged_title_map[$branch]=""
 	done
 
 	# Recognise squash merges before grading, so that a branch whose work is
@@ -627,7 +654,12 @@ function __renderWorktreeRisks() {
 		printf '     %-20s %s\n' "UNPUSHED" "$(__plural "${unpushed_map[$branch]}" "commit") on no other branch or remote"
 	fi
 	if [[ -n "${merged_map[$branch]}" ]]; then
-		printf '     %-20s %s\n' "MERGED" "tip is the head of merged PR #${merged_map[$branch]}"
+		# Narrower than the reason column above, because the pull request title and
+		# body that follow are prose and read badly pushed a third of the way in.
+		# worktree_pr_detail.sh indents the body to match.
+		printf '     %-6s  %s\n' "MERGED" "PR #${merged_map[$branch]} on ${merged_at_map[$branch]:-an unknown date}${merged_by_map[$branch]:+, merged by ${merged_by_map[$branch]}}"
+		[[ -n "${merged_title_map[$branch]}" ]] &&
+			printf '     %-6s  %s\n' "" "${merged_title_map[$branch]}"
 	fi
 }
 
@@ -674,6 +706,12 @@ function gitWorktreeCleanup {
 	local deleting_as_group
 	# Started before any local work so the network round trip overlaps it
 	__startMergedPrFetch
+	# The preview reads pull request bodies straight out of the fetched JSON, so
+	# it has to outlive the scan and go on every way out of here. The path is
+	# baked into the trap rather than read from the variable, which is a local
+	# and is already out of scope by the time the trap runs.
+	[[ -n "$merged_pr_file" ]] &&
+		trap "rm -f '$merged_pr_file' '$merged_pr_file.rc' '$merged_pr_file.pid'" EXIT
 	if ! all_procs="$(__worktreeProcesses "$worktree_root")"; then
 		can_check=0
 		print -P "%B%F{red}Warning: cannot check for running processes, install lsof to have worktrees still in use flagged%f%b"
@@ -681,7 +719,8 @@ function gitWorktreeCleanup {
 
 	# Build the picker list rather than piping find straight into fzf, so that
 	# anything unsafe is already marked before it can be chosen
-	local -A active_map tracked_map untracked_map newsource_map unpushed_map merged_map risk_map level_map
+	local -A active_map tracked_map untracked_map newsource_map unpushed_map risk_map level_map
+	local -A merged_map merged_at_map merged_by_map merged_title_map
 	local -a fzf_lines safe_lines caution_lines unsafe_lines worktree_branches
 	local branch detail
 	worktree_branches=(${(f)"$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18-)"})
@@ -700,15 +739,17 @@ function gitWorktreeCleanup {
 			detail="${detail//\\/\\\\}"
 			detail="\\n${detail//$'\n'/\\n}"
 		fi
+		# A fifth field carries the pull request number, so the preview can go and
+		# fetch the approver and body for just the one being looked at
 		case "${level_map[$branch]}" in
 			blocked)
-				unsafe_lines+=($'\e[1;31m'"$branch"$'\t✗\e[0m\t'"$detail"$'\tblocked')
+				unsafe_lines+=($'\e[1;31m'"$branch"$'\t✗\e[0m\t'"$detail"$'\tblocked\t'"${merged_map[$branch]}")
 				;;
 			untracked)
-				caution_lines+=($'\e[1;33m'"$branch"$'\t⚠\e[0m\t'"$detail"$'\tuntracked')
+				caution_lines+=($'\e[1;33m'"$branch"$'\t⚠\e[0m\t'"$detail"$'\tuntracked\t'"${merged_map[$branch]}")
 				;;
 			*)
-				safe_lines+=("$branch"$'\t'$'\t'"$detail"$'\tsafe')
+				safe_lines+=("$branch"$'\t'$'\t'"$detail"$'\tsafe\t'"${merged_map[$branch]}")
 				;;
 		esac
 	done
@@ -722,7 +763,11 @@ function gitWorktreeCleanup {
 		return 2;
 	fi
 
-	git_branches=$(print -rl -- "${fzf_lines[@]}" | fzf -m --ansi --delimiter=$'\t' --with-nth=1,2 --tabstop=20 --header "Worktree Cleanup (TAB to select multiple)" --preview "if [ {4} = blocked ]; then printf '\033[1;31m!! NOT SAFE TO DELETE\033[0m\n'; elif [ {4} = untracked ]; then printf '\033[1;33m!! UNTRACKED FILES ONLY - deleting this discards them\033[0m\n'; fi; if [ -n {3} ]; then printf '%b\n' {3}; printf '%*s\n\n' \${FZF_PREVIEW_COLUMNS:-40} '' | sed 's/ /─/g'; fi; cd $worktree_root/{1} && git log")
+	# Left for the preview shell to expand, as in __gitFilePicker
+	# Reads bodies out of the fetched JSON, keeping the preview local. Left for
+	# the preview shell to expand $HOME, as in __gitFilePicker
+	local pr_detail='$HOME/.dotfiles/shell/worktree_pr_detail.sh'
+	git_branches=$(print -rl -- "${fzf_lines[@]}" | fzf -m --ansi --delimiter=$'\t' --with-nth=1,2 --tabstop=20 --header "Worktree Cleanup (TAB to select multiple)" --preview "if [ {4} = blocked ]; then printf '\033[1;31m!! NOT SAFE TO DELETE\033[0m\n'; elif [ {4} = untracked ]; then printf '\033[1;33m!! UNTRACKED FILES ONLY - deleting this discards them\033[0m\n'; fi; if [ -n {3} ]; then printf '%b\n' {3}; fi; [ -n {5} ] && $pr_detail "$merged_pr_file" {5}; if [ -n {3} ]; then printf '\n'; printf '%*s\n\n' \${FZF_PREVIEW_COLUMNS:-40} '' | sed 's/ /─/g'; fi; cd $worktree_root/{1} && git log")
 	if [[ "$git_branches" == '' ]]; then
 		echo "Error: No branches selected for cleanup"
 		return 3;
