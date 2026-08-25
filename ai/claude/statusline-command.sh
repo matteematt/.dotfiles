@@ -9,8 +9,10 @@ input=$(cat)
   IFS= read -r effort
   IFS= read -r used
   IFS= read -r cwd
-  IFS= read -r rl_used
-  IFS= read -r rl_reset
+  IFS= read -r rl5_used
+  IFS= read -r rl5_reset
+  IFS= read -r rl7_used
+  IFS= read -r rl7_reset
 } <<EOF
 $(echo "$input" | jq -r '[
   .model.display_name,
@@ -18,7 +20,9 @@ $(echo "$input" | jq -r '[
   .context_window.used_percentage,
   .workspace.current_dir,
   .rate_limits.five_hour.used_percentage,
-  .rate_limits.five_hour.resets_at
+  .rate_limits.five_hour.resets_at,
+  .rate_limits.seven_day.used_percentage,
+  .rate_limits.seven_day.resets_at
 ] | map(if . == null then "" else tostring end) | .[]' 2>/dev/null)
 EOF
 
@@ -35,8 +39,12 @@ ESC_GREY=$'\033[90m'
 
 BAR_WIDTH=16
 DIVIDER="│"
-# Length of the rate-limit window, used to judge burn rate against elapsed time
-WINDOW_SECS=18000
+
+# Quota windows: length in seconds, and the absolute usage scale both share
+FIVE_HOUR_SECS=18000
+SEVEN_DAY_SECS=604800
+QUOTA_AMBER_PCT=80
+QUOTA_RED_PCT=100
 
 # Burn is how far ahead of the clock the spending is, in percentage points:
 # usage% minus elapsed%. Level pace reads 0 and the quota then lasts exactly to
@@ -68,7 +76,7 @@ bar() {
 }
 
 # Usage colour for percentage $1: green below $2, amber from $2, red from $3.
-# The two meters run on different scales, hence the explicit thresholds.
+# The meters run on different scales, hence the explicit thresholds.
 usage_color() {
   if [ "$1" -ge "$3" ]; then
     printf '%s' "$ESC_RED"
@@ -77,6 +85,61 @@ usage_color() {
   else
     printf '%s' "$ESC_GREEN"
   fi
+}
+
+# Compact time remaining for $1 seconds: 3d04h, 2h30m, or 47m
+duration() {
+  _mins=$(( ($1 + 59) / 60 ))
+  if [ "$_mins" -ge 1440 ]; then
+    printf '%dd%02dh' "$(( _mins / 1440 ))" "$(( (_mins % 1440) / 60 ))"
+  elif [ "$_mins" -ge 60 ]; then
+    printf '%dh%02dm' "$(( _mins / 60 ))" "$(( _mins % 60 ))"
+  else
+    printf '%dm' "$_mins"
+  fi
+}
+
+# One quota meter: $1 label, $2 usage %, $3 reset timestamp, $4 window seconds.
+# Prints the bar and percentage on the absolute scale, then time to reset and
+# the burn figure, each in its own colour. Silent when there is no usage figure.
+quota_seg() {
+  [ -n "$2" ] || return 0
+
+  _pct=$(printf "%.0f" "$2")
+  _color=$(usage_color "$_pct" "$QUOTA_AMBER_PCT" "$QUOTA_RED_PCT")
+  _eta=""
+  _burn=""
+
+  # Time until the window resets ($3 is epoch seconds). Suppressed, along with
+  # the burn figure, when the timestamp is already past - the reading is stale.
+  if [ -n "$3" ]; then
+    _left=$(( $(printf "%.0f" "$3") - $(date +%s) ))
+    if [ "$_left" -gt 0 ]; then
+      _eta=" $(duration "$_left")"
+
+      # The window is assumed to have opened $4 seconds before it resets, so
+      # elapsed% is how far through it we are
+      _elapsed=$(( ($4 - _left) * 100 / $4 ))
+      [ "$_elapsed" -lt 0 ] && _elapsed=0
+      _pts=$(( _pct - _elapsed ))
+
+      if [ "$_pts" -ge "$BURN_RED_PTS" ]; then
+        _burn_color="$ESC_RED"
+      elif [ "$_pts" -ge "$BURN_AMBER_PTS" ]; then
+        _burn_color="$ESC_AMBER"
+      elif [ "$_pts" -ge "$BURN_GREEN_PTS" ]; then
+        _burn_color="$ESC_GREEN"
+      else
+        _burn_color="$ESC_GREY"
+      fi
+
+      # %+d so the sign is carried on both sides of level pace
+      _burn=$(printf " %sBurn %+d%%%s" "$_burn_color" "$_pts" "$ESC_RESET")
+    fi
+  fi
+
+  printf '%s%s: [%s] %d%%%s%s%s' \
+    "$_color" "$1" "$(bar "$_pct")" "$_pct" "$_eta" "$ESC_RESET" "$_burn"
 }
 
 # Colour by model family; display names are prefixed "Opus 5 (1M context)", "Sonnet 5", ...
@@ -116,51 +179,8 @@ if [ -n "$used" ]; then
   ctx_seg="${ctx_color}Ctx: [$(bar "$used_int")] ${used_int}%${ESC_RESET}"
 fi
 
-# 5-hour rate limit: green < 80%, amber 80-99%, red at 100%
-rl_seg=""
-if [ -n "$rl_used" ]; then
-  rl_int=$(printf "%.0f" "$rl_used")
-  rl_color=$(usage_color "$rl_int" 80 100)
-
-  # Time until the window resets (.resets_at is epoch seconds). Suppressed only
-  # when the timestamp is already in the past, i.e. the reading is stale.
-  rl_eta=""
-  rl_burn=""
-  if [ -n "$rl_reset" ]; then
-    reset_int=$(printf "%.0f" "$rl_reset")
-    secs_left=$(( reset_int - $(date +%s) ))
-    if [ "$secs_left" -gt 0 ]; then
-      mins_left=$(( (secs_left + 59) / 60 ))
-      if [ "$mins_left" -ge 60 ]; then
-        rl_eta=$(printf " %dh%02dm" "$(( mins_left / 60 ))" "$(( mins_left % 60 ))")
-      else
-        rl_eta=" ${mins_left}m"
-      fi
-
-      # The window is assumed to have opened WINDOW_SECS before it resets, so
-      # elapsed% is how far through it we are
-      elapsed_pct=$(( (WINDOW_SECS - secs_left) * 100 / WINDOW_SECS ))
-      [ "$elapsed_pct" -lt 0 ] && elapsed_pct=0
-
-      burn=$(( rl_int - elapsed_pct ))
-
-      if [ "$burn" -ge "$BURN_RED_PTS" ]; then
-        burn_color="$ESC_RED"
-      elif [ "$burn" -ge "$BURN_AMBER_PTS" ]; then
-        burn_color="$ESC_AMBER"
-      elif [ "$burn" -ge "$BURN_GREEN_PTS" ]; then
-        burn_color="$ESC_GREEN"
-      else
-        burn_color="$ESC_GREY"
-      fi
-
-      # %+d so the sign is carried on both sides of level pace
-      rl_burn=$(printf " %sBurn %+d%%%s" "$burn_color" "$burn" "$ESC_RESET")
-    fi
-  fi
-
-  rl_seg="${rl_color}5h: [$(bar "$rl_int")] ${rl_int}%${rl_eta}${ESC_RESET}${rl_burn}"
-fi
+rl5_seg=$(quota_seg "5h" "$rl5_used" "$rl5_reset" "$FIVE_HOUR_SECS")
+rl7_seg=$(quota_seg "7d" "$rl7_used" "$rl7_reset" "$SEVEN_DAY_SECS")
 
 # Branch / worktree segment, derived from git rather than from the payload: the
 # payload's .worktree object only covers Claude-managed worktrees and is absent
@@ -197,7 +217,7 @@ fi
 # Join whichever sections exist with a dim divider, so a missing one never
 # leaves a stray divider or a leading/trailing separator behind
 out=""
-for seg in "$model_seg" "$ctx_seg" "$rl_seg" "$wt_seg"; do
+for seg in "$model_seg" "$ctx_seg" "$rl5_seg" "$rl7_seg" "$wt_seg"; do
   [ -n "$seg" ] || continue
   if [ -n "$out" ]; then
     out="${out} ${ESC_GREY}${DIVIDER}${ESC_RESET} ${seg}"
