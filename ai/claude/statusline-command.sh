@@ -35,6 +35,16 @@ ESC_GREY=$'\033[90m'
 
 BAR_WIDTH=16
 DIVIDER="│"
+# Length of the rate-limit window, used to judge burn rate against elapsed time
+WINDOW_SECS=18000
+
+# Burn is how far ahead of the clock the spending is, in percentage points:
+# usage% minus elapsed%. Level pace reads 0 and the quota then lasts exactly to
+# the reset. Positive is spending brought forward; negative is quota in hand for
+# how far through the window we are.
+BURN_GREEN_PTS=1
+BURN_AMBER_PTS=10
+BURN_RED_PTS=25
 
 # Render a block bar for percentage $1. Clamped, so a reading over 100 (or a
 # negative one) can never stretch or invert the bar.
@@ -115,19 +125,41 @@ if [ -n "$rl_used" ]; then
   # Time until the window resets (.resets_at is epoch seconds). Suppressed only
   # when the timestamp is already in the past, i.e. the reading is stale.
   rl_eta=""
+  rl_burn=""
   if [ -n "$rl_reset" ]; then
     reset_int=$(printf "%.0f" "$rl_reset")
-    mins_left=$(( (reset_int - $(date +%s) + 59) / 60 ))
-    if [ "$mins_left" -gt 0 ]; then
+    secs_left=$(( reset_int - $(date +%s) ))
+    if [ "$secs_left" -gt 0 ]; then
+      mins_left=$(( (secs_left + 59) / 60 ))
       if [ "$mins_left" -ge 60 ]; then
         rl_eta=$(printf " %dh%02dm" "$(( mins_left / 60 ))" "$(( mins_left % 60 ))")
       else
         rl_eta=" ${mins_left}m"
       fi
+
+      # The window is assumed to have opened WINDOW_SECS before it resets, so
+      # elapsed% is how far through it we are
+      elapsed_pct=$(( (WINDOW_SECS - secs_left) * 100 / WINDOW_SECS ))
+      [ "$elapsed_pct" -lt 0 ] && elapsed_pct=0
+
+      burn=$(( rl_int - elapsed_pct ))
+
+      if [ "$burn" -ge "$BURN_RED_PTS" ]; then
+        burn_color="$ESC_RED"
+      elif [ "$burn" -ge "$BURN_AMBER_PTS" ]; then
+        burn_color="$ESC_AMBER"
+      elif [ "$burn" -ge "$BURN_GREEN_PTS" ]; then
+        burn_color="$ESC_GREEN"
+      else
+        burn_color="$ESC_GREY"
+      fi
+
+      # %+d so the sign is carried on both sides of level pace
+      rl_burn=$(printf " %sBurn %+d%%%s" "$burn_color" "$burn" "$ESC_RESET")
     fi
   fi
 
-  rl_seg="${rl_color}5h: [$(bar "$rl_int")] ${rl_int}%${rl_eta}${ESC_RESET}"
+  rl_seg="${rl_color}5h: [$(bar "$rl_int")] ${rl_int}%${rl_eta}${ESC_RESET}${rl_burn}"
 fi
 
 # Branch / worktree segment, derived from git rather than from the payload: the
