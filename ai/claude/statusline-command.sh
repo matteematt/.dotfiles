@@ -26,19 +26,27 @@ $(echo "$input" | jq -r '[
 ] | map(if . == null then "" else tostring end) | .[]' 2>/dev/null)
 EOF
 
+now=$(date +%s)
+
 # ANSI escape sequences as literal ESC bytes (ANSI-C quoting, portable in sh)
-ESC_RESET=$'\033[0m'
-ESC_YELLOW=$'\033[33m'
-ESC_GREEN=$'\033[32m'
-ESC_AMBER=$'\033[33m'
-ESC_RED=$'\033[31m'
-ESC_BLUE=$'\033[34m'
-ESC_CYAN=$'\033[36m'
-ESC_MAGENTA=$'\033[35m'
-ESC_GREY=$'\033[90m'
+ESC=$'\033'
+ESC_RESET="${ESC}[0m"
+ESC_YELLOW="${ESC}[33m"
+ESC_GREEN="${ESC}[32m"
+ESC_AMBER="${ESC}[33m"
+ESC_RED="${ESC}[31m"
+ESC_BLUE="${ESC}[34m"
+ESC_CYAN="${ESC}[36m"
+ESC_MAGENTA="${ESC}[35m"
+ESC_GREY="${ESC}[90m"
 
 BAR_WIDTH=16
 DIVIDER="│"
+
+# Width of a full-screen pane on this laptop, used whenever the real width
+# cannot be read (outside tmux there is no way to obtain it - the status line
+# runs with no controlling terminal at all).
+DEFAULT_COLS=187
 
 # Quota windows: length in seconds, and the absolute usage scale both share
 FIVE_HOUR_SECS=18000
@@ -53,6 +61,28 @@ QUOTA_RED_PCT=100
 BURN_GREEN_PTS=1
 BURN_AMBER_PTS=10
 BURN_RED_PTS=25
+
+# Real pane width when tmux can tell us. Target our own pane explicitly: an
+# untargeted query answers for whichever pane is active, which is often another
+# session. pane_width rather than client_width, so it survives a detached client.
+cols=$DEFAULT_COLS
+if [ -n "$TMUX_PANE" ] && command -v tmux >/dev/null 2>&1; then
+  tmux_cols=$(tmux display-message -p -t "$TMUX_PANE" '#{pane_width}' 2>/dev/null)
+  case "$tmux_cols" in
+    ''|*[!0-9]*) ;;
+    *) cols=$tmux_cols ;;
+  esac
+fi
+
+# ${#} counts display columns only under a UTF-8 locale; under LC_ALL=C it
+# counts bytes and every measurement would be wrong. Probe once, and if the
+# locale is byte-oriented, skip adapting rather than lay out from bad numbers.
+probe="█"
+if [ ${#probe} -eq 1 ]; then
+  can_measure=1
+else
+  can_measure=""
+fi
 
 # Render a block bar for percentage $1. Clamped, so a reading over 100 (or a
 # negative one) can never stretch or invert the bar.
@@ -99,9 +129,22 @@ duration() {
   fi
 }
 
-# One quota meter: $1 label, $2 usage %, $3 reset timestamp, $4 window seconds.
-# Prints the bar and percentage on the absolute scale, then time to reset and
-# the burn figure, each in its own colour. Silent when there is no usage figure.
+# Burn in percentage points for $1 usage %, $2 reset stamp, $3 window seconds.
+# Silent when there is no usage or the reset has already passed.
+burn_pts() {
+  [ -n "$1" ] && [ -n "$2" ] || return 0
+  _left=$(( $(printf "%.0f" "$2") - now ))
+  [ "$_left" -gt 0 ] || return 0
+
+  # The window is assumed to have opened $3 seconds before it resets, so
+  # elapsed% is how far through it we are
+  _elapsed=$(( ($3 - _left) * 100 / $3 ))
+  [ "$_elapsed" -lt 0 ] && _elapsed=0
+  printf '%d' "$(( $(printf "%.0f" "$1") - _elapsed ))"
+}
+
+# One quota meter: $1 label, $2 usage %, $3 reset stamp, $4 window seconds,
+# $5 non-empty to draw the bar. Silent when there is no usage figure.
 quota_seg() {
   [ -n "$2" ] || return 0
 
@@ -113,15 +156,10 @@ quota_seg() {
   # Time until the window resets ($3 is epoch seconds). Suppressed, along with
   # the burn figure, when the timestamp is already past - the reading is stale.
   if [ -n "$3" ]; then
-    _left=$(( $(printf "%.0f" "$3") - $(date +%s) ))
+    _left=$(( $(printf "%.0f" "$3") - now ))
     if [ "$_left" -gt 0 ]; then
       _eta=" $(duration "$_left")"
-
-      # The window is assumed to have opened $4 seconds before it resets, so
-      # elapsed% is how far through it we are
-      _elapsed=$(( ($4 - _left) * 100 / $4 ))
-      [ "$_elapsed" -lt 0 ] && _elapsed=0
-      _pts=$(( _pct - _elapsed ))
+      _pts=$(burn_pts "$2" "$3" "$4")
 
       if [ "$_pts" -ge "$BURN_RED_PTS" ]; then
         _burn_color="$ESC_RED"
@@ -138,8 +176,26 @@ quota_seg() {
     fi
   fi
 
-  printf '%s%s: [%s] %d%%%s%s%s' \
-    "$_color" "$1" "$(bar "$_pct")" "$_pct" "$_eta" "$ESC_RESET" "$_burn"
+  if [ -n "$5" ]; then
+    printf '%s%s: [%s] %d%%%s%s%s' \
+      "$_color" "$1" "$(bar "$_pct")" "$_pct" "$_eta" "$ESC_RESET" "$_burn"
+  else
+    printf '%s%s: %d%%%s%s%s' \
+      "$_color" "$1" "$_pct" "$_eta" "$ESC_RESET" "$_burn"
+  fi
+}
+
+# Context window usage: green < 50%, amber 50-79%, red 80%+. $1 non-empty to
+# draw the bar.
+ctx_seg_of() {
+  [ -n "$used" ] || return 0
+  _u=$(printf "%.0f" "$used")
+  _c=$(usage_color "$_u" 50 80)
+  if [ -n "$1" ]; then
+    printf '%sCtx: [%s] %d%%%s' "$_c" "$(bar "$_u")" "$_u" "$ESC_RESET"
+  else
+    printf '%sCtx: %d%%%s' "$_c" "$_u" "$ESC_RESET"
+  fi
 }
 
 # Colour by model family; display names are prefixed "Opus 5 (1M context)", "Sonnet 5", ...
@@ -170,17 +226,6 @@ if [ -n "$model" ]; then
     model_seg="${model_color}[${model}]${ESC_RESET}"
   fi
 fi
-
-# Context window usage: green < 50%, amber 50-79%, red 80%+
-ctx_seg=""
-if [ -n "$used" ]; then
-  used_int=$(printf "%.0f" "$used")
-  ctx_color=$(usage_color "$used_int" 50 80)
-  ctx_seg="${ctx_color}Ctx: [$(bar "$used_int")] ${used_int}%${ESC_RESET}"
-fi
-
-rl5_seg=$(quota_seg "5h" "$rl5_used" "$rl5_reset" "$FIVE_HOUR_SECS")
-rl7_seg=$(quota_seg "7d" "$rl7_used" "$rl7_reset" "$SEVEN_DAY_SECS")
 
 # Branch / worktree segment, derived from git rather than from the payload: the
 # payload's .worktree object only covers Claude-managed worktrees and is absent
@@ -214,16 +259,51 @@ EOF
   fi
 fi
 
-# Join whichever sections exist with a dim divider, so a missing one never
-# leaves a stray divider or a leading/trailing separator behind
-out=""
-for seg in "$model_seg" "$ctx_seg" "$rl5_seg" "$rl7_seg" "$wt_seg"; do
-  [ -n "$seg" ] || continue
-  if [ -n "$out" ]; then
-    out="${out} ${ESC_GREY}${DIVIDER}${ESC_RESET} ${seg}"
+# Assemble one candidate line: $1 non-empty draws bars, $2 non-empty includes 7d.
+# Sections are joined with a dim divider, so a missing one never leaves a stray
+# divider or a leading/trailing separator behind.
+render() {
+  _seven=""
+  [ -n "$2" ] && _seven=$(quota_seg "7d" "$rl7_used" "$rl7_reset" "$SEVEN_DAY_SECS" "$1")
+
+  _line=""
+  for _seg in \
+    "$model_seg" \
+    "$(ctx_seg_of "$1")" \
+    "$(quota_seg "5h" "$rl5_used" "$rl5_reset" "$FIVE_HOUR_SECS" "$1")" \
+    "$_seven" \
+    "$wt_seg"
+  do
+    [ -n "$_seg" ] || continue
+    if [ -n "$_line" ]; then
+      _line="${_line} ${ESC_GREY}${DIVIDER}${ESC_RESET} ${_seg}"
+    else
+      _line="$_seg"
+    fi
+  done
+
+  printf '%s' "$_line"
+}
+
+# Display columns of $1, ignoring the colour escapes
+visual_width() {
+  _plain=$(printf '%s' "$1" | sed "s/${ESC}\[[0-9;]*m//g")
+  printf '%d' "${#_plain}"
+}
+
+out=$(render 1 1)
+
+# Adapt only when the width is trustworthy and the full line will not fit.
+# Under pace there is nothing to watch on the weekly quota, so it goes entirely;
+# over pace it is worth keeping, and the bars are given up across the board
+# instead - the labels and figures carry the same information in far less space.
+if [ -n "$can_measure" ] && [ "$(visual_width "$out")" -gt "$cols" ]; then
+  burn7=$(burn_pts "$rl7_used" "$rl7_reset" "$SEVEN_DAY_SECS")
+  if [ -n "$burn7" ] && [ "$burn7" -le 0 ]; then
+    out=$(render 1 "")
   else
-    out="$seg"
+    out=$(render "" 1)
   fi
-done
+fi
 
 printf '%s' "$out"
