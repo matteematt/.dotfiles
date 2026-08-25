@@ -88,7 +88,7 @@
       "Bash(git clone:*)"
     ]
   },
-  "model": "opus[1m]",
+  "model": "sonnet",
   "hooks": {
     "PostToolUse": [
       {
@@ -137,7 +137,7 @@
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
