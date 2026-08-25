@@ -1,0 +1,19 @@
+ai/claude/statusline-command.sh
+  s_ae1eb3910f5880::t_ac3d8ec00a6e73 29-30,32-41,46-50,65-86,132-147,159,162,179-198,262-303,305,307
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "1c6013a230f846f45a1f3eedad77c48c2f587119",
+  "prompts": {},
+  "sessions": {
+    "s_ae1eb3910f5880": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8e12070-f6e9-48d2-a756-29015d4f0fad",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
