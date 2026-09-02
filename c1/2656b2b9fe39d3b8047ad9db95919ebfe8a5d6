@@ -1,0 +1,24 @@
+shell/dir_jumping.sh
+  s_576ce4cb812663::t_e50678582ed0fd 8-9,11-24,26-42,47,50,54,63,67-85,92,97-99,101
+  s_576ce4cb812663::t_a5415bcc2d362d 52
+  s_576ce4cb812663::t_da553752850d75 86-89,91
+  s_576ce4cb812663::t_2c986fdeec59a5 10,43-46,48-49,51,53,55-62,64
+shell/README.md
+  s_576ce4cb812663::t_0cbd7aee8ff42d 15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c12656b2b9fe39d3b8047ad9db95919ebfe8a5d6",
+  "prompts": {},
+  "sessions": {
+    "s_576ce4cb812663": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdf1f5cc-37c8-48f2-aed7-5f9e9fe5a7dc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
