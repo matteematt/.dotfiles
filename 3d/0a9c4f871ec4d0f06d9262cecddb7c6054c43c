@@ -1,0 +1,19 @@
+shell/README.md
+  s_576ce4cb812663::t_0cbd7aee8ff42d 15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3d0a9c4f871ec4d0f06d9262cecddb7c6054c43c",
+  "prompts": {},
+  "sessions": {
+    "s_576ce4cb812663": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdf1f5cc-37c8-48f2-aed7-5f9e9fe5a7dc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
