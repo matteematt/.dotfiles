@@ -12,8 +12,8 @@ The `dir_jumping.sh` file contains shell functions to make moving around the fil
 and painless.
 
 * `changeDirShortcut` - Use fzf to choose a directory to jump to from a list of favourites. Aliased to `cdf` in `.zshrc`.
-* `pushChangedDirToList` - When you change a directory the jumped directory is added to a history file, contains the
-		last 100 unique entries. Overwrites the standard `cd` in the `.zshrc`.
+* `pushChangedDirToList` - When you change a directory the jumped directory is appended to a history file, which is
+		compacted in the background to the last 1000 unique entries. Overwrites the standard `cd` in the `.zshrc`.
 * `changeDirFromHistory` - Use fzf to jump to one of the directors saved from the usage of the last command.
 
 ### GIT Extras

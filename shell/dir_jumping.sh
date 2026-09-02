@@ -5,33 +5,100 @@ function changeDirShortcut {
   unset chosen_dir
 }
 
-# Saves the current directory in a history file, ordered by last access time,
-# removes duplicates, and keeps the previous 1000
-# ignores git worktree directories
+zmodload -F zsh/datetime p:EPOCHSECONDS
+zmodload -F zsh/stat b:zstat
+zmodload -F zsh/system b:zsystem
+
+# The directory history is an append-only log of "<dir> <epoch>" lines. Spaces
+# in a path are encoded as <spc;> so that every entry stays two fields.
+: ${CDHISTORY_FILE:=$HOME/.cache/cdhistory}
+# Most recently used directories kept when the log is compacted
+: ${CDHISTORY_MAX_ENTRIES:=1000}
+# Compact once the log passes this size (~2000 appends at ~73 bytes a line)
+: ${CDHISTORY_COMPACT_BYTES:=153600}
+
+# Records the current directory in the history log
+# ignores git worktree and /tmp directories
+# The entry is a single append, which the OS writes whole, so concurrent shells
+# can never interleave or clobber each other's lines. Duplicate entries are
+# left to accumulate rather than rewriting the whole log on every `cd`.
 function __pushchangeddirToListSave {
-	# return from function if the current working directory contains _worktrees_git
-	if [[ $(pwd) == *"_worktrees_git"* ]] && return;
-	# return from funtion if the current working directory contains /tmp
-	if [[ $(pwd) == *"/tmp"* ]] && return;
-  cdhistory="$HOME/.cache/cdhistory"
-  touch "$cdhistory"
-	echo "$(pwd | sed 's/ /<spc;>/g') $(date +'%s')" >> "$cdhistory"
-  sort -r "$cdhistory" | sort -k1,1 --unique | sort -k 2,2 | tail -n 1000 > "$cdhistory.tmp.$$"
-  mv -f "$cdhistory.tmp.$$" "$cdhistory"
+  [[ $PWD == *_worktrees_git* ]] && return 0
+  [[ $PWD == */tmp* ]] && return 0
+
+  [[ -d ${CDHISTORY_FILE:h} ]] || mkdir -p "${CDHISTORY_FILE:h}"
+  print -r -- "${PWD// /<spc;>} $EPOCHSECONDS" >> "$CDHISTORY_FILE"
+
+  # Collapse the accumulated duplicates once the log outgrows its threshold
+  local -a log_stat
+  if zstat -A log_stat +size "$CDHISTORY_FILE" 2>/dev/null &&
+     (( log_stat[1] > CDHISTORY_COMPACT_BYTES )); then
+    (__cdhistoryCompact &) &>/dev/null
+  fi
+  return 0
 }
 
-# After a normal 'cd' calls function to save dir in the background, unless in a worktree
+# Rewrites the log keeping the newest entry per directory, capped at the most
+# recent CDHISTORY_MAX_ENTRIES
+# Only one compaction may run at a time, since two would trample each other's
+# output. The lock is never taken on the `cd` path, is skipped rather than
+# waited on, and flock drops it automatically if this process dies, so a killed
+# compaction cannot wedge the next one.
+# The live log is moved aside rather than overwritten, so nothing but an append
+# ever writes to it: a concurrent `cd` recreates the log with its own append
+# instead of writing into the copy being compacted.
+function __cdhistoryCompact {
+  local old lockfd
+  : >> "$CDHISTORY_FILE.lock"   # flock will not create the lock file itself
+  zsystem flock -t 0 -f lockfd "$CDHISTORY_FILE.lock" 2>/dev/null || return 1
+
+  if old=$(mktemp "$CDHISTORY_FILE.compacting.XXXXXX"); then
+    if mv -f "$CDHISTORY_FILE" "$old" 2>/dev/null; then
+      awk 'NF == 2 && $2 ~ /^[0-9]+$/ { seen[$1] = $2 }
+           END { for (dir in seen) print dir, seen[dir] }' "$old" |
+        sort -k2,2n | tail -n "$CDHISTORY_MAX_ENTRIES" >> "$CDHISTORY_FILE"
+    fi
+    rm -f "$old"
+  fi
+
+  exec {lockfd}>&-
+}
+
+# Prints the history log oldest first, one entry per directory
+# Malformed lines and directories that no longer exist are dropped, so neither
+# a deleted worktree nor a line spliced by an interrupted compaction can reach
+# the jump list
+function __cdhistoryList {
+  [[ -f $CDHISTORY_FILE ]] || return 0
+
+  local dir
+  awk 'NF == 2 && $2 ~ /^[0-9]+$/ { seen[$1] = $2 }
+       END { for (dir in seen) print seen[dir], dir }' "$CDHISTORY_FILE" |
+    sort -n | tail -n "$CDHISTORY_MAX_ENTRIES" | cut -d" " -f2- |
+    while IFS= read -r dir; do
+      dir=${dir//<spc;>/ }
+      [[ -d $dir ]] && print -r -- "$dir"
+    done
+  return 0
+}
+
+# After a normal 'cd' records the dir in the history log
+# "$@" keeps every form of the real cd working: bare `cd` to $HOME, `cd -`,
+# `cd -q dir`, and the two argument `cd old new` substitution
+# `builtin cd` so that re-sourcing this file after .zshrc has aliased `cd` to
+# this function cannot turn the call below into infinite recursion
 function pushChangedDirToList {
-  cd "$1"
-	(__pushchangeddirToListSave &) &>/dev/null
+  builtin cd "$@" || return
+  __pushchangeddirToListSave
 }
 
 # Use fzf to choose a dir to jump to from the history
 function changeDirFromHistory {
-  cdhistory="$HOME/.cache/cdhistory"
-	chosen_dir=$(eval "$(fzfLsPreview "History Jump")" <<< "$(rev "$cdhistory" | cut -d" " -f 2-  | rev | sed 's/<spc;>/ /g')" )
+  chosen_dir=$(eval "$(fzfLsPreview "History Jump")" <<< "$(__cdhistoryList)")
+
+  # Only proceed if fzf returned a selection (not cancelled with Esc/Ctrl-C)
   if [[ -d "$chosen_dir" ]]; then
-		pushChangedDirToList "$chosen_dir"
+    pushChangedDirToList "$chosen_dir"
   fi
 }
 
