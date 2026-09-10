@@ -15,7 +15,9 @@
 #               it's there whenever you glance over — that tab marker is the whole
 #               signal for this case, since nothing actually needs you.
 #   3. APPROVAL (Notification/permission_prompt) — blocked mid-task needing your
-#               approval. Bell + macOS notification with sound.
+#               approval. Bell + macOS notification with sound, and sets
+#               @claude_blocked, which unlike the bell outlives you glancing at the
+#               window — it clears when a tool actually runs, i.e. when you answer.
 #
 #   4. BUSY     (UserPromptSubmit) — you just handed it work. Sets @claude_busy to
 #               the unix time the turn STARTED, and stops there. Every other event
@@ -47,8 +49,12 @@ if [ "${1:-}" = "working" ]; then
   # -F expands the value as a format, so this is "keep the existing stamp, else
   # stamp now" in a single tmux call: the marker holds the time the CURRENT turn
   # started, and the heartbeat must not reset that clock on every tool call.
+  # A tool actually ran, so any permission prompt has been answered: clearing
+  # @claude_blocked rides along in the same tmux invocation, keeping this path at
+  # one fork however many markers it maintains.
   [ -n "${TMUX:-}" ] && tmux set -wF ${TMUX_PANE:+-t "$TMUX_PANE"} @claude_busy \
-    "#{?@claude_busy,#{@claude_busy},$(date +%s)}" 2>/dev/null
+    "#{?@claude_busy,#{@claude_busy},$(date +%s)}" \; \
+    set -uw ${TMUX_PANE:+-t "$TMUX_PANE"} @claude_blocked 2>/dev/null
   exit 0
 fi
 
@@ -71,8 +77,10 @@ p="${TMUX_PANE:-}"
 # Claude's context, so this path must stay silent and MUST exit 0 — a non-zero exit
 # would block the prompt.
 if [ "$event" = "UserPromptSubmit" ]; then
-  # A new turn: stamp unconditionally, restarting the clock.
-  tmux set -w ${p:+-t "$p"} @claude_busy "$(date +%s)" 2>/dev/null
+  # A new turn: stamp unconditionally, restarting the clock, and drop any stale
+  # block (you can interrupt a permission prompt and just type something else).
+  tmux set -w ${p:+-t "$p"} @claude_busy "$(date +%s)" \; \
+    set -uw ${p:+-t "$p"} @claude_blocked 2>/dev/null
   exit 0
 fi
 # ...and cleared by anything meaning the turn came to rest: a Stop of either
@@ -95,6 +103,19 @@ fi
 case "$event" in
   Stop | Notification) tmux set -w ${p:+-t "$p"} @claude_idle_at "$(date +%s)" 2>/dev/null ;;
 esac
+
+# BLOCKED — waiting on you for an approval, specifically. The bell already says
+# "this window wants you", but it is a TAB signal: it clears the moment you glance
+# at the window. Look at a prompt, decline to answer it and walk away and the bell
+# is gone while the agent is still sat there — @claude_busy is still set from before
+# the prompt, so it reads as working. This marker is what survives the glance. Set
+# by the one event that means blocked, cleared by everything else this hook sees
+# (and by the PostToolUse heartbeat, since a tool running proves you approved).
+if [ "$event" = "Notification" ] && [ "$ntype" = "permission_prompt" ]; then
+  tmux set -w ${p:+-t "$p"} @claude_blocked 1 2>/dev/null
+else
+  tmux set -uw ${p:+-t "$p"} @claude_blocked 2>/dev/null
+fi
 
 # Only a permission_prompt notification is worth a ping; ignore idle_prompt (Stop
 # already covers "done while away") and the MCP auth/elicitation types.

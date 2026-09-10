@@ -13,6 +13,10 @@
 #     claude_notify.sh already raises and sorts/marks by them:
 #       !  window bell flag  — DONE or needs-approval, rung while you were elsewhere
 #          (the same signal behind the red tab and the SESSION_ALERTS_ strip)
+#          @claude_blocked also raises ! — waiting on you to answer a permission
+#          prompt. Same mark deliberately, since it means the same thing to you, but
+#          unlike the bell it outlives a glance at the window: it clears only when a
+#          tool runs, i.e. when you actually answer
 #       ▸  @claude_busy      — actively working: you gave it a prompt and no Stop
 #          or Notification has landed since
 #       ⋯  @claude_pending   — stopped, but background work will auto-resume it
@@ -60,7 +64,7 @@ SELF=$0
 case "$SELF" in /*) ;; *) SELF="$PWD/$SELF" ;; esac
 
 # Legend for the popup. Colours must match the marks in align_candidates.
-HEADER=$'\033[1;31m!\033[0m needs you   \033[32m▸\033[0m working   \033[33m⋯\033[0m background work   * you are here   ⏱ time in state'
+HEADER=$'\033[1;31m!\033[0m needs you   \033[32m▸\033[0m working   \033[33m⋯\033[0m background work   * you are here'
 
 usage() {
 	sed -n '/^# Usage:/,/^$/s/^# \{0,1\}//p' "$0"
@@ -152,10 +156,10 @@ list_agent_panes() {
 	# the middle silently shifts every later value one slot left, which is how
 	# @claude_pending first showed up wearing @claude_busy's mark. Never let a field
 	# in here be empty.
-	pane_format="#{session_name}${TAB}#{window_index}${TAB}#{pane_index}${TAB}#{pane_id}${TAB}#{pane_pid}${TAB}#{pane_current_path}${TAB}#{pane_active}${TAB}#{window_active}${TAB}#{session_attached}${TAB}#{window_bell_flag}${TAB}#{?@claude_busy,#{@claude_busy},0}${TAB}#{?@claude_pending,1,0}${TAB}#{window_activity}${TAB}#{?@claude_idle_at,#{@claude_idle_at},0}"
+	pane_format="#{session_name}${TAB}#{window_index}${TAB}#{pane_index}${TAB}#{pane_id}${TAB}#{pane_pid}${TAB}#{pane_current_path}${TAB}#{pane_active}${TAB}#{window_active}${TAB}#{session_attached}${TAB}#{window_bell_flag}${TAB}#{?@claude_blocked,1,0}${TAB}#{?@claude_busy,#{@claude_busy},0}${TAB}#{?@claude_pending,1,0}${TAB}#{window_activity}${TAB}#{?@claude_idle_at,#{@claude_idle_at},0}"
 
 	while IFS=$TAB read -r session window_index pane_index pane_id pane_pid pane_path \
-		pane_active window_active session_attached bell busy pending activity idle_at; do
+		pane_active window_active session_attached bell blocked busy pending activity idle_at; do
 		local pid args exec_name tool prio mark repo branch short_path sortkey age ref
 
 		pid=${NEWEST_CHILD[$pane_pid]:-$pane_pid}
@@ -177,7 +181,7 @@ list_agent_panes() {
 		# Needs-you first, then the two in-flight states, then everything idle. The
 		# flags are window-scoped, so two agent panes sharing a window both light
 		# up — the pane index column tells them apart.
-		if [[ "$bell" == '1' ]]; then
+		if [[ "$blocked" == '1' || "$bell" == '1' ]]; then
 			prio=0 mark='!'
 		elif [[ "$busy" != '0' ]]; then
 			prio=1 mark='▸'
