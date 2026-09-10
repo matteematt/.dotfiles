@@ -1,0 +1,21 @@
+ai/skills/install.sh
+  s_9cba2787424ab0::t_9e93b3a78132a8 31-34
+ai/skills/jira-token/SKILL.md
+  s_9cba2787424ab0::t_cfce797eaefd70 1-133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3cb575c11550e7db520839882a203a4a22cbd6e4",
+  "prompts": {},
+  "sessions": {
+    "s_9cba2787424ab0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5fb9cba6-d181-4924-8192-0cd327b3396d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
