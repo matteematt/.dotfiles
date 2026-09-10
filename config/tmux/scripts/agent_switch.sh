@@ -36,6 +36,7 @@
 # Usage: agent_switch.sh [--debug] [--json]
 #   --debug  print the pane list plus captured content, no fzf
 #   --json   print discovered panes as JSON (needs jq) and exit
+#   --popup=<client>  internal: the second half, already inside the tmux popup
 
 set -u
 
@@ -50,6 +51,16 @@ AGENT_EXECS='^(claude|codex|aider|node|bun)$'
 
 DEBUG_MODE=0
 JSON_MODE=0
+POPUP_MODE=0
+CLIENT=''
+
+# Absolute path to self, so the popup can re-invoke us. The keybinding passes an
+# absolute path already; the guard covers being run as ./agent_switch.sh.
+SELF=$0
+case "$SELF" in /*) ;; *) SELF="$PWD/$SELF" ;; esac
+
+# Legend for the popup. Colours must match the marks in align_candidates.
+HEADER=$'\033[1;31m!\033[0m needs you   \033[32m▸\033[0m working   \033[33m⋯\033[0m background work   * you are here'
 
 usage() {
 	sed -n '/^# Usage:/,/^$/s/^# \{0,1\}//p' "$0"
@@ -60,6 +71,7 @@ for arg in "$@"; do
 	case "$arg" in
 		--debug) DEBUG_MODE=1 ;;
 		--json) JSON_MODE=1 ;;
+		--popup=*) POPUP_MODE=1 CLIENT=${arg#--popup=} ;;
 		-h | --help) usage ;;
 		*)
 			echo "agent_switch.sh: unknown argument '$arg'" >&2
@@ -70,8 +82,8 @@ done
 
 command -v tmux >/dev/null 2>&1 || { echo 'agent_switch.sh: tmux is required' >&2; exit 1; }
 
-if [[ $DEBUG_MODE -eq 0 && $JSON_MODE -eq 0 ]] && ! command -v fzf-tmux >/dev/null 2>&1; then
-	echo 'agent_switch.sh: fzf-tmux is required' >&2
+if [[ $DEBUG_MODE -eq 0 && $JSON_MODE -eq 0 ]] && ! command -v fzf >/dev/null 2>&1; then
+	echo 'agent_switch.sh: fzf is required' >&2
 	exit 1
 fi
 
@@ -271,20 +283,37 @@ main() {
 		exit 0
 	fi
 
+	# First half: get a popup on screen NOW and do the work inside it. Building the
+	# candidate list costs ~150ms (mostly the ps snapshot) and fzf-tmux's wrapper
+	# script another ~140ms before it even creates the popup — that was ~300ms of
+	# dead air between the keypress and anything appearing. tmux draws a native
+	# popup in ~10ms, so the wait now happens with the window already up.
+	if [[ $POPUP_MODE -eq 0 ]]; then
+		local client
+		client=$(tmux display -p '#{client_name}' 2>/dev/null)
+		[[ -z "$client" ]] && client=$(tmux list-clients -F '#{client_name}' 2>/dev/null | head -1)
+		exec tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% "'$SELF' '--popup=$client'"
+	fi
+
+	# Second half: inside the popup. The client is passed in rather than inferred,
+	# because a popup is not a pane — switch-client here has no current client of
+	# its own to fall back on.
+	printf '\n  \033[2m⟳ scanning panes…\033[0m\n'
+
 	local candidates selected pane_id target
 	candidates=$(list_agent_panes | align_candidates)
 
 	if [[ -z "$candidates" ]]; then
-		tmux display-message 'No agents running'
+		tmux display-message ${CLIENT:+-c "$CLIENT"} 'No agents running'
 		exit 0
 	fi
 
 	# --with-nth=1 shows only the padded label; {2} hands the preview the pane id.
 	selected=$(printf '%s\n' "$candidates" |
-		fzf-tmux -p -w 90% -h 80% \
-			--ansi \
+		fzf --ansi \
 			--prompt='agents> ' \
 			--layout=reverse-list \
+			--header="$HEADER" \
 			--delimiter="$TAB" \
 			--with-nth=1 \
 			--preview='tmux capture-pane -ep -t {2}' \
@@ -296,7 +325,7 @@ main() {
 	target=$(printf '%s' "$selected" | cut -f3)
 
 	# Visiting the window is what clears its bell / @claude_pending marker.
-	tmux switch-client -t "$target"
+	tmux switch-client ${CLIENT:+-c "$CLIENT"} -t "$target"
 	tmux select-pane -t "$pane_id"
 }
 
