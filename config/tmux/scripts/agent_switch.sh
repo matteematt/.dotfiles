@@ -341,7 +341,7 @@ main() {
 		local client
 		client=$(tmux display -p '#{client_name}' 2>/dev/null)
 		[[ -z "$client" ]] && client=$(tmux list-clients -F '#{client_name}' 2>/dev/null | head -1)
-		exec tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% "'$SELF' '--popup=$client'"
+		exec tmux display-popup ${client:+-c "$client"} -E -B -w 100% -h 100% "'$SELF' '--popup=$client'"
 	fi
 
 	# Second half: inside the popup. The client is passed in rather than inferred,
@@ -360,6 +360,7 @@ main() {
 	# --with-nth=1 shows only the padded label; {2} hands the preview the pane id.
 	selected=$(printf '%s\n' "$candidates" |
 		fzf --ansi \
+			--margin='1,0,0,0' \
 			--prompt='agents> ' \
 			--layout=reverse-list \
 			--header="$HEADER" \
