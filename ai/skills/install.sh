@@ -28,3 +28,7 @@ ln -sf "$SKILLS_SRC/commit-message/SKILL.md" "$CLAUDE_SKILLS_DIR/commit-message/
 # allow-commit
 mkdir -p "$CLAUDE_SKILLS_DIR/allow-commit"
 ln -sf "$SKILLS_SRC/allow-commit/SKILL.md" "$CLAUDE_SKILLS_DIR/allow-commit/SKILL.md"
+
+# jira-token
+mkdir -p "$CLAUDE_SKILLS_DIR/jira-token"
+ln -sf "$SKILLS_SRC/jira-token/SKILL.md" "$CLAUDE_SKILLS_DIR/jira-token/SKILL.md"

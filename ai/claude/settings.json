@@ -97,6 +97,10 @@
           {
             "type": "command",
             "command": "/Users/matt.walker/.git-ai/bin/git-ai checkpoint claude --hook-input stdin"
+          },
+          {
+            "type": "command",
+            "command": "/Users/matt.walker/.dotfiles/config/tmux/scripts/claude_notify.sh working"
           }
         ]
       }
@@ -123,6 +127,16 @@
       }
     ],
     "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/matt.walker/.dotfiles/config/tmux/scripts/claude_notify.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
       {
         "hooks": [
           {
