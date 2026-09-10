@@ -232,12 +232,17 @@ list_agent_panes() {
 		sort -t"$US" -s -k1,1n -k2,2n
 }
 
-# Pads columns to a common width and drops the sort key. Colour is applied after
-# padding so the escapes never enter the width arithmetic.
+# Pads columns to a common width and drops the sort key. The window.pane index is
+# rendered ONLY for sessions holding more than one agent pane, since that is the
+# only case where two rows would otherwise be indistinguishable — the bell and the
+# state markers are window-scoped, so same-session rows can carry identical marks.
+# When no session is doubled up the column disappears entirely. Colour is applied
+# after padding so the escapes never enter the width arithmetic.
 align_candidates() {
-	local lines=() line rest display
+	local lines=() keys=() idxs=() line rest display
 	local prio sortkey mark repo branch idx tool age path
-	local w_repo=0 w_branch=0 w_idx=0 w_tool=0 w_age=0
+	local w_repo=0 w_branch=0 w_tool=0 w_age=0 w_idx=0
+	local key seen='' dupes='' RS=$'\036'
 
 	while IFS= read -r line; do lines+=("$line"); done
 	[[ ${#lines[@]} -eq 0 ]] && return
@@ -247,30 +252,62 @@ align_candidates() {
 		IFS=$US read -r prio sortkey mark repo branch idx tool age path <<<"$display"
 		[[ ${#repo} -gt $w_repo ]] && w_repo=${#repo}
 		[[ ${#branch} -gt $w_branch ]] && w_branch=${#branch}
-		[[ ${#idx} -gt $w_idx ]] && w_idx=${#idx}
 		[[ ${#tool} -gt $w_tool ]] && w_tool=${#tool}
 		[[ ${#age} -gt $w_age ]] && w_age=${#age}
+
+		# repo+branch identifies the session. Delimited with RS so one key cannot
+		# partially match another, and the needle is quoted so a branch name
+		# containing glob characters stays literal.
+		key="${RS}${repo}${US}${branch}${RS}"
+		keys+=("$key")
+		idxs+=("$idx")
+		if [[ "$seen" == *"$key"* ]]; then
+			[[ "$dupes" != *"$key"* ]] && dupes="$dupes$key"
+		else
+			seen="$seen$key"
+		fi
+	done
+
+	local i=0
+	for key in "${keys[@]}"; do
+		if [[ "$dupes" == *"$key"* ]] && [[ ${#idxs[$i]} -gt $w_idx ]]; then
+			w_idx=${#idxs[$i]}
+		fi
+		i=$((i + 1))
 	done
 
 	local label mark_out
+	i=0
 	for line in "${lines[@]}"; do
 		rest=${line#*$TAB}
 		display=${line%%$TAB*}
 		IFS=$US read -r prio sortkey mark repo branch idx tool age path <<<"$display"
+		[[ "$dupes" != *"${keys[$i]}"* ]] && idx=''
+		i=$((i + 1))
 		case "$mark" in
 			'!') mark_out=$'\033[1;31m!\033[0m' ;;
 			'▸') mark_out=$'\033[32m▸\033[0m' ;;
 			'⋯') mark_out=$'\033[33m⋯\033[0m' ;;
 			*) mark_out=$mark ;;
 		esac
-		printf -v label '%s  %-*s  %-*s  %*s  %-*s  %*s  %s' \
-			"$mark_out" \
-			"$w_repo" "$repo" \
-			"$w_branch" "$branch" \
-			"$w_idx" "$idx" \
-			"$w_tool" "$tool" \
-			"$w_age" "$age" \
-			"$path"
+		if [[ $w_idx -gt 0 ]]; then
+			printf -v label '%s  %-*s  %-*s  %*s  %-*s  %*s  %s' \
+				"$mark_out" \
+				"$w_repo" "$repo" \
+				"$w_branch" "$branch" \
+				"$w_idx" "$idx" \
+				"$w_tool" "$tool" \
+				"$w_age" "$age" \
+				"$path"
+		else
+			printf -v label '%s  %-*s  %-*s  %-*s  %*s  %s' \
+				"$mark_out" \
+				"$w_repo" "$repo" \
+				"$w_branch" "$branch" \
+				"$w_tool" "$tool" \
+				"$w_age" "$age" \
+				"$path"
+		fi
 		printf '%s%s%s\n' "$label" "$TAB" "$rest"
 	done
 }
