@@ -1,0 +1,30 @@
+ai/claude/settings.json
+  s_480b860418d940::t_54cd12fd98d600 100-103
+  s_480b860418d940::t_364c715bdbaf07 138-147
+config/tmux/scripts/claude_notify.sh
+  s_480b860418d940::t_364c715bdbaf07 5,20-24,30-33,61-70,81
+  s_480b860418d940::t_54cd12fd98d600 25-29,42-49,71-80
+  s_480b860418d940::t_7edcca85d67dbe 82
+config/tmux/scripts/agent_switch.sh
+  s_480b860418d940::t_fcf9981b0689ab 1-15,18-19,22-121,128-129,131-148,152-153,158,160,162-201,203-236,238-242,244,246-252,255,258-303
+  s_480b860418d940::t_e1d85a2d7e9b35 122-127,154,156
+  s_480b860418d940::t_35b5544b6b51d4 16-17,20-21,130,149-151,155,157,159,161,202,237,243,245,253-254,256-257
+config/tmux/tmux.conf
+  s_480b860418d940::t_ceebfe3c009198 69-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5e26baa1a6b021b37548128d5e98e7f692a917bd",
+  "prompts": {},
+  "sessions": {
+    "s_480b860418d940": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "595b5f0c-f143-475a-b42a-615c26808ac2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
