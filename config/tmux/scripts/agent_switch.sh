@@ -60,7 +60,7 @@ SELF=$0
 case "$SELF" in /*) ;; *) SELF="$PWD/$SELF" ;; esac
 
 # Legend for the popup. Colours must match the marks in align_candidates.
-HEADER=$'\033[1;31m!\033[0m needs you   \033[32m▸\033[0m working   \033[33m⋯\033[0m background work   * you are here'
+HEADER=$'\033[1;31m!\033[0m needs you   \033[32m▸\033[0m working   \033[33m⋯\033[0m background work   * you are here   ⏱ time in state'
 
 usage() {
 	sed -n '/^# Usage:/,/^$/s/^# \{0,1\}//p' "$0"
@@ -111,6 +111,21 @@ snapshot_processes() {
 	done < <(ps -axo ppid=,pid=,args=)
 }
 
+# Compact relative age: 12s, 4m, 1h4m, 2d3h.
+fmt_age() {
+	local s=$1
+	[[ $s -lt 0 ]] && s=0
+	if [[ $s -lt 60 ]]; then
+		AGE="${s}s"
+	elif [[ $s -lt 3600 ]]; then
+		AGE="$((s / 60))m"
+	elif [[ $s -lt 86400 ]]; then
+		AGE="$((s / 3600))h$(((s % 3600) / 60))m"
+	else
+		AGE="$((s / 86400))d$(((s % 86400) / 3600))h"
+	fi
+}
+
 agent_label() {
 	local exec_name=$1 args=$2
 	case "$exec_name" in
@@ -127,20 +142,21 @@ agent_label() {
 }
 
 # One line per agent pane, priority-sorted:
-#   <prio>US<mark>US<repo>US<branch>US<idx>US<tool>US<path> TAB <pane_id> TAB <target>
+#   <prio>US<sortkey>US<mark>US<repo>US<branch>US<idx>US<tool>US<age>US<path> TAB <pane_id> TAB <target>
 list_agent_panes() {
-	local pane_format
+	local pane_format now
+	now=$(date +%s)
 	snapshot_processes
 	# The user options are emitted as an explicit 0/1 rather than "" / "1". TAB is an
 	# IFS *whitespace* character, so `read` collapses runs of it — an empty field in
 	# the middle silently shifts every later value one slot left, which is how
 	# @claude_pending first showed up wearing @claude_busy's mark. Never let a field
 	# in here be empty.
-	pane_format="#{session_name}${TAB}#{window_index}${TAB}#{pane_index}${TAB}#{pane_id}${TAB}#{pane_pid}${TAB}#{pane_current_path}${TAB}#{pane_active}${TAB}#{window_active}${TAB}#{session_attached}${TAB}#{window_bell_flag}${TAB}#{?@claude_busy,1,0}${TAB}#{?@claude_pending,1,0}"
+	pane_format="#{session_name}${TAB}#{window_index}${TAB}#{pane_index}${TAB}#{pane_id}${TAB}#{pane_pid}${TAB}#{pane_current_path}${TAB}#{pane_active}${TAB}#{window_active}${TAB}#{session_attached}${TAB}#{window_bell_flag}${TAB}#{?@claude_busy,#{@claude_busy},0}${TAB}#{?@claude_pending,1,0}${TAB}#{window_activity}${TAB}#{?@claude_idle_at,#{@claude_idle_at},0}"
 
 	while IFS=$TAB read -r session window_index pane_index pane_id pane_pid pane_path \
-		pane_active window_active session_attached bell busy pending; do
-		local pid args exec_name tool prio mark repo branch short_path
+		pane_active window_active session_attached bell busy pending activity idle_at; do
+		local pid args exec_name tool prio mark repo branch short_path sortkey age ref
 
 		pid=${NEWEST_CHILD[$pane_pid]:-$pane_pid}
 		args=${PROCESS_ARGS[$pid]:-}
@@ -163,7 +179,7 @@ list_agent_panes() {
 		# up — the pane index column tells them apart.
 		if [[ "$bell" == '1' ]]; then
 			prio=0 mark='!'
-		elif [[ "$busy" == '1' ]]; then
+		elif [[ "$busy" != '0' ]]; then
 			prio=1 mark='▸'
 		elif [[ "$pending" == '1' ]]; then
 			prio=2 mark='⋯'
@@ -173,69 +189,102 @@ list_agent_panes() {
 			prio=3 mark=' '
 		fi
 
+		# One column, two meanings, from whichever stamp the state makes meaningful:
+		#   working  → @claude_busy, when the turn started (its window_activity is
+		#              always "just now", since it is emitting constantly)
+		#   anything → @claude_idle_at, when the agent last came to rest
+		# #{window_activity} is only the fallback, for a pane whose agent has not
+		# stopped since the marker existed, or one with no hooks at all (codex,
+		# aider). It answers "was anything output here", so it is reset by a repaint
+		# when you visit the window — which is exactly the wrong thing to measure.
+		# The lower bounds reject a stale marker from the scheme where @claude_busy
+		# held "1"; those self-heal on the window's next turn.
+		if [[ $prio -eq 1 && $busy -gt 1000000000 ]]; then
+			ref=$busy
+		elif [[ $idle_at -gt 1000000000 ]]; then
+			ref=$idle_at
+		else
+			ref=$activity
+		fi
+		fmt_age $((now - ref))
+		age=$AGE
+
+		# Secondary key, on the same stamp the age column shows so the two agree. The
+		# three marked tiers keep tmux's own order (alphabetical by session, then
+		# window/pane index), so they all share key 0 and the stable sort leaves them
+		# alone. Idle panes sort least-recently-idle last; negated so a single
+		# ascending numeric sort gives descending time.
+		if [[ $prio -eq 3 ]]; then
+			sortkey="-$ref"
+		else
+			sortkey=0
+		fi
+
 		repo=$session branch=''
 		[[ "$session" =~ ^(.+)\((.+)\)$ ]] && { repo=${BASH_REMATCH[1]}; branch=${BASH_REMATCH[2]}; }
 
 		short_path=${pane_path/#$HOME/\~}
 
-		printf '%s\n' "${prio}${US}${mark}${US}${repo}${US}${branch}${US}${window_index}.${pane_index}${US}${tool}${US}${short_path}${TAB}${pane_id}${TAB}${session}:${window_index}"
+		printf '%s\n' "${prio}${US}${sortkey}${US}${mark}${US}${repo}${US}${branch}${US}${window_index}.${pane_index}${US}${tool}${US}${age}${US}${short_path}${TAB}${pane_id}${TAB}${session}:${window_index}"
 	done < <(tmux list-panes -a -F "$pane_format") |
-		# Stable numeric sort on prio alone: alerts rise, tmux's order survives within
-		# each group so the list doesn't reshuffle under you between invocations.
-		sort -t"$US" -s -k1,1n
+		# Tier first, then the secondary key; -s keeps tmux's order wherever both are
+		# equal, so the marked tiers don't reshuffle under you between invocations.
+		sort -t"$US" -s -k1,1n -k2,2n
 }
 
 # Pads columns to a common width and drops the sort key. Colour is applied after
 # padding so the escapes never enter the width arithmetic.
 align_candidates() {
 	local lines=() line rest display
-	local prio mark repo branch idx tool path
-	local w_repo=0 w_branch=0 w_idx=0 w_tool=0
+	local prio sortkey mark repo branch idx tool age path
+	local w_repo=0 w_branch=0 w_idx=0 w_tool=0 w_age=0
 
 	while IFS= read -r line; do lines+=("$line"); done
 	[[ ${#lines[@]} -eq 0 ]] && return
 
 	for line in "${lines[@]}"; do
 		display=${line%%$TAB*}
-		IFS=$US read -r prio mark repo branch idx tool path <<<"$display"
+		IFS=$US read -r prio sortkey mark repo branch idx tool age path <<<"$display"
 		[[ ${#repo} -gt $w_repo ]] && w_repo=${#repo}
 		[[ ${#branch} -gt $w_branch ]] && w_branch=${#branch}
 		[[ ${#idx} -gt $w_idx ]] && w_idx=${#idx}
 		[[ ${#tool} -gt $w_tool ]] && w_tool=${#tool}
+		[[ ${#age} -gt $w_age ]] && w_age=${#age}
 	done
 
 	local label mark_out
 	for line in "${lines[@]}"; do
 		rest=${line#*$TAB}
 		display=${line%%$TAB*}
-		IFS=$US read -r prio mark repo branch idx tool path <<<"$display"
+		IFS=$US read -r prio sortkey mark repo branch idx tool age path <<<"$display"
 		case "$mark" in
 			'!') mark_out=$'\033[1;31m!\033[0m' ;;
 			'▸') mark_out=$'\033[32m▸\033[0m' ;;
 			'⋯') mark_out=$'\033[33m⋯\033[0m' ;;
 			*) mark_out=$mark ;;
 		esac
-		printf -v label '%s  %-*s  %-*s  %*s  %-*s  %s' \
+		printf -v label '%s  %-*s  %-*s  %*s  %-*s  %*s  %s' \
 			"$mark_out" \
 			"$w_repo" "$repo" \
 			"$w_branch" "$branch" \
 			"$w_idx" "$idx" \
 			"$w_tool" "$tool" \
+			"$w_age" "$age" \
 			"$path"
 		printf '%s%s%s\n' "$label" "$TAB" "$rest"
 	done
 }
 
 debug_panes() {
-	local raw=$1 display pane_id target prio mark repo branch idx tool path
+	local raw=$1 display pane_id target prio sortkey mark repo branch idx tool age path
 	if [[ -z "$raw" ]]; then
 		echo 'No agent panes found.'
 		return
 	fi
 	while IFS=$TAB read -r display pane_id target; do
-		IFS=$US read -r prio mark repo branch idx tool path <<<"$display"
+		IFS=$US read -r prio sortkey mark repo branch idx tool age path <<<"$display"
 		echo '──────────────────────────────────────────'
-		printf 'MARK: %s  PRIO: %s  TOOL: %s\n' "[$mark]" "$prio" "$tool"
+		printf 'MARK: %s  PRIO: %s  TOOL: %s  AGE: %s\n' "[$mark]" "$prio" "$tool" "$age"
 		printf 'REPO: %s  BRANCH: %s  IDX: %s\n' "$repo" "$branch" "$idx"
 		printf 'PANE: %s  TARGET: %s  PATH: %s\n' "$pane_id" "$target" "$path"
 		echo '┄┄┄ last 20 lines ┄┄┄'
@@ -246,12 +295,12 @@ debug_panes() {
 
 json_panes() {
 	local raw objects=() display pane_id target
-	local prio mark repo branch idx tool path preview alert busy_json pending_json
+	local prio sortkey mark repo branch idx tool age path preview alert busy_json pending_json
 	raw=$(list_agent_panes)
 	[[ -z "$raw" ]] && { printf '[]\n'; return; }
 
 	while IFS=$TAB read -r display pane_id target; do
-		IFS=$US read -r prio mark repo branch idx tool path <<<"$display"
+		IFS=$US read -r prio sortkey mark repo branch idx tool age path <<<"$display"
 		alert=false busy_json=false pending_json=false
 		[[ "$mark" == '!' ]] && alert=true
 		[[ "$mark" == '▸' ]] && busy_json=true
@@ -260,11 +309,11 @@ json_panes() {
 			grep -v '^[─━═[:space:]]*$' | tail -20)
 		objects+=("$(jq -n \
 			--arg repo "$repo" --arg branch "$branch" --arg idx "$idx" \
-			--arg tool "$tool" --arg path "$path" --arg pane_id "$pane_id" \
+			--arg tool "$tool" --arg age "$age" --arg path "$path" --arg pane_id "$pane_id" \
 			--arg target "$target" --arg preview "$preview" \
 			--argjson alert "$alert" --argjson busy "$busy_json" \
 			--argjson pending "$pending_json" \
-			'{repo:$repo,branch:$branch,index:$idx,tool:$tool,path:$path,
+			'{repo:$repo,branch:$branch,index:$idx,tool:$tool,age:$age,path:$path,
 			  pane_id:$pane_id,target:$target,alert:$alert,busy:$busy,pending:$pending,
 			  preview:$preview}')")
 	done <<<"$raw"

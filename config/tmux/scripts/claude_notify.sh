@@ -17,19 +17,20 @@
 #   3. APPROVAL (Notification/permission_prompt) — blocked mid-task needing your
 #               approval. Bell + macOS notification with sound.
 #
-#   4. BUSY     (UserPromptSubmit) — you just handed it work. Sets the @claude_busy
-#               marker and stops there. Every other event this hook sees means the
-#               agent has come to rest, so they all clear it. Nothing is drawn on
-#               the tab for this one: it exists so agent_switch.sh can tell
-#               "actively working" apart from "idle since forever" and sort
-#               accordingly. Re-armed on every PostToolUse (registered with the
-#               "working" argument), which is what makes it survive an approval:
+#   4. BUSY     (UserPromptSubmit) — you just handed it work. Sets @claude_busy to
+#               the unix time the turn STARTED, and stops there. Every other event
+#               this hook sees means the agent has come to rest, so they all clear
+#               it. Nothing is drawn on the tab for this one: it exists so
+#               agent_switch.sh can tell "actively working" apart from "idle since
+#               forever", sort accordingly, and show how long each has been at it.
+#               Re-armed on every PostToolUse (registered with the "working"
+#               argument), which is what makes it survive an approval:
 #               permission_prompt leaves it alone, so once you approve and walk away
-#               the window reads as working rather than idle.
-#               Interrupting a turn (esc) fires no Stop, so the marker
-#               can linger — the 60s idle_prompt Notification clears it, and a dead
-#               Claude drops out of agent_switch.sh's list entirely (it only lists
-#               panes with a live agent process).
+#               the window reads as working rather than idle. Interrupting a turn
+#               (esc) fires no Stop, so the marker can linger — the 60s idle_prompt
+#               Notification clears it, and a dead Claude drops out of
+#               agent_switch.sh's list entirely (it only lists panes with a live
+#               agent process).
 #
 # background_tasks is a JSON array on the Stop payload (Claude Code 2.1.145+);
 # each entry is a running shell ("type":"shell") OR subagent ("type":"subagent").
@@ -43,7 +44,11 @@
 # skip the payload read and the jq calls entirely. This runs on EVERY tool call, so
 # it must stay down to a single tmux invocation. Silent, and always exit 0.
 if [ "${1:-}" = "working" ]; then
-  [ -n "${TMUX:-}" ] && tmux set -w ${TMUX_PANE:+-t "$TMUX_PANE"} @claude_busy 1 2>/dev/null
+  # -F expands the value as a format, so this is "keep the existing stamp, else
+  # stamp now" in a single tmux call: the marker holds the time the CURRENT turn
+  # started, and the heartbeat must not reset that clock on every tool call.
+  [ -n "${TMUX:-}" ] && tmux set -wF ${TMUX_PANE:+-t "$TMUX_PANE"} @claude_busy \
+    "#{?@claude_busy,#{@claude_busy},$(date +%s)}" 2>/dev/null
   exit 0
 fi
 
@@ -66,7 +71,8 @@ p="${TMUX_PANE:-}"
 # Claude's context, so this path must stay silent and MUST exit 0 — a non-zero exit
 # would block the prompt.
 if [ "$event" = "UserPromptSubmit" ]; then
-  tmux set -w ${p:+-t "$p"} @claude_busy 1 2>/dev/null
+  # A new turn: stamp unconditionally, restarting the clock.
+  tmux set -w ${p:+-t "$p"} @claude_busy "$(date +%s)" 2>/dev/null
   exit 0
 fi
 # ...and cleared by anything meaning the turn came to rest: a Stop of either
@@ -79,6 +85,16 @@ fi
 if [ "$event" = "Stop" ] || { [ "$event" = "Notification" ] && [ "$ntype" != "permission_prompt" ]; }; then
   tmux set -uw ${p:+-t "$p"} @claude_busy 2>/dev/null
 fi
+
+# Every event this hook sees is the agent coming to rest in some sense — finished,
+# gone idle, or blocked on you — so stamp WHEN. tmux's own #{window_activity} can't
+# answer this: it means "anything was output in this window", which a repaint on
+# visiting resets, so an agent idle for hours reads as seconds old once you have
+# glanced at it. permission_prompt counts here even though it does not clear
+# @claude_busy: the wait for you starts at the prompt.
+case "$event" in
+  Stop | Notification) tmux set -w ${p:+-t "$p"} @claude_idle_at "$(date +%s)" 2>/dev/null ;;
+esac
 
 # Only a permission_prompt notification is worth a ping; ignore idle_prompt (Stop
 # already covers "done while away") and the MCP auth/elicitation types.
