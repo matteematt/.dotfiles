@@ -73,6 +73,8 @@ DEBUG_MODE=0
 JSON_MODE=0
 POPUP_MODE=0
 CLIENT=''
+# Set by the fzf version probe below; 0 keeps the old static preview.
+LIVE_PREVIEW=0
 
 # Absolute path to self, so the popup can re-invoke us. The keybinding passes an
 # absolute path already; the guard covers being run as ./agent_switch.sh.
@@ -109,6 +111,40 @@ ESC_ACTION="transform:if [[ \$FZF_INPUT_STATE != enabled ]]; then echo abort; \
 elif [[ -n \$FZF_QUERY ]]; then echo clear-query; \
 else echo 'hide-input+rebind($LIST_KEYS)'; fi"
 CHANGE_ACTION="transform:[[ -z \$FZF_QUERY ]] && echo 'hide-input+rebind($LIST_KEYS)'"
+
+# The preview refreshes on a timer, so it has to say when it has stopped doing so —
+# a frozen preview and a genuinely idle agent look identical otherwise. fzf's preview
+# label is the one piece of chrome attached to the preview itself, which is where you
+# are already looking when you scroll. No parentheses or commas in either string:
+# both would terminate the change-preview-label action early.
+PREVIEW_LABEL_LIVE=' ⟳ live '
+PREVIEW_LABEL_HELD=' ⏸ paused · j/k to resume '
+
+# Two ways to render the same pane.
+#
+# TAIL is the resting view: capture-pane returns the agent's whole visible screen
+# (65 rows here) while the preview window is about 44, so the untrimmed capture shows
+# the screen's TOP — the oldest third — and cuts off exactly the newest output you
+# opened the switcher to see. Trimming to the preview's own height instead makes the
+# bottom the only thing there is, which is also what kills the flash: fzf applies a
+# scroll offset per render, so pairing refresh-preview with preview-bottom races the
+# reload — the jump to the bottom lands, then the finishing reload resets the offset
+# to 0. Measured at one frame in twenty-five. With nothing to scroll there is no
+# offset to lose, and the view is rock steady.
+#
+# FULL is what d/u swap to, since a preview trimmed to an exact fit has nothing to
+# scroll. Scrolling means "let me read back", so it trades the live tail for the
+# whole screen and stops the timer; moving to another row restores the tail.
+#
+# $FZF_PREVIEW_LINES is exported by fzf to the preview command and tracks the window,
+# so ctrl-o widening the preview simply shows more history on the next render. The
+# preview does not wrap, which is what makes that count exact: one captured line is
+# one preview row, so the last N lines land in N rows and the newest is always the
+# bottom one. Wrapping would spend two rows on one long line and push the newest
+# line below the fold — and an agent pane is full of lines wider than the preview,
+# since the preview is narrower than the window it is showing.
+PREVIEW_TAIL='tmux capture-pane -ep -t {2} | tail -n "$FZF_PREVIEW_LINES"'
+PREVIEW_FULL='tmux capture-pane -ep -t {2}'
 
 # The gap between the two halves depends on the popup's width, so the header is
 # built at render time. Padding counts characters with the colour codes stripped —
@@ -184,6 +220,13 @@ if [[ $DEBUG_MODE -eq 0 && $JSON_MODE -eq 0 ]]; then
 	if [[ ${fzf_ver%%.*} -eq 0 && ${fzf_minor:-0} -lt 56 ]]; then
 		echo "agent_switch.sh: fzf 0.56+ required for list mode (found $fzf_ver)" >&2
 		exit 1
+	fi
+	# The live preview additionally needs the every(N) timer event, which landed in
+	# 0.73 — far newer than the 0.56 the rest of the UI needs. Detected rather than
+	# demanded, so an older fzf keeps the static preview instead of hard-failing
+	# inside a popup where the error cannot be read.
+	if [[ ${fzf_ver%%.*} -gt 0 || ${fzf_minor:-0} -ge 73 ]]; then
+		LIVE_PREVIEW=1
 	fi
 fi
 
@@ -504,6 +547,30 @@ main() {
 	printf '\n  \033[2m⟳ scanning panes…\033[0m\n'
 
 	local candidates selected pane_id target header
+	# fzf only ever runs ONE preview — for the row that has focus — and re-runs it on
+	# focus change, so the timer costs a single capture-pane per second for the row
+	# you are actually looking at and nothing at all for the rest.
+	#
+	# Both paths open on the trimmed tail and swap to the full screen when you scroll,
+	# so the bottom-anchored view is not conditional on a new fzf; only the refresh
+	# timer and its label are. Search mode needs no special case: / already unbinds d
+	# and u along with the rest of LIST_KEYS.
+	local -a preview_binds
+	if [[ $LIVE_PREVIEW -eq 1 ]]; then
+		preview_binds=(
+			--preview-label="$PREVIEW_LABEL_LIVE"
+			--bind 'every(1):refresh-preview'
+			--bind "d:unbind(every(1))+change-preview($PREVIEW_FULL)+change-preview-label($PREVIEW_LABEL_HELD)+preview-half-page-down"
+			--bind "u:unbind(every(1))+change-preview($PREVIEW_FULL)+change-preview-label($PREVIEW_LABEL_HELD)+preview-half-page-up"
+			--bind "focus:rebind(every(1))+change-preview($PREVIEW_TAIL)+change-preview-label($PREVIEW_LABEL_LIVE)"
+		)
+	else
+		preview_binds=(
+			--bind "d:change-preview($PREVIEW_FULL)+preview-half-page-down"
+			--bind "u:change-preview($PREVIEW_FULL)+preview-half-page-up"
+			--bind "focus:change-preview($PREVIEW_TAIL)"
+		)
+	fi
 	header=$(build_header)
 	candidates=$(list_agent_panes | align_candidates)
 
@@ -521,13 +588,13 @@ main() {
 			--header="$header" \
 			--delimiter="$TAB" \
 			--with-nth=1 \
-			--preview='tmux capture-pane -ep -t {2}' \
-			--preview-window='down,70%,wrap' \
+			--preview="$PREVIEW_TAIL" \
+			--preview-window='down,70%' \
 			--no-input \
 			--bind 'enter:accept' \
 			--bind 'j:down,k:up,g:first,G:last,q:abort' \
-			--bind 'd:preview-half-page-down,u:preview-half-page-up' \
-			--bind 'ctrl-o:change-preview-window(down,99%,wrap|down,70%,wrap)' \
+			"${preview_binds[@]}" \
+			--bind 'ctrl-o:change-preview-window(down,99%|down,70%)' \
 			--bind "/:show-input+unbind($LIST_KEYS)" \
 			--bind "esc:$ESC_ACTION" \
 			--bind "change:$CHANGE_ACTION") || exit 0
