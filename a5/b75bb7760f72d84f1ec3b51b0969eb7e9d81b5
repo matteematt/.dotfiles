@@ -1,0 +1,25 @@
+ai/skills/install.sh
+  s_730f9940287c10::t_fc076f3b8718d1 36-38
+  s_730f9940287c10::t_843cb74cfc1c64 35
+ai/skills/ste/SKILL.md
+  s_730f9940287c10::t_33789e642dd549 1-18,25-29
+  s_730f9940287c10::t_d735791d371faf 19,21-23
+  s_730f9940287c10::t_4907fb6b780f7e 24
+  s_730f9940287c10::t_4a2939f6438fc4 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a5b75bb7760f72d84f1ec3b51b0969eb7e9d81b5",
+  "prompts": {},
+  "sessions": {
+    "s_730f9940287c10": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9730926-74eb-4f9e-9666-f3b2f363e026",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
