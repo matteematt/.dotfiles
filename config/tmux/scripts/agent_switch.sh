@@ -18,7 +18,8 @@
 #          unlike the bell it outlives a glance at the window: it clears only when a
 #          tool runs, i.e. when you actually answer
 #       ▸  @claude_busy      — actively working: you gave it a prompt and no Stop
-#          or Notification has landed since
+#          or Notification has landed since. Cross-checked against the pane's
+#          output clock, since an interrupt clears no marker — see BUSY_STALE_SECS
 #       ⋯  @claude_pending   — stopped, but background work will auto-resume it
 #       *  the pane you're sitting in right now
 #     All are window-scoped; bell and @claude_pending self-clear when you visit, so
@@ -52,6 +53,21 @@ AGENT_REGEX='(^|[^[:alnum:]_-])(claude|codex|aider)([^[:alnum:]_-]|$)'
 # Bare executable names worth a second look; node/bun only count if argv also
 # matches AGENT_REGEX, so a random node process isn't listed as an agent.
 AGENT_EXECS='^(claude|codex|aider|node|bun)$'
+
+# How stale a pane's output may go before @claude_busy stops being believed.
+# Interrupting a turn with ctrl-c (or esc) fires NO hook — Claude Code has no
+# interrupt event — so the marker outlives the turn it was stamped for and the pane
+# reads "working" until its next turn runs to completion. What a working agent DOES
+# do is repaint its spinner about once a second, so #{window_activity} sits at "now"
+# for as long as one is genuinely running: measured at 0s throughout streaming
+# output, a silent 75s tool call, and copy-mode scrollback. Output staler than this
+# with the marker still set means the turn was interrupted.
+#
+# Short on purpose. Visiting a window repaints it and so resets its activity clock,
+# and the pane you just interrupted is the pane you were just sitting on — every
+# second here is a second the switcher still claims it is working, exactly when you
+# are most likely to look. 10s is ten times the observed repaint cadence.
+BUSY_STALE_SECS=10
 
 DEBUG_MODE=0
 JSON_MODE=0
@@ -240,7 +256,7 @@ list_agent_panes() {
 
 	while IFS=$TAB read -r session window_index pane_index pane_id pane_pid pane_path \
 		pane_active window_active session_attached bell blocked busy pending activity idle_at; do
-		local pid args exec_name tool prio mark repo branch short_path sortkey age ref
+		local pid args exec_name tool prio mark repo branch short_path sortkey age ref stale_busy
 
 		pid=${NEWEST_CHILD[$pane_pid]:-$pane_pid}
 		args=${PROCESS_ARGS[$pid]:-}
@@ -258,6 +274,14 @@ list_agent_panes() {
 		agent_label "$exec_name" "$args"
 		tool=$AGENT_LABEL
 
+		# Resolve a marker left behind by an interrupt before the tiers below, so an
+		# interrupted pane falls through the chain exactly as an idle one does rather
+		# than needing its own branch in it. See BUSY_STALE_SECS.
+		stale_busy=0
+		if [[ "$busy" != '0' ]] && ((now - activity >= BUSY_STALE_SECS)); then
+			stale_busy=1 busy=0
+		fi
+
 		# Needs-you first, then the two in-flight states, then everything idle. The
 		# flags are window-scoped, so two agent panes sharing a window both light
 		# up — the pane index column tells them apart.
@@ -273,18 +297,27 @@ list_agent_panes() {
 			prio=3 mark=' '
 		fi
 
-		# One column, two meanings, from whichever stamp the state makes meaningful:
-		#   working  → @claude_busy, when the turn started (its window_activity is
-		#              always "just now", since it is emitting constantly)
-		#   anything → @claude_idle_at, when the agent last came to rest
-		# #{window_activity} is only the fallback, for a pane whose agent has not
-		# stopped since the marker existed, or one with no hooks at all (codex,
-		# aider). It answers "was anything output here", so it is reset by a repaint
-		# when you visit the window — which is exactly the wrong thing to measure.
+		# One column, several meanings, from whichever stamp the state makes
+		# meaningful:
+		#   working     → @claude_busy, when the turn started (its window_activity is
+		#                 always "just now", since it is emitting constantly)
+		#   interrupted → window_activity, when the pane stopped repainting, which is
+		#                 when you hit ctrl-c. @claude_idle_at is the wrong stamp
+		#                 here: it is either unset (nothing in this session has ever
+		#                 come to rest) or holds an OLDER completed turn, which would
+		#                 date the interrupt to before it happened.
+		#   anything    → @claude_idle_at, when the agent last came to rest
+		# #{window_activity} is otherwise only the fallback, for a pane whose agent
+		# has not stopped since the marker existed, or one with no hooks at all
+		# (codex, aider). It answers "was anything output here", so it is reset by a
+		# repaint when you visit the window — which is exactly the wrong thing to
+		# measure, and the reason it is not preferred outside the interrupted case.
 		# The lower bounds reject a stale marker from the scheme where @claude_busy
 		# held "1"; those self-heal on the window's next turn.
 		if [[ $prio -eq 1 && $busy -gt 1000000000 ]]; then
 			ref=$busy
+		elif [[ $stale_busy -eq 1 ]]; then
+			ref=$activity
 		elif [[ $idle_at -gt 1000000000 ]]; then
 			ref=$idle_at
 		else
