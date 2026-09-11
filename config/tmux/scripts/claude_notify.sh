@@ -29,10 +29,15 @@
 #               argument), which is what makes it survive an approval:
 #               permission_prompt leaves it alone, so once you approve and walk away
 #               the window reads as working rather than idle. Interrupting a turn
-#               (esc) fires no Stop, so the marker can linger — the 60s idle_prompt
-#               Notification clears it, and a dead Claude drops out of
-#               agent_switch.sh's list entirely (it only lists panes with a live
-#               agent process).
+#               (ctrl-c/esc) fires NO hook at all — Claude Code has no interrupt
+#               event — so nothing here ever clears the marker and it lingers until
+#               that pane's next turn runs to completion. No idle_prompt
+#               Notification arrives to rescue it either — measured over several
+#               minutes, with the input box both populated and empty. The switcher
+#               compensates by disbelieving the marker once the pane stops
+#               repainting (see BUSY_STALE_SECS in agent_switch.sh), and a dead
+#               Claude drops out of its list entirely (it only lists panes with a
+#               live agent process).
 #
 # background_tasks is a JSON array on the Stop payload (Claude Code 2.1.145+);
 # each entry is a running shell ("type":"shell") OR subagent ("type":"subagent").

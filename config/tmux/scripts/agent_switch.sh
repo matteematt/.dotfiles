@@ -18,7 +18,8 @@
 #          unlike the bell it outlives a glance at the window: it clears only when a
 #          tool runs, i.e. when you actually answer
 #       ▸  @claude_busy      — actively working: you gave it a prompt and no Stop
-#          or Notification has landed since
+#          or Notification has landed since. Cross-checked against the pane's
+#          output clock, since an interrupt clears no marker — see BUSY_STALE_SECS
 #       ⋯  @claude_pending   — stopped, but background work will auto-resume it
 #       *  the pane you're sitting in right now
 #     All are window-scoped; bell and @claude_pending self-clear when you visit, so
@@ -53,10 +54,27 @@ AGENT_REGEX='(^|[^[:alnum:]_-])(claude|codex|aider)([^[:alnum:]_-]|$)'
 # matches AGENT_REGEX, so a random node process isn't listed as an agent.
 AGENT_EXECS='^(claude|codex|aider|node|bun)$'
 
+# How stale a pane's output may go before @claude_busy stops being believed.
+# Interrupting a turn with ctrl-c (or esc) fires NO hook — Claude Code has no
+# interrupt event — so the marker outlives the turn it was stamped for and the pane
+# reads "working" until its next turn runs to completion. What a working agent DOES
+# do is repaint its spinner about once a second, so #{window_activity} sits at "now"
+# for as long as one is genuinely running: measured at 0s throughout streaming
+# output, a silent 75s tool call, and copy-mode scrollback. Output staler than this
+# with the marker still set means the turn was interrupted.
+#
+# Short on purpose. Visiting a window repaints it and so resets its activity clock,
+# and the pane you just interrupted is the pane you were just sitting on — every
+# second here is a second the switcher still claims it is working, exactly when you
+# are most likely to look. 10s is ten times the observed repaint cadence.
+BUSY_STALE_SECS=10
+
 DEBUG_MODE=0
 JSON_MODE=0
 POPUP_MODE=0
 CLIENT=''
+# Set by the fzf version probe below; 0 keeps the old static preview.
+LIVE_PREVIEW=0
 
 # Absolute path to self, so the popup can re-invoke us. The keybinding passes an
 # absolute path already; the guard covers being run as ./agent_switch.sh.
@@ -93,6 +111,40 @@ ESC_ACTION="transform:if [[ \$FZF_INPUT_STATE != enabled ]]; then echo abort; \
 elif [[ -n \$FZF_QUERY ]]; then echo clear-query; \
 else echo 'hide-input+rebind($LIST_KEYS)'; fi"
 CHANGE_ACTION="transform:[[ -z \$FZF_QUERY ]] && echo 'hide-input+rebind($LIST_KEYS)'"
+
+# The preview refreshes on a timer, so it has to say when it has stopped doing so —
+# a frozen preview and a genuinely idle agent look identical otherwise. fzf's preview
+# label is the one piece of chrome attached to the preview itself, which is where you
+# are already looking when you scroll. No parentheses or commas in either string:
+# both would terminate the change-preview-label action early.
+PREVIEW_LABEL_LIVE=' ⟳ live '
+PREVIEW_LABEL_HELD=' ⏸ paused · j/k to resume '
+
+# Two ways to render the same pane.
+#
+# TAIL is the resting view: capture-pane returns the agent's whole visible screen
+# (65 rows here) while the preview window is about 44, so the untrimmed capture shows
+# the screen's TOP — the oldest third — and cuts off exactly the newest output you
+# opened the switcher to see. Trimming to the preview's own height instead makes the
+# bottom the only thing there is, which is also what kills the flash: fzf applies a
+# scroll offset per render, so pairing refresh-preview with preview-bottom races the
+# reload — the jump to the bottom lands, then the finishing reload resets the offset
+# to 0. Measured at one frame in twenty-five. With nothing to scroll there is no
+# offset to lose, and the view is rock steady.
+#
+# FULL is what d/u swap to, since a preview trimmed to an exact fit has nothing to
+# scroll. Scrolling means "let me read back", so it trades the live tail for the
+# whole screen and stops the timer; moving to another row restores the tail.
+#
+# $FZF_PREVIEW_LINES is exported by fzf to the preview command and tracks the window,
+# so ctrl-o widening the preview simply shows more history on the next render. The
+# preview does not wrap, which is what makes that count exact: one captured line is
+# one preview row, so the last N lines land in N rows and the newest is always the
+# bottom one. Wrapping would spend two rows on one long line and push the newest
+# line below the fold — and an agent pane is full of lines wider than the preview,
+# since the preview is narrower than the window it is showing.
+PREVIEW_TAIL='tmux capture-pane -ep -t {2} | tail -n "$FZF_PREVIEW_LINES"'
+PREVIEW_FULL='tmux capture-pane -ep -t {2}'
 
 # The gap between the two halves depends on the popup's width, so the header is
 # built at render time. Padding counts characters with the colour codes stripped —
@@ -169,6 +221,13 @@ if [[ $DEBUG_MODE -eq 0 && $JSON_MODE -eq 0 ]]; then
 		echo "agent_switch.sh: fzf 0.56+ required for list mode (found $fzf_ver)" >&2
 		exit 1
 	fi
+	# The live preview additionally needs the every(N) timer event, which landed in
+	# 0.73 — far newer than the 0.56 the rest of the UI needs. Detected rather than
+	# demanded, so an older fzf keeps the static preview instead of hard-failing
+	# inside a popup where the error cannot be read.
+	if [[ ${fzf_ver%%.*} -gt 0 || ${fzf_minor:-0} -ge 73 ]]; then
+		LIVE_PREVIEW=1
+	fi
 fi
 
 if [[ $JSON_MODE -eq 1 ]] && ! command -v jq >/dev/null 2>&1; then
@@ -240,7 +299,7 @@ list_agent_panes() {
 
 	while IFS=$TAB read -r session window_index pane_index pane_id pane_pid pane_path \
 		pane_active window_active session_attached bell blocked busy pending activity idle_at; do
-		local pid args exec_name tool prio mark repo branch short_path sortkey age ref
+		local pid args exec_name tool prio mark repo branch short_path sortkey age ref stale_busy
 
 		pid=${NEWEST_CHILD[$pane_pid]:-$pane_pid}
 		args=${PROCESS_ARGS[$pid]:-}
@@ -258,6 +317,14 @@ list_agent_panes() {
 		agent_label "$exec_name" "$args"
 		tool=$AGENT_LABEL
 
+		# Resolve a marker left behind by an interrupt before the tiers below, so an
+		# interrupted pane falls through the chain exactly as an idle one does rather
+		# than needing its own branch in it. See BUSY_STALE_SECS.
+		stale_busy=0
+		if [[ "$busy" != '0' ]] && ((now - activity >= BUSY_STALE_SECS)); then
+			stale_busy=1 busy=0
+		fi
+
 		# Needs-you first, then the two in-flight states, then everything idle. The
 		# flags are window-scoped, so two agent panes sharing a window both light
 		# up — the pane index column tells them apart.
@@ -273,18 +340,27 @@ list_agent_panes() {
 			prio=3 mark=' '
 		fi
 
-		# One column, two meanings, from whichever stamp the state makes meaningful:
-		#   working  → @claude_busy, when the turn started (its window_activity is
-		#              always "just now", since it is emitting constantly)
-		#   anything → @claude_idle_at, when the agent last came to rest
-		# #{window_activity} is only the fallback, for a pane whose agent has not
-		# stopped since the marker existed, or one with no hooks at all (codex,
-		# aider). It answers "was anything output here", so it is reset by a repaint
-		# when you visit the window — which is exactly the wrong thing to measure.
+		# One column, several meanings, from whichever stamp the state makes
+		# meaningful:
+		#   working     → @claude_busy, when the turn started (its window_activity is
+		#                 always "just now", since it is emitting constantly)
+		#   interrupted → window_activity, when the pane stopped repainting, which is
+		#                 when you hit ctrl-c. @claude_idle_at is the wrong stamp
+		#                 here: it is either unset (nothing in this session has ever
+		#                 come to rest) or holds an OLDER completed turn, which would
+		#                 date the interrupt to before it happened.
+		#   anything    → @claude_idle_at, when the agent last came to rest
+		# #{window_activity} is otherwise only the fallback, for a pane whose agent
+		# has not stopped since the marker existed, or one with no hooks at all
+		# (codex, aider). It answers "was anything output here", so it is reset by a
+		# repaint when you visit the window — which is exactly the wrong thing to
+		# measure, and the reason it is not preferred outside the interrupted case.
 		# The lower bounds reject a stale marker from the scheme where @claude_busy
 		# held "1"; those self-heal on the window's next turn.
 		if [[ $prio -eq 1 && $busy -gt 1000000000 ]]; then
 			ref=$busy
+		elif [[ $stale_busy -eq 1 ]]; then
+			ref=$activity
 		elif [[ $idle_at -gt 1000000000 ]]; then
 			ref=$idle_at
 		else
@@ -471,6 +547,30 @@ main() {
 	printf '\n  \033[2m⟳ scanning panes…\033[0m\n'
 
 	local candidates selected pane_id target header
+	# fzf only ever runs ONE preview — for the row that has focus — and re-runs it on
+	# focus change, so the timer costs a single capture-pane per second for the row
+	# you are actually looking at and nothing at all for the rest.
+	#
+	# Both paths open on the trimmed tail and swap to the full screen when you scroll,
+	# so the bottom-anchored view is not conditional on a new fzf; only the refresh
+	# timer and its label are. Search mode needs no special case: / already unbinds d
+	# and u along with the rest of LIST_KEYS.
+	local -a preview_binds
+	if [[ $LIVE_PREVIEW -eq 1 ]]; then
+		preview_binds=(
+			--preview-label="$PREVIEW_LABEL_LIVE"
+			--bind 'every(1):refresh-preview'
+			--bind "d:unbind(every(1))+change-preview($PREVIEW_FULL)+change-preview-label($PREVIEW_LABEL_HELD)+preview-half-page-down"
+			--bind "u:unbind(every(1))+change-preview($PREVIEW_FULL)+change-preview-label($PREVIEW_LABEL_HELD)+preview-half-page-up"
+			--bind "focus:rebind(every(1))+change-preview($PREVIEW_TAIL)+change-preview-label($PREVIEW_LABEL_LIVE)"
+		)
+	else
+		preview_binds=(
+			--bind "d:change-preview($PREVIEW_FULL)+preview-half-page-down"
+			--bind "u:change-preview($PREVIEW_FULL)+preview-half-page-up"
+			--bind "focus:change-preview($PREVIEW_TAIL)"
+		)
+	fi
 	header=$(build_header)
 	candidates=$(list_agent_panes | align_candidates)
 
@@ -488,13 +588,13 @@ main() {
 			--header="$header" \
 			--delimiter="$TAB" \
 			--with-nth=1 \
-			--preview='tmux capture-pane -ep -t {2}' \
-			--preview-window='down,70%,wrap' \
+			--preview="$PREVIEW_TAIL" \
+			--preview-window='down,70%' \
 			--no-input \
 			--bind 'enter:accept' \
 			--bind 'j:down,k:up,g:first,G:last,q:abort' \
-			--bind 'd:preview-half-page-down,u:preview-half-page-up' \
-			--bind 'ctrl-o:change-preview-window(down,99%,wrap|down,70%,wrap)' \
+			"${preview_binds[@]}" \
+			--bind 'ctrl-o:change-preview-window(down,99%|down,70%)' \
 			--bind "/:show-input+unbind($LIST_KEYS)" \
 			--bind "esc:$ESC_ACTION" \
 			--bind "change:$CHANGE_ACTION") || exit 0
