@@ -1,0 +1,24 @@
+config/tmux/scripts/claude_notify.sh
+  s_1c8fbae88c6b8c::t_889cfd9f3f86c7 35
+  s_1c8fbae88c6b8c::t_41fa70496d9312 36-40
+  s_1c8fbae88c6b8c::t_a092f0b4c51628 32-34
+config/tmux/scripts/agent_switch.sh
+  s_1c8fbae88c6b8c::t_a092f0b4c51628 57-71,259,277-284,300-314,319-320
+  s_1c8fbae88c6b8c::t_889cfd9f3f86c7 21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "df757276aaec6134f187d0a4d195cd62bf11a244",
+  "prompts": {},
+  "sessions": {
+    "s_1c8fbae88c6b8c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1517b535-7dc4-4ef9-84e3-f212013a5ce0",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
