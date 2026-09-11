@@ -63,8 +63,76 @@ CLIENT=''
 SELF=$0
 case "$SELF" in /*) ;; *) SELF="$PWD/$SELF" ;; esac
 
-# Legend for the popup. Colours must match the marks in align_candidates.
-HEADER=$'\033[1;31m!\033[0m needs you   \033[32m▸\033[0m working   \033[33m⋯\033[0m background work   * you are here'
+# Legend for the popup, one row: marks on the left, keys flushed right. Colours must
+# match the marks in align_candidates. The keys half earns its place because list
+# mode hides the prompt, leaving nothing on screen to hint that / searches.
+LEGEND_MARKS=$'\033[1;31m!\033[0m needs you   \033[32m▸\033[0m working   \033[33m⋯\033[0m background work   * you are here'
+# Key then what it does, split on the first space. Kept as pairs rather than one
+# string so build_header can colour the two halves differently and still measure the
+# printable width.
+LEGEND_KEYS_SPEC=( 'j/k move' 'd/u scroll' 'ctrl-o expand' '/ search' 'enter jump' 'esc/q quit' )
+
+# fzf opens with its input field hidden (--no-input), so the list reads as a vim
+# buffer: bare letters navigate instead of filtering. Pressing / reveals the field
+# and unbinds every one of these, or you could not type a "j" into the query; esc
+# hides it again and rebinds them. Anything ctrl-prefixed is safe in both modes and
+# so stays out of this list.
+LIST_KEYS='j,k,g,G,d,u,q,/'
+
+# esc keeps both of its meanings: quit from list mode, leave search from search mode.
+# A key holds one binding, so the branch happens at run time off $FZF_INPUT_STATE.
+#
+# The catch is that fzf drops clear-query when it shares a transform's output with
+# hide-input — either order, silently — which would drop you back into a list still
+# filtered by a query you can no longer see. Split across two events it works, so esc
+# only clears the query, and the change event that clearing fires does the hiding.
+# That also means backspacing a query away returns you to list mode on its own, which
+# is the same state by a different route. An esc pressed on an already-empty query
+# has no change to ride, so it hides the input itself.
+ESC_ACTION="transform:if [[ \$FZF_INPUT_STATE != enabled ]]; then echo abort; \
+elif [[ -n \$FZF_QUERY ]]; then echo clear-query; \
+else echo 'hide-input+rebind($LIST_KEYS)'; fi"
+CHANGE_ACTION="transform:[[ -z \$FZF_QUERY ]] && echo 'hide-input+rebind($LIST_KEYS)'"
+
+# The gap between the two halves depends on the popup's width, so the header is
+# built at render time. Padding counts characters with the colour codes stripped —
+# ${#LEGEND_MARKS} would count the escapes as printable and shove the keys off the
+# right edge. Narrow terminals stack the halves rather than overlapping them.
+build_header() {
+	local cols marks_plain keys keys_plain entry key label pad
+	# tmux, not tput: the header is built inside $(build_header), so tput's stdout is
+	# a pipe rather than a terminal and it answers with a bare 80 every time. The
+	# popup is opened at -w 100%, so the client's width is the popup's width.
+	cols=$(tmux display -p ${CLIENT:+-c "$CLIENT"} '#{client_width}' 2>/dev/null)
+	[[ -n "$cols" && $cols -gt 0 ]] || cols=$(tput cols 2>/dev/null)
+	[[ -n "$cols" && $cols -gt 0 ]] || cols=80
+
+	# Cyan key, dimmed description — cyan is the one colour the marks do not already
+	# use, so a key never reads as a status mark. The plain copy is built alongside,
+	# since the coloured one cannot be measured.
+	keys=''
+	keys_plain=''
+	for entry in "${LEGEND_KEYS_SPEC[@]}"; do
+		key=${entry%% *}
+		label=${entry#* }
+		if [[ -n "$keys" ]]; then
+			keys+='   '
+			keys_plain+='   '
+		fi
+		keys+=$'\033[36m'"$key"$'\033[0m\033[2m '"$label"$'\033[0m'
+		keys_plain+="$key $label"
+	done
+
+	marks_plain=$(printf '%s' "$LEGEND_MARKS" | sed $'s/\033\\[[0-9;]*m//g')
+	# fzf indents the header by the pointer column; one more spare keeps the last
+	# character clear of the right edge, where a wrap would cost a whole row.
+	pad=$(( cols - 3 - ${#marks_plain} - ${#keys_plain} ))
+	if [[ $pad -lt 3 ]]; then
+		printf '%s\n%s' "$LEGEND_MARKS" "$keys"
+		return
+	fi
+	printf '%s%*s%s' "$LEGEND_MARKS" "$pad" '' "$keys"
+}
 
 usage() {
 	sed -n '/^# Usage:/,/^$/s/^# \{0,1\}//p' "$0"
@@ -86,9 +154,21 @@ done
 
 command -v tmux >/dev/null 2>&1 || { echo 'agent_switch.sh: tmux is required' >&2; exit 1; }
 
-if [[ $DEBUG_MODE -eq 0 && $JSON_MODE -eq 0 ]] && ! command -v fzf >/dev/null 2>&1; then
-	echo 'agent_switch.sh: fzf is required' >&2
-	exit 1
+if [[ $DEBUG_MODE -eq 0 && $JSON_MODE -eq 0 ]]; then
+	if ! command -v fzf >/dev/null 2>&1; then
+		echo 'agent_switch.sh: fzf is required' >&2
+		exit 1
+	fi
+	# List mode needs --no-input and show-input/hide-input, which landed in fzf 0.56.
+	# Without this guard an older fzf fails inside the popup, where you cannot read it.
+	fzf_ver=$(fzf --version 2>/dev/null)
+	fzf_ver=${fzf_ver%% *}
+	fzf_minor=${fzf_ver#*.}
+	fzf_minor=${fzf_minor%%.*}
+	if [[ ${fzf_ver%%.*} -eq 0 && ${fzf_minor:-0} -lt 56 ]]; then
+		echo "agent_switch.sh: fzf 0.56+ required for list mode (found $fzf_ver)" >&2
+		exit 1
+	fi
 fi
 
 if [[ $JSON_MODE -eq 1 ]] && ! command -v jq >/dev/null 2>&1; then
@@ -390,7 +470,8 @@ main() {
 	# its own to fall back on.
 	printf '\n  \033[2m⟳ scanning panes…\033[0m\n'
 
-	local candidates selected pane_id target
+	local candidates selected pane_id target header
+	header=$(build_header)
 	candidates=$(list_agent_panes | align_candidates)
 
 	if [[ -z "$candidates" ]]; then
@@ -404,12 +485,19 @@ main() {
 			--margin='1,0,0,0' \
 			--prompt='agents> ' \
 			--layout=reverse-list \
-			--header="$HEADER" \
+			--header="$header" \
 			--delimiter="$TAB" \
 			--with-nth=1 \
 			--preview='tmux capture-pane -ep -t {2}' \
 			--preview-window='down,70%,wrap' \
-			--bind 'enter:accept') || exit 0
+			--no-input \
+			--bind 'enter:accept' \
+			--bind 'j:down,k:up,g:first,G:last,q:abort' \
+			--bind 'd:preview-half-page-down,u:preview-half-page-up' \
+			--bind 'ctrl-o:change-preview-window(down,99%,wrap|down,70%,wrap)' \
+			--bind "/:show-input+unbind($LIST_KEYS)" \
+			--bind "esc:$ESC_ACTION" \
+			--bind "change:$CHANGE_ACTION") || exit 0
 
 	[[ -z "$selected" ]] && exit 0
 	pane_id=$(printf '%s' "$selected" | cut -f2)
