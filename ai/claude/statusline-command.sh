@@ -52,15 +52,15 @@ DEFAULT_COLS=187
 FIVE_HOUR_SECS=18000
 SEVEN_DAY_SECS=604800
 QUOTA_AMBER_PCT=80
-QUOTA_RED_PCT=100
+QUOTA_RED_PCT=90
 
 # Burn is how far ahead of the clock the spending is, in percentage points:
 # usage% minus elapsed%. Level pace reads 0 and the quota then lasts exactly to
 # the reset. Positive is spending brought forward; negative is quota in hand for
 # how far through the window we are.
 BURN_GREEN_PTS=1
-BURN_AMBER_PTS=10
-BURN_RED_PTS=25
+BURN_AMBER_PTS=6
+BURN_RED_PTS=11
 
 # Real pane width when tmux can tell us. Target our own pane explicitly: an
 # untargeted query answers for whichever pane is active, which is often another
@@ -149,9 +149,9 @@ quota_seg() {
   [ -n "$2" ] || return 0
 
   _pct=$(printf "%.0f" "$2")
-  _color=$(usage_color "$_pct" "$QUOTA_AMBER_PCT" "$QUOTA_RED_PCT")
   _eta=""
   _burn=""
+  _pts=""
 
   # Time until the window resets ($3 is epoch seconds). Suppressed, along with
   # the burn figure, when the timestamp is already past - the reading is stale.
@@ -174,6 +174,17 @@ quota_seg() {
       # %+d so the sign is carried on both sides of level pace
       _burn=$(printf " %sBurn %+d%%%s" "$_burn_color" "$_pts" "$ESC_RESET")
     fi
+  fi
+
+  # A full-looking meter only warrants a warning colour when the spending is
+  # also ahead of the clock: at or under pace the quota lasts to its reset
+  # however high the reading, so there is nothing to warn about and the meter
+  # stays green. With no burn figure to go on - no reset stamp, or a stale one -
+  # there is no evidence either way, so fall back to the reading alone.
+  if [ -n "$_pts" ] && [ "$_pts" -le 0 ]; then
+    _color="$ESC_GREEN"
+  else
+    _color=$(usage_color "$_pct" "$QUOTA_AMBER_PCT" "$QUOTA_RED_PCT")
   fi
 
   if [ -n "$5" ]; then
