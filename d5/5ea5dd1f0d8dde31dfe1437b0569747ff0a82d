@@ -1,0 +1,16 @@
+config/nvim/plugin/snapshot/snapshot_260918.json
+  h_732e1ca22a2079 1
+mac/brewlist.txt
+  h_732e1ca22a2079 10-11,19,24,29,46,53,64,70,90,106,116,119,129,135,145,148,154,161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d55ea5dd1f0d8dde31dfe1437b0569747ff0a82d",
+  "prompts": {},
+  "humans": {
+    "h_732e1ca22a2079": {
+      "author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
