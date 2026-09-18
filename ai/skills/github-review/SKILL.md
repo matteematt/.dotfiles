@@ -12,6 +12,27 @@ The first token of `$ARGUMENTS` is the **base branch** for the diff (e.g. `main`
 
 If the base branch isn't supplied, abort and ask for it. Do not guess.
 
+## Subagents — optimise for context, not speed
+
+Subagents are a context-management tool, not a parallelism trick. The default is to do the work yourself in the main context. Delegate a step only when it would otherwise pull a lot of material you don't need to keep — reading a large set of files, grepping call sites across the repo, scanning a huge diff — and the useful output is a short list of findings.
+
+Don't fan out a swarm of agents just to finish sooner. Running seven finder angles as seven parallel agents costs far more than it saves when the diff is small enough to hold in context. Judge it per review: a 40-line diff is a read-it-yourself job; a 3000-line diff across 30 files is where delegation earns its keep. Where you do delegate, batch several angles into one agent rather than one agent per angle.
+
+None of this lowers the bar. The review must be completely thorough — every angle below gets covered either way. The only question is whether you cover it inline or hand it to an agent to keep the main context clean.
+
+## The workflow this skill sits in
+
+You never submit a review. The full cycle is:
+
+1. You draft findings and post them as a **pending** review. Only the user can see them.
+2. The user reads, tweaks, deletes, and adds — possibly over several turns (Phase 7).
+3. **The user submits the review themselves, outside this session.** From that moment the comments are public and the PR author has read them.
+4. The author pushes fixes and/or replies to the comments. The user comes back and asks for another look.
+
+Step 3 is invisible to you — nothing in the session tells you it happened. So never assume the review you created earlier is still pending. Check the state before you touch anything (Phase 1), and re-check before any edit or delete in Phase 7.
+
+Once a review is submitted its comments are no longer yours to rewrite. Editing one silently changes something the author has already read and may have replied to; deleting one erases a thread they're mid-conversation on. Leave them alone unless the user explicitly asks for a change to a specific comment, and put new findings in a new pending review.
+
 ## Phase 1 — Gather the diff and the PR
 
 1. Identify the PR for the current branch:
@@ -19,13 +40,39 @@ If the base branch isn't supplied, abort and ask for it. Do not guess.
    gh pr list --head "$(git branch --show-current)" --json number,title,baseRefName,url
    ```
    If there's no PR yet, tell the user and stop — pending reviews need a PR.
-2. Pull the diff against the supplied base: `git diff <base>...HEAD`. If it's large, save to `/tmp/pr_diff.patch` and Read in chunks rather than dumping into the context.
-3. Read the surrounding context for every hunk you'll comment on — bugs in unchanged lines of a touched function are in scope.
-4. Install dependencies if it helps the review. If the repo's deps aren't present and having them would let you type-check, lint, resolve imports, or run the finder/verifier agents against real modules, go ahead and run `npm i` (or the project's equivalent — `pnpm i`, `yarn`, etc.). This is worth doing whenever it raises confidence in the findings; don't hold back on it.
+2. Work out where things stand — what you've already said, and what's happened since:
+   ```bash
+   # Reviews on this PR and their state (PENDING = drafted, not yet submitted)
+   gh api /repos/<owner>/<repo>/pulls/<n>/reviews \
+     --jq '.[] | {id, user: .user.login, state, commit_id, submitted_at}'
 
-## Phase 2 — Find candidates (run in parallel)
+   # Existing review threads, with resolution status and author replies
+   gh api graphql -f query='
+   {
+     repository(owner: "<owner>", name: "<repo>") {
+       pullRequest(number: <n>) {
+         reviewThreads(first: 100) {
+           nodes {
+             isResolved isOutdated path line
+             comments(first: 20) { nodes { author { login } body } }
+           }
+         }
+       }
+     }
+   }'
+   ```
+   Read the results before reviewing anything:
+   - **Nothing there** — first review, carry on with the full pass below.
+   - **A `PENDING` review of yours** — the user hasn't submitted yet, you're still drafting. Add to that review (Phase 7); don't create a second one.
+   - **A submitted review of yours** (`COMMENTED` / `CHANGES_REQUESTED` / `APPROVED`) — those comments are public. Its `commit_id` is the SHA you last reviewed, so `git diff <commit_id>...HEAD` is what the author has done since, and that's the focus of this pass. See the second-round rules in Phase 7.
+   - **Resolved threads** are settled — don't re-raise them. **Unresolved threads with an author reply** are live arguments: read the reply and only push back if it doesn't hold up.
+3. Pull the diff against the supplied base: `git diff <base>...HEAD`. If it's large, save to `/tmp/pr_diff.patch` and Read in chunks rather than dumping into the context.
+4. Read the surrounding context for every hunk you'll comment on — bugs in unchanged lines of a touched function are in scope.
+5. Install dependencies if it helps the review. If the repo's deps aren't present and having them would let you type-check, lint, resolve imports, or run the finder/verifier agents against real modules, go ahead and run `npm i` (or the project's equivalent — `pnpm i`, `yarn`, etc.). This is worth doing whenever it raises confidence in the findings; don't hold back on it.
 
-Dispatch independent finder angles via the Agent tool. Each surfaces up to 8 candidates. Bias for recall — a missed bug ships:
+## Phase 2 — Find candidates
+
+Work through every angle below — that's the coverage bar and it doesn't move. Do them yourself unless the diff is big enough that delegating keeps the main context usable; where you delegate, batch angles together, cap each at 8 candidates, and bias for recall — a missed bug ships:
 
 - **Line-by-line diff scan** — every changed line: what input, state, timing, or platform makes this wrong? Inverted conditions, off-by-one, missing `await`, falsy-zero, copy-paste vars, swallowed errors.
 - **Removed-behaviour auditor** — for each deleted/replaced line, name the invariant it enforced. Find where the new code re-establishes it. If you can't, that's a candidate.
@@ -39,7 +86,7 @@ If the user passed extra context, add an extra finder angle scoped to that conce
 
 ## Phase 3 — Verify
 
-Dedup candidates pointing at the same mechanism. For each remaining, run a single verifier (Agent tool, fresh context, given the diff + relevant files). Return one of:
+Dedup candidates pointing at the same mechanism. Then verify each survivor against the actual code — trace the path, don't pattern-match. A fresh-context verifier agent (given the diff + the relevant files) earns its cost when checking the claim means reading files you'd otherwise have to hold in context, or when you want an unprimed second opinion on a candidate you drafted yourself; otherwise verify it inline. Each verdict is one of:
 
 - **CONFIRMED** — name the inputs/state and the wrong output. Quote the line.
 - **PLAUSIBLE** — mechanism real, trigger uncertain. State what would confirm it.
@@ -49,7 +96,7 @@ Keep CONFIRMED + PLAUSIBLE. Recall mode: a single non-REFUTED vote carries the f
 
 ## Phase 4 — Sweep
 
-Run one more finder as a fresh reviewer with the verified list, looking only for gaps. Don't pad — if nothing new, return empty.
+One more pass over the diff as a fresh reviewer holding the verified list, looking only for gaps. This is the one place a subagent is usually worth it even on a small diff — an unprimed context is the entire point of the pass. Don't pad; if nothing new, return empty.
 
 ## Phase 5 — Write the comments in the user's voice
 
@@ -151,7 +198,9 @@ After posting, briefly summarise: count of comments, the review URL, and which f
 
 ## Phase 7 — Follow-up workflow (CRITICAL)
 
-Typical workflow: agent drafts comments → user reads, tweaks, deletes some, then comes back asking for more / for rewrites. **Every follow-up must also stay in the same pending review.** The REST `POST /pulls/{n}/comments` endpoint won't work while a pending review exists — it errors with `user_id can only have one pending review per pull request`. Use GraphQL instead.
+Typical workflow: agent drafts comments → user reads, tweaks, deletes some, then comes back asking for more / for rewrites. **Re-run the state check from Phase 1 before every follow-up.** The user may have submitted the review since you last looked — everything in this section applies only while it's still `PENDING`, and the second-round rules below apply once it isn't.
+
+While it is pending, **every follow-up must stay in that same review.** The REST `POST /pulls/{n}/comments` endpoint won't work while a pending review exists — it errors with `user_id can only have one pending review per pull request`. Use GraphQL instead.
 
 ### Adding more comments to the existing pending review
 
@@ -216,6 +265,8 @@ gh api -X DELETE /repos/<owner>/<repo>/pulls/comments/<comment_id>
 
 | Operation                | Endpoint                                                                                |
 |--------------------------|-----------------------------------------------------------------------------------------|
+| Check review state       | REST `GET /pulls/{n}/reviews` → `.state`, `.commit_id`                                  |
+| Read threads + replies   | GraphQL `pullRequest.reviewThreads` → `isResolved`, `comments`                          |
 | Create pending review    | REST `POST /pulls/{n}/reviews` (omit `event`)                                           |
 | List pending comments    | REST `GET /pulls/{n}/reviews/{id}/comments` or GraphQL `reviews(states: PENDING)`       |
 | Add comment to pending   | GraphQL `addPullRequestReviewThread` (with `pullRequestReviewId`)                       |
@@ -223,11 +274,27 @@ gh api -X DELETE /repos/<owner>/<repo>/pulls/comments/<comment_id>
 | Delete pending comment   | REST `DELETE /pulls/comments/{id}`                                                      |
 | Get review node_id       | REST `GET /pulls/{n}/reviews/{id}` → `.node_id`                                         |
 | Get comment node_ids     | GraphQL `repository.pullRequest.reviews(states: PENDING).nodes.comments.nodes[].id`     |
+| Reply to submitted comment | REST `POST /pulls/{n}/comments` with `in_reply_to` (only once nothing is pending)      |
 | Submit (DO NOT)          | REST `POST /pulls/{n}/reviews/{id}/events` — never call this                            |
+
+### After the user has submitted (second round)
+
+The user submits outside this session, so the first sign is the state check: your review now reads `COMMENTED` / `CHANGES_REQUESTED` / `APPROVED` instead of `PENDING`, and there may be author replies on the threads. When that's the case:
+
+- **Don't edit or delete the submitted comments.** They're public and already read. Editing rewrites history under a conversation in progress. If the user explicitly asks to change one, say what it'll look like to the author first.
+- **Reply in-thread** to answer the author or concede a point — `in_reply_to` takes the original comment's `id`:
+  ```bash
+  gh api -X POST /repos/<owner>/<repo>/pulls/<n>/comments \
+    -F in_reply_to=<comment_id> --raw-field body="$BODY"
+  ```
+  This endpoint works now — the "one pending review" restriction only bit while a pending review existed. Same voice rules as Phase 5.
+- **Review the new commits, not the whole PR again.** Diff from the submitted review's `commit_id` to `HEAD`. A finding that's now fixed is done — don't re-raise it. A finding that *isn't* fixed belongs in the existing thread as a reply, not as a fresh comment on the same line.
+- **New findings go in a new pending review** — same Phase 6 mechanics, same non-negotiable: don't submit it.
 
 ## Conduct
 
 - **Push back on your own findings when challenged.** If the user questions a finding, walk through the actual code path — don't capitulate, but don't dig in either. Many "bugs" survive draft and dissolve on a second look. Delete the comment if it doesn't hold up.
 - **Don't claim certainty you don't have.** Use the voice's hedges (`probably`, `I think`, `not sure`) when uncertain — they're stylistically aligned and intellectually honest.
 - **Severity gate.** Correctness > altitude/duplication > style. If the cap forces a cut, drop nits first.
+- **Don't assume the state of your own review.** The user submits outside the session, the author pushes between turns. Check before you edit, delete, or re-raise anything.
 - **Don't review what you can't see.** If a finding depends on caller behaviour you haven't grepped, either grep first or downgrade to PLAUSIBLE.
