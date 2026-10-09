@@ -152,17 +152,23 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "effortLevel": "xhigh",
-  "tui": "fullscreen",
-  "skipWorkflowUsageWarning": true,
-  "theme": "dark",
-  "editorMode": "vim",
-  "skipAutoPermissionPrompt": true,
   "modelSettings": {
     "claude-sonnet-5": {
       "effortLevel": "medium"
     },
     "claude-opus-5": {
       "effortLevel": "xhigh"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
     }
-  }
+  },
+  "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark",
+  "editorMode": "vim",
+  "autoCompactEnabled": true,
+  "idleCompaction": false,
+  "skipAutoPermissionPrompt": true,
+  "workflowKeywordTriggerEnabled": false
 }
