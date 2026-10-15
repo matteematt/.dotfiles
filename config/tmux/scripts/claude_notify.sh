@@ -47,19 +47,62 @@
 # For DONE/APPROVAL the bell/notification stay SILENT whenever your tmux client is
 # already sitting on the Claude window — you'll see it when you look.
 
+# Which tmux pane to flag. Normally just $TMUX_PANE, inherited from the pane that
+# launched claude. A BACKGROUND session breaks that: forking/sending a session to the
+# background re-hosts it under the Claude daemon (`claude --bg-pty-host …`, parented
+# to launchd), and the claude left in the pane is only a viewer attached to it. Hooks
+# run in the background process, which has no TMUX or TMUX_PANE, so every marker and
+# the bell silently stopped for that pane.
+#
+# Fallback, for background sessions only: the one pane whose shell is running claude
+# in the session's cwd. Gated on a bg-pty-host ancestor so a claude outside tmux
+# (Claude.app, a plain terminal) in the same directory never lights up a tmux pane.
+# Two candidate panes is ambiguous, so neither is flagged.
+is_bg_session() {
+  # Walk our own ancestry in one ps snapshot, looking for the daemon's pty host.
+  # Starts at our parent, and matches the flag as a whole word, so a command line
+  # that merely mentions it (this script being grepped, say) is not mistaken for it.
+  ps -axo pid=,ppid=,args= | awk -v p=$PPID '
+    { pid = $1; ppid[pid] = $2; $1 = $2 = ""; args[pid] = $0 " " }
+    END {
+      while (p > 1 && (p in ppid)) {
+        if (args[p] ~ / --bg-pty-host /) exit 0
+        p = ppid[p]
+      }
+      exit 1
+    }'
+}
+
+resolve_pane() {
+  [ -n "${TMUX_PANE:-}" ] && { printf '%s' "$TMUX_PANE"; return; }
+  local cwd=$1 match='' id pid path
+  [ -n "$cwd" ] || return
+  is_bg_session || return
+  while IFS=$'\t' read -r id pid path; do
+    [ "$path" = "$cwd" ] || continue
+    pgrep -P "$pid" -f claude >/dev/null 2>&1 || continue
+    [ -n "$match" ] && return
+    match=$id
+  done < <(tmux list-panes -a -F "#{pane_id}	#{pane_pid}	#{pane_current_path}" 2>/dev/null)
+  printf '%s' "$match"
+}
+
 # Fast path for the PostToolUse heartbeat: the event is implied by the argument, so
 # skip the payload read and the jq calls entirely. This runs on EVERY tool call, so
-# it must stay down to a single tmux invocation. Silent, and always exit 0.
+# it must stay down to a single tmux invocation. Silent, and always exit 0. (A
+# background session pays for a pane lookup here instead; see resolve_pane.)
 if [ "${1:-}" = "working" ]; then
+  p=${TMUX_PANE:-}
+  [ -z "$p" ] && p=$(resolve_pane "$(jq -r '.cwd // empty' 2>/dev/null)")
   # -F expands the value as a format, so this is "keep the existing stamp, else
   # stamp now" in a single tmux call: the marker holds the time the CURRENT turn
   # started, and the heartbeat must not reset that clock on every tool call.
   # A tool actually ran, so any permission prompt has been answered: clearing
   # @claude_blocked rides along in the same tmux invocation, keeping this path at
   # one fork however many markers it maintains.
-  [ -n "${TMUX:-}" ] && tmux set -wF ${TMUX_PANE:+-t "$TMUX_PANE"} @claude_busy \
+  [ -n "$p" ] && tmux set -wF -t "$p" @claude_busy \
     "#{?@claude_busy,#{@claude_busy},$(date +%s)}" \; \
-    set -uw ${TMUX_PANE:+-t "$TMUX_PANE"} @claude_blocked 2>/dev/null
+    set -uw -t "$p" @claude_blocked 2>/dev/null
   exit 0
 fi
 
@@ -70,9 +113,8 @@ ntype=$(printf '%s' "$payload" | jq -r '.notification_type // empty' 2>/dev/null
 pending=$(printf '%s' "$payload" | jq '(.background_tasks | length) // 0' 2>/dev/null)
 [ -z "$pending" ] && pending=0
 
-[ -z "${TMUX:-}" ] && exit 0   # not inside tmux → nothing to flag
-
-p="${TMUX_PANE:-}"
+p=$(resolve_pane "$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null)")
+[ -z "$p" ] && exit 0   # not inside tmux (or no pane to pin it on) → nothing to flag
 
 # BUSY is set by the one event that means work just started, and cleared by every
 # other event this hook receives — a Stop of either flavour, or a Notification of
