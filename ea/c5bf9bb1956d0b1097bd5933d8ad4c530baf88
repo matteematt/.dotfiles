@@ -1,0 +1,14 @@
+mac/brewlist.txt
+  h_732e1ca22a2079 3,10-11,19-20,32,88,92-94,102,104,108,113,119,122-124,129-130,138-141,152,165,167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eac5bf9bb1956d0b1097bd5933d8ad4c530baf88",
+  "prompts": {},
+  "humans": {
+    "h_732e1ca22a2079": {
+      "author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
