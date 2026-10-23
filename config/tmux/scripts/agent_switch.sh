@@ -10,7 +10,7 @@
 # What's different here:
 #   * ALERT AWARENESS. His version lists panes in tmux's enumeration order with no
 #     notion of which agent is waiting. This one reads the two signals
-#     claude_notify.sh already raises and sorts/marks by them:
+#     agent_notify.sh raises and sorts/marks by them:
 #       !  window bell flag  — DONE or needs-approval, rung while you were elsewhere
 #          (the same signal behind the red tab and the SESSION_ALERTS_ strip)
 #          @claude_blocked also raises ! — waiting on you to answer a permission
@@ -352,7 +352,7 @@ list_agent_panes() {
 		#   anything    → @claude_idle_at, when the agent last came to rest
 		# #{window_activity} is otherwise only the fallback, for a pane whose agent
 		# has not stopped since the marker existed, or one with no hooks at all
-		# (codex, aider). It answers "was anything output here", so it is reset by a
+		# (currently aider). It answers "was anything output here", so it is reset by a
 		# repaint when you visit the window — which is exactly the wrong thing to
 		# measure, and the reason it is not preferred outside the interrupted case.
 		# The lower bounds reject a stale marker from the scheme where @claude_busy

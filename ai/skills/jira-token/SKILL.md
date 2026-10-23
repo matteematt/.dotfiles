@@ -14,18 +14,21 @@ https://id.atlassian.com/manage-profile/security/api-tokens and re-stored (see *
 
 ## Setting up the shell variables
 
-Every example below assumes these three. The account is read from the keychain item itself, so
-no address is hardcoded:
+Every example below assumes these variables. Set and use them within the same shell session or
+tool call; separate tool calls may not preserve shell variables. The account is read from the
+keychain item itself, so no address is hardcoded:
 
 ```bash
-TOKEN=$(security find-generic-password -s jira-api-token -w)
-ACCOUNT=$(security find-generic-password -s jira-api-token | awk -F'"' '/"acct"/{print $4}')
-SITE=your-site.atlassian.net
+JIRA_API_TOKEN=$(security find-generic-password -s jira-api-token -w)
+JIRA_ACCOUNT=$(security find-generic-password -s jira-api-token | awk -F'"' '/"acct"/{print $4}')
+JIRA_SITE=your-site.atlassian.net
+JIRA_TMP_DIR=$(mktemp -d /tmp/jira-api.XXXXXX)
 ```
 
-Find `SITE` from the browser URL of any issue, or from the MCP's
-`getAccessibleAtlassianResources`. Never print, echo, log or write `$TOKEN` — keep it in a shell
-variable used inline, so the value never reaches the transcript, shell history or a file.
+Find `JIRA_SITE` from the browser URL of any issue, or from the available Atlassian connector's
+accessible-resources operation. Never print, echo, log or write `$JIRA_API_TOKEN` — keep it in a
+shell variable used inline, so the value never reaches the transcript, shell history or a file.
+Keychain and network access may require the host's normal approval flow; do not bypass it.
 
 ## Why the MCP is not enough
 
@@ -40,26 +43,27 @@ That path only accepts a bearer token — Basic auth returns `401` there, and an
 fetch returns `403`. Use the **site domain** instead, which accepts Basic auth with an API token:
 
 ```
-https://$SITE/rest/api/3/...
+https://$JIRA_SITE/rest/api/3/...
 ```
 
-(The cloud id, if ever needed for the OAuth form, appears in the `context` block of every MCP
-response and in `getAccessibleAtlassianResources`.)
+(The cloud id, if ever needed for the OAuth form, appears in the `context` block of connector
+responses and in the accessible-resources response.)
 
 ## Download an attachment
 
-Get the attachment id from the MCP first — `getJiraIssue` with `fields: ["attachment"]` returns
-`id`, `filename`, `size` and `mimeType` for each one. Then:
+Get the attachment id from the available Atlassian connector first. The operation commonly named
+`getJiraIssue`, with `fields: ["attachment"]`, returns `id`, `filename`, `size` and `mimeType` for
+each one. Then:
 
 ```bash
-curl -sL -u "$ACCOUNT:$TOKEN" \
-  -o "$SCRATCHPAD/whatever.md" \
-  "https://$SITE/rest/api/3/attachment/content/<ATTACHMENT_ID>"
+curl -sL -u "$JIRA_ACCOUNT:$JIRA_API_TOKEN" \
+  -o "$JIRA_TMP_DIR/whatever.md" \
+  "https://$JIRA_SITE/rest/api/3/attachment/content/<ATTACHMENT_ID>"
 ```
 
 `-L` is required: the endpoint redirects to a signed media URL and without it you get an empty
-file. Write to the session scratchpad, not the repo — these are someone else's files and they
-should not end up untracked in a worktree.
+file. Write to the task-specific temporary directory, not the repo — these are someone else's
+files and they should not end up untracked in a worktree.
 
 For a large attachment (a multi-MB diagnostics dump), download it and then read it with
 `jq`/`grep` rather than pulling the whole thing into context.
@@ -72,8 +76,8 @@ The MCP's markdown conversion renders an inline **file** attachment as image syn
 ![](blob:https://media.staging.atl-paas.net/?type=file&id=<uuid>...)
 ```
 
-This looks like a pasted screenshot and is not one. To find out what it actually is, call
-`getJiraIssue` with `expand: "renderedFields"`. The rendered HTML carries
+This looks like a pasted screenshot and is not one. To find out what it actually is, call the
+connector's issue operation (commonly `getJiraIssue`) with `expand: "renderedFields"`. The rendered HTML carries
 `data-attachment-name`, `data-media-services-type` (`file` vs `image`) and
 `href="/rest/api/3/attachment/content/<attachmentId>"` — i.e. it maps the media-services id in
 the blob URL to a real attachment id, which is the lookup Atlassian's own developer community
@@ -84,10 +88,10 @@ Do this **before** telling anyone an issue has a screenshot you cannot see.
 ## Upload an attachment
 
 ```bash
-curl -s -u "$ACCOUNT:$TOKEN" \
+curl -s -u "$JIRA_ACCOUNT:$JIRA_API_TOKEN" \
   -X POST -H "X-Atlassian-Token: no-check" \
   -F "file=@./report.md" \
-  "https://$SITE/rest/api/3/issue/PROJ-123/attachments"
+  "https://$JIRA_SITE/rest/api/3/issue/PROJ-123/attachments"
 ```
 
 The `X-Atlassian-Token: no-check` header is mandatory; without it the request is rejected as XSRF.
@@ -107,7 +111,7 @@ Check authentication first — this distinguishes a bad credential from a permis
 problem:
 
 ```bash
-curl -s -u "$ACCOUNT:$TOKEN" "https://$SITE/rest/api/3/myself" | head -c 200
+curl -s -u "$JIRA_ACCOUNT:$JIRA_API_TOKEN" "https://$JIRA_SITE/rest/api/3/myself" | head -c 200
 ```
 
 Expect `200` and the account's `displayName`. A `401` means the token is wrong or expired.
@@ -116,8 +120,8 @@ A truncated paste is the likeliest cause and it is silent — the value still st
 but is short. Check the shape without revealing it:
 
 ```bash
-printf 'length: %s\n' "${#TOKEN}"
-printf '%s' "$TOKEN" | grep -qE '^ATATT[A-Za-z0-9_-]+=[0-9A-F]{8}$' \
+printf 'length: %s\n' "${#JIRA_API_TOKEN}"
+printf '%s' "$JIRA_API_TOKEN" | grep -qE '^ATATT[A-Za-z0-9_-]+=[0-9A-F]{8}$' \
   && echo "structure OK" || echo "TRUNCATED or altered"
 ```
 

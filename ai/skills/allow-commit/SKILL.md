@@ -17,11 +17,11 @@ Not granted by the skill on its own:
 - deleting or moving branches or tags
 - anything belonging to a different piece of work than this invocation covers
 
-**Read the whole instruction, though, not just the skill call.** Any of the above is authorised when the rest of what the user said alongside `/allow-commit` implies it — "commit and push this", "squash these first", "put it on a fresh branch off master", "bin the stray changes before you commit". The invocation and the sentence around it are one instruction; take that implication at face value rather than asking again for something the user has already asked for.
+**Read the whole instruction, though, not just the skill call.** Any of the above is authorised when the rest of what the user said alongside the invocation implies it — "commit and push this", "squash these first", "put it on a fresh branch off master", "bin the stray changes before you commit". The invocation and the sentence around it are one instruction; take that implication at face value rather than asking again for something the user has already asked for.
 
-The implication has to be real. Do not read a step in because it would be convenient, or because it is how this kind of work usually ends: `/allow-commit` on its own never means push, and finishing a commit is not a licence to open a PR. Where the surrounding instruction is silent, the step is not granted — ask.
+The implication has to be real. Do not read a step in because it would be convenient, or because it is how this kind of work usually ends: this skill on its own never means push, and finishing a commit is not a licence to open a PR. Where the surrounding instruction is silent, the step is not granted — ask.
 
-The grant expires with the scope of work. A new, unrelated task needs a new `/allow-commit`.
+The grant expires with the scope of work. A new, unrelated task needs a new invocation.
 
 ## Before committing
 
@@ -31,13 +31,13 @@ The grant expires with the scope of work. A new, unrelated task needs a new `/al
 
 ## The message
 
-Follow the convention in the `commit-message` skill — read that skill and apply it rather than duplicating its rules here. In short: one line, derived from the repo's own log, no invented `(#123)` suffix, and **no Claude attribution or trailer of any kind**.
+Follow the convention in the `commit-message` skill — read that skill and apply it rather than duplicating its rules here. In short: one line, derived from the repo's own log, no invented `(#123)` suffix, and **no AI attribution or trailer of any kind**.
 
 Commit with a single `-m`: `git commit -m "<line>"`. No body unless the user asked for one.
 
 ## Permission prompts
 
-`git add`, `git commit`, and every other git write listed above are gated by the global permission rules — on the `ask` list, or falling through to the default prompt — so the harness shows a permission prompt for each one no matter what this skill or the user's instruction has authorised. That prompt is the intended final confirmation, not a sign anything is wrong — proceed through it. If a prompt is **denied**, stop immediately, leave the tree as it is, and report what you were about to do. Do not retry and do not look for another route.
+This skill records the user's authorisation for the scoped git work; it does not override the host's sandbox or approval policy. If the host requires a permission prompt, use that normal route. If permission is denied, stop immediately, leave the tree as it is, and report what you were about to do. Do not retry or look for another route.
 
 ## After committing
 

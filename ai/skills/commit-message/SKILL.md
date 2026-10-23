@@ -1,6 +1,6 @@
 ---
 name: commit-message
-description: Propose a one-line commit message for the current dirty work, matching this repo's commit style, with no Claude attribution.
+description: Propose a one-line commit message for the current dirty work, matching this repo's commit style, with no AI attribution.
 argument-hint: "[optional steer, e.g. 'this is a fix not a feature' or 'scope it to the installer']"
 ---
 
@@ -46,7 +46,7 @@ If the log is genuinely mixed, follow the most recent 10 commits.
 
 - Describe **what the change does**, not what you did or which files moved. `fix: guard against empty worktree list` beats `update script`.
 - One line only. No body, no bullets, no surrounding quotes, no backticks, no code fence.
-- **No Claude or AI attribution in any form** — no trailer, no emoji, no "with Claude". The author of record is the user.
+- **No AI attribution in any form** — no trailer, no emoji, no assistant credit. The author of record is the user.
 - If `$ARGUMENTS` is present, treat it as the user's steer on framing (change type, scope, what to emphasise) and honour it over your own reading of the diff.
 
 If the tree holds two or more unrelated changes, still give the best single line, then add one short sentence noting that it would read better as separate commits and what the split would be. Put that note *above* the message so the final line stays copy-pasteable.

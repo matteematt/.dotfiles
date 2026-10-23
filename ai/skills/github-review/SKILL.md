@@ -2,6 +2,7 @@
 name: github-review
 description: Review the current branch's PR in depth and queue findings as a pending GitHub review, written in the user's voice.
 argument-hint: "<base-branch> [extra context / focus areas]"
+disable-model-invocation: true
 ---
 
 Review the PR for the current branch and queue findings as a **pending** GitHub review. Comments must land in pending state so the user can read, tweak, delete, or extend them before submission — never submit the review.
@@ -68,7 +69,7 @@ Once a review is submitted its comments are no longer yours to rewrite. Editing 
    - **Resolved threads** are settled — don't re-raise them. **Unresolved threads with an author reply** are live arguments: read the reply and only push back if it doesn't hold up.
 3. Pull the diff against the supplied base: `git diff <base>...HEAD`. If it's large, save to `/tmp/pr_diff.patch` and Read in chunks rather than dumping into the context.
 4. Read the surrounding context for every hunk you'll comment on — bugs in unchanged lines of a touched function are in scope.
-5. Install dependencies if it helps the review. If the repo's deps aren't present and having them would let you type-check, lint, resolve imports, or run the finder/verifier agents against real modules, go ahead and run `npm i` (or the project's equivalent — `pnpm i`, `yarn`, etc.). This is worth doing whenever it raises confidence in the findings; don't hold back on it.
+5. Use dependencies already present in the workspace when they help the review. Do not install or update dependencies during a review unless the user explicitly authorised that workspace mutation. If missing dependencies prevent meaningful verification, report the limitation or ask before installing them.
 
 ## Phase 2 — Find candidates
 

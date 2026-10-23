@@ -1,38 +1,38 @@
 #!/bin/bash
 
-# Install AI skills for Claude Code.
+# Install AI skills for Claude Code and Codex.
 #
 # Claude Code does not yet follow directory symlinks when discovering skills,
 # so each skill's files must be symlinked individually into ~/.claude/skills/.
 # See: https://github.com/anthropics/claude-code/issues/14836
+#
+# Codex supports symlinked skill directories and discovers user-level skills
+# from ~/.agents/skills/.
 
 set -euo pipefail
 
 SKILLS_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
+CODEX_SKILLS_DIR="$HOME/.agents/skills"
 
 mkdir -p "$CLAUDE_SKILLS_DIR"
+mkdir -p "$CODEX_SKILLS_DIR"
 
-# handoff
-mkdir -p "$CLAUDE_SKILLS_DIR/handoff"
-ln -sf "$SKILLS_SRC/handoff/SKILL.md" "$CLAUDE_SKILLS_DIR/handoff/SKILL.md"
+for skill_dir in "$SKILLS_SRC"/*; do
+  [ -d "$skill_dir" ] || continue
+  [ -f "$skill_dir/SKILL.md" ] || continue
 
-# github-review
-mkdir -p "$CLAUDE_SKILLS_DIR/github-review"
-ln -sf "$SKILLS_SRC/github-review/SKILL.md" "$CLAUDE_SKILLS_DIR/github-review/SKILL.md"
+  skill_name="${skill_dir##*/}"
+  claude_dest="$CLAUDE_SKILLS_DIR/$skill_name"
+  codex_dest="$CODEX_SKILLS_DIR/$skill_name"
 
-# commit-message
-mkdir -p "$CLAUDE_SKILLS_DIR/commit-message"
-ln -sf "$SKILLS_SRC/commit-message/SKILL.md" "$CLAUDE_SKILLS_DIR/commit-message/SKILL.md"
+  mkdir -p "$claude_dest"
+  ln -sf "$skill_dir/SKILL.md" "$claude_dest/SKILL.md"
 
-# allow-commit
-mkdir -p "$CLAUDE_SKILLS_DIR/allow-commit"
-ln -sf "$SKILLS_SRC/allow-commit/SKILL.md" "$CLAUDE_SKILLS_DIR/allow-commit/SKILL.md"
+  if [ -e "$codex_dest" ] && [ ! -L "$codex_dest" ]; then
+    echo "not replacing existing Codex skill directory: $codex_dest" >&2
+    continue
+  fi
 
-# jira-token
-mkdir -p "$CLAUDE_SKILLS_DIR/jira-token"
-ln -sf "$SKILLS_SRC/jira-token/SKILL.md" "$CLAUDE_SKILLS_DIR/jira-token/SKILL.md"
-
-# ste
-mkdir -p "$CLAUDE_SKILLS_DIR/ste"
-ln -sf "$SKILLS_SRC/ste/SKILL.md" "$CLAUDE_SKILLS_DIR/ste/SKILL.md"
+  ln -sfn "$skill_dir" "$codex_dest"
+done
