@@ -58,11 +58,14 @@ ln -s ~/.dotfiles/config/global.sbt ~/.sbt/1.0/
 ln -s ~/.dotfiles/config/nvim ~/.config
 ln -s ~/.dotfiles/config/tmux/ ~/.config
 
-# Install AI skills for Claude Code
+# Install shared AI skills for Claude Code and Codex
 ~/.dotfiles/ai/skills/install.sh
 
 # Install global Claude Code config (settings.json)
 ~/.dotfiles/ai/claude/install.sh
+
+# Install global Codex config (config.toml)
+~/.dotfiles/ai/codex/install.sh
 
 # Set up global git commands
 git config --global core.excludesfile ~/.dotfiles/config/git/.gitignore_global

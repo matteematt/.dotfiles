@@ -1,0 +1,104 @@
+approvals_reviewer = "auto_review"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+notify = ["/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh", "codex", "notify"]
+
+[features]
+hooks = true
+
+[[hooks.PostToolUse]]
+
+[[hooks.PostToolUse.hooks]]
+command = "/Users/matt.walker/.git-ai/bin/git-ai checkpoint codex --hook-input stdin"
+type = "command"
+
+[[hooks.PostToolUse.hooks]]
+command = "/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh codex working"
+type = "command"
+
+[[hooks.PreToolUse]]
+
+[[hooks.PreToolUse.hooks]]
+command = "/Users/matt.walker/.git-ai/bin/git-ai checkpoint codex --hook-input stdin"
+type = "command"
+
+[[hooks.PermissionRequest]]
+
+[[hooks.PermissionRequest.hooks]]
+command = "/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh codex"
+type = "command"
+
+[[hooks.UserPromptSubmit]]
+
+[[hooks.UserPromptSubmit.hooks]]
+command = "/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh codex"
+type = "command"
+
+[[hooks.Stop]]
+
+[[hooks.Stop.hooks]]
+command = "/Users/matt.walker/.git-ai/bin/git-ai checkpoint codex --hook-input stdin"
+type = "command"
+
+[[hooks.Stop.hooks]]
+command = "/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh codex"
+type = "command"
+
+[[hooks.Interrupt]]
+
+[[hooks.Interrupt.hooks]]
+command = "/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh codex"
+type = "command"
+
+[hooks.state]
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:post_tool_use:0:0"]
+enabled = true
+trusted_hash = "sha256:97b44443363ca2ae48f7c87bcf11a9c46f0691efd34adeea98107de881859e75"
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:pre_tool_use:0:0"]
+enabled = true
+trusted_hash = "sha256:870b0aa0a6be744f35f0d07c4c5065cd46f91c14e4573a38583833969066bb7e"
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:stop:0:0"]
+enabled = true
+trusted_hash = "sha256:88a0e43d904191fbcf8561945135ea3bfb750f60cf39e1f5dc6f54f98a91b83f"
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:permission_request:0:0"]
+trusted_hash = "sha256:694b90f1335bfb2792efacc73a2e1123f0dbcac2e47ebf3682af2236ecc783c0"
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:post_tool_use:0:1"]
+trusted_hash = "sha256:7d88226cf96a6419a31c1004d839e94eda1728a1b88419eebf28b0d4860c294c"
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:user_prompt_submit:0:0"]
+trusted_hash = "sha256:907ea4bc545f81f71e88299eb5c15db7cd55f73431d4f9d6e972b35d75c11b62"
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:stop:0:1"]
+trusted_hash = "sha256:b50bb636a208ff7d98e1959c8f43292d407370e4f1e79026a1044b36d5141978"
+
+[hooks.state."/Users/matt.walker/.codex/config.toml:interrupt:0:0"]
+trusted_hash = "sha256:f590058aaa0bd493cd4887ccdf367785856c1c9d34833e1ceaf5175c67d33f96"
+
+[projects."/Users/matt.walker/genesis/genesis-create"]
+trust_level = "trusted"
+
+[projects."/Users/matt.walker/genesis/CLAUDE_CODE_TEST"]
+trust_level = "trusted"
+
+[projects."/Users/matt.walker/genesis/foundation-ui"]
+trust_level = "trusted"
+
+[projects."/Users/matt.walker/.dotfiles"]
+trust_level = "trusted"
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+
+[tui]
+screen_reader_detection_done = true
+status_line = ["model-with-reasoning", "context-remaining", "five-hour-limit", "weekly-limit", "git-branch"]
+
+[tui.model_availability_nux]
+"gpt-5.6-sol" = 1
+gpt-6-astra = 3
+"gpt-6.1-sol" = 4
