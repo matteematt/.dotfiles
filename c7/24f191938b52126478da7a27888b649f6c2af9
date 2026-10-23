@@ -1,0 +1,21 @@
+config/nvim/plugin/snapshot/snapshot_261023.json
+  s_d8fbc9a90c0aeb::t_72913654fa3794 1
+mac/brewlist.txt
+  s_d8fbc9a90c0aeb::t_58bb2984a534a0 6-8,10-12,14,25,34,39-40,64,69,74,79,85,88,104,107-108,111,119,124-130,137,139-140,149,152,167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c724f191938b52126478da7a27888b649f6c2af9",
+  "prompts": {},
+  "sessions": {
+    "s_d8fbc9a90c0aeb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79bf70f4-9bc4-4917-97b2-dc1c1e0f3cd1",
+        "model": "unknown"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
