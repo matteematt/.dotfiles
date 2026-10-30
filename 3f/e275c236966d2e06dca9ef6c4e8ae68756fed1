@@ -1,0 +1,24 @@
+ai/skills/afk/CLAUDE_ONLY
+  s_f3682e00393b0d::t_2ffb8db67ddbe5 1
+ai/skills/afk/SKILL.md
+  s_f3682e00393b0d::t_5dd5ede9109ad7 79
+  s_f3682e00393b0d::t_2ffb8db67ddbe5 1-54,56-57,59-72,75-78,80-94
+  s_f3682e00393b0d::t_b761ee62581aa3 55,58
+  s_f3682e00393b0d::t_5e2ad5229f78e2 73-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3fe275c236966d2e06dca9ef6c4e8ae68756fed1",
+  "prompts": {},
+  "sessions": {
+    "s_f3682e00393b0d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e1b7bdd-da78-4c20-b7ea-0f2a3cd69242",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
