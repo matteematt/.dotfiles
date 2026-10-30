@@ -29,6 +29,13 @@ for skill_dir in "$SKILLS_SRC"/*; do
   mkdir -p "$claude_dest"
   ln -sf "$skill_dir/SKILL.md" "$claude_dest/SKILL.md"
 
+  # Skills that only make sense in Claude Code (e.g. they rely on its Agent
+  # tool or model names) carry a CLAUDE_ONLY marker and are not linked for Codex.
+  if [ -f "$skill_dir/CLAUDE_ONLY" ]; then
+    [ -L "$codex_dest" ] && rm "$codex_dest"
+    continue
+  fi
+
   if [ -e "$codex_dest" ] && [ ! -L "$codex_dest" ]; then
     echo "not replacing existing Codex skill directory: $codex_dest" >&2
     continue
