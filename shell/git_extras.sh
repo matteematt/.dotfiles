@@ -505,12 +505,12 @@ function __markMergedPrs() {
 }
 
 # Works out what would be lost by deleting each worktree named in $@, filling in
-# active_map, tracked_map, untracked_map, newsource_map, unpushed_map and
-# merged_map, plus a short risk_map summary and a level_map grade of "blocked",
-# "untracked" or "" for each.
+# active_map, tracked_map, untracked_map, newsource_map, unpushed_map,
+# recent_map and merged_map, plus a short risk_map summary and a level_map grade
+# of "blocked", "untracked" or "" for each.
 #
 # A running process, a change to a tracked file, an untracked file that reads as
-# code, or a commit held nowhere else all block a delete. Untracked files that
+# code, a commit on no remote, or recent activity all block a delete. Untracked files that
 # do not read as code are graded apart, because they are nearly always run
 # output - logs, screenshots, exported projects - and counting those as equally
 # serious is what gets the flag that matters ignored.
@@ -520,16 +520,14 @@ function __markMergedPrs() {
 function __collectWorktreeRisks() {
 	local branch worktree
 	local -i scanned=0
-	local -a parts porcelain tracked untracked newsource excludes
-
-	# Excluding only $branch is right when weighing one worktree on its own, but
-	# wrong for a whole selection: two worktrees sitting on the same commit would
-	# each cite the other as proof it is held somewhere, both read as safe, and
-	# deleting both strand it. So when the set goes together, every branch in the
-	# set drops out of the reachability check. Set deleting_as_group for that.
-	if [[ -n "$deleting_as_group" ]]; then
-		for branch in "$@"; do excludes+=(--exclude="$branch"); done
-	fi
+	local -a parts porcelain tracked untracked newsource
+	local -i now last age
+	local git_dir head_log
+	local -a head_log_stat
+	# Loaded here rather than assumed: another file happens to load them today
+	zmodload -F zsh/datetime p:EPOCHSECONDS
+	zmodload -F zsh/stat b:zstat
+	now=$EPOCHSECONDS
 
 	for branch in "$@"; do
 		# Two git calls per worktree adds up over a couple of dozen of them, so
@@ -560,13 +558,41 @@ function __collectWorktreeRisks() {
 		[[ ${#untracked} -gt 0 ]] && untracked_map[$branch]="${#untracked}"
 		[[ ${#newsource} -gt 0 ]] && newsource_map[$branch]="${#newsource}"
 
-		# Commits reachable from no other branch and no remote, so deleting the
-		# branch is the last thing standing between them and the reflog. This is
-		# stricter than git branch -d, which only consults the upstream or HEAD.
-		[[ -n "$deleting_as_group" ]] || excludes=(--exclude="$branch")
-		unpushed_map[$branch]="$(git -C "$top_level" rev-list --count "$branch" --not "${excludes[@]}" --branches --remotes 2>/dev/null)"
+		# Commits on no remote. Only a remote counts as holding them: another local
+		# branch does not, because it is just as deletable - often by this same
+		# cleanup, a step later. Counting local branches let a never-pushed branch
+		# read as safe whenever a scratch branch sat on the same commit, and the
+		# work then hung on whichever of them went last. This is stricter than git
+		# branch -d, which only consults the upstream or HEAD.
+		unpushed_map[$branch]="$(git -C "$top_level" rev-list --count "$branch" --not --remotes 2>/dev/null)"
 		if [[ -z "${unpushed_map[$branch]}" || "${unpushed_map[$branch]}" == "0" ]]; then
 			unpushed_map[$branch]=""
+		fi
+
+		# Recent activity: a commit, checkout or reset in the last
+		# $WORKTREE_RECENT_HOURS. Something can be using a worktree without any
+		# process sitting in it - a script or an agent that reaches it by path - and
+		# a clean, recently committed worktree is the one most likely to be about to
+		# be used again. Taken from the worktree's own HEAD reflog file and the
+		# commit time, never from the index, which the status call above may have
+		# just rewritten.
+		recent_map[$branch]=""
+		last="$(git -C "$worktree" log -1 --format=%ct 2>/dev/null)"
+		git_dir="$(git -C "$worktree" rev-parse --absolute-git-dir 2>/dev/null)"
+		head_log="$git_dir/logs/HEAD"
+		if [[ -n "$git_dir" && -f "$head_log" ]]; then
+			zstat -A head_log_stat +mtime -- "$head_log" 2>/dev/null &&
+				(( head_log_stat[1] > last )) && last=${head_log_stat[1]}
+		fi
+		if (( last > 0 )); then
+			age=$(( now - last ))
+			if (( age < ${WORKTREE_RECENT_HOURS:-4} * 3600 )); then
+				if (( age < 3600 )); then
+					recent_map[$branch]="$(( age / 60 )) min ago"
+				else
+					recent_map[$branch]="$(( age / 3600 )) h ago"
+				fi
+			fi
 		fi
 		merged_map[$branch]=""
 		merged_at_map[$branch]=""
@@ -592,6 +618,9 @@ function __collectWorktreeRisks() {
 		fi
 		if [[ -n "${unpushed_map[$branch]}" ]]; then
 			parts+=("${unpushed_map[$branch]} UNPUSHED")
+		fi
+		if [[ -n "${recent_map[$branch]}" ]]; then
+			parts+=("RECENT (${recent_map[$branch]})")
 		fi
 
 		if [[ ${#parts} -gt 0 ]]; then
@@ -651,7 +680,10 @@ function __renderWorktreeRisks() {
 		__worktreeUntrackedPreview "$branch"
 	fi
 	if [[ -n "${unpushed_map[$branch]}" ]]; then
-		printf '     %-20s %s\n' "UNPUSHED" "$(__plural "${unpushed_map[$branch]}" "commit") on no other branch or remote"
+		printf '     %-20s %s\n' "UNPUSHED" "$(__plural "${unpushed_map[$branch]}" "commit") on no remote"
+	fi
+	if [[ -n "${recent_map[$branch]}" ]]; then
+		printf '     %-20s %s\n' "RECENT" "last commit or checkout ${recent_map[$branch]}"
 	fi
 	if [[ -n "${merged_map[$branch]}" ]]; then
 		# Narrower than the reason column above, because the pull request title and
@@ -701,9 +733,6 @@ function gitWorktreeCleanup {
 	# __startMergedPrFetch set, silently costing the overlap and leaking its
 	# temporary file. Reused for the recheck, so a run makes one API call.
 	local merged_heads merged_heads_loaded merged_pr_file
-	# Off while the picker is built, on for the selection, where the question is
-	# what the whole set costs rather than what each worktree costs alone
-	local deleting_as_group
 	# Started before any local work so the network round trip overlaps it
 	__startMergedPrFetch
 	# The preview reads pull request bodies straight out of the fetched JSON, so
@@ -719,7 +748,7 @@ function gitWorktreeCleanup {
 
 	# Build the picker list rather than piping find straight into fzf, so that
 	# anything unsafe is already marked before it can be chosen
-	local -A active_map tracked_map untracked_map newsource_map unpushed_map risk_map level_map
+	local -A active_map tracked_map untracked_map newsource_map unpushed_map recent_map risk_map level_map
 	local -A merged_map merged_at_map merged_by_map merged_title_map
 	local -a fzf_lines safe_lines caution_lines unsafe_lines worktree_branches
 	local branch detail
@@ -781,7 +810,6 @@ function gitWorktreeCleanup {
 	if [[ $can_check -eq 1 ]]; then
 		all_procs="$(__worktreeProcesses "$worktree_root")"
 	fi
-	deleting_as_group=1
 	__collectWorktreeRisks "${branches_array[@]}"
 
 	# Show confirmation with all selected branches, flagging the unsafe ones
