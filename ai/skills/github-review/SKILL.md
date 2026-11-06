@@ -1,17 +1,18 @@
 ---
 name: github-review
 description: Review the current branch's PR in depth and queue findings as a pending GitHub review, written in the user's voice.
-argument-hint: "<base-branch> [extra context / focus areas]"
+argument-hint: "[base-branch] [extra context / focus areas]"
 disable-model-invocation: true
 ---
 
-Review the PR for the current branch and queue findings as a **pending** GitHub review. Comments must land in pending state so the user can read, tweak, delete, or extend them before submission — never submit the review.
+Review the PR for the current branch and queue findings as a **pending** GitHub review. Comments must land in pending state so the user can read, tweak, delete, or extend them before submission. Never submit a review on your own initiative — only when the user explicitly asks (see Phase 6 — Submitting on request).
 
 ## Argument
 
-The first token of `$ARGUMENTS` is the **base branch** for the diff (e.g. `main`, `master`, `develop`). Anything after is **extra context** the user wants you to factor into the review — e.g. "focus on the websocket session lifecycle", "this PR is meant to be backwards-compatible", "skip style nits". If no extra context is given, do a general review.
+`$ARGUMENTS` is an optional **base branch** followed by optional **extra context**.
 
-If the base branch isn't supplied, abort and ask for it. Do not guess.
+- **Base branch** — if the first token names a branch that exists (check with `git rev-parse --verify --quiet <token>` or `git rev-parse --verify --quiet origin/<token>`), it's the base for the diff (e.g. `main`, `master`, `develop`). If it's omitted, or the first token isn't a branch, use the PR's own base branch (`baseRefName` from Phase 1) and treat all of `$ARGUMENTS` as extra context.
+- **Extra context** — anything the user wants you to factor into the review, e.g. "focus on the websocket session lifecycle", "this PR is meant to be backwards-compatible", "skip style nits". If none is given, do a general review.
 
 ## Subagents — optimise for context, not speed
 
@@ -23,14 +24,15 @@ None of this lowers the bar. The review must be completely thorough — every an
 
 ## The workflow this skill sits in
 
-You never submit a review. The full cycle is:
+You never submit a review on your own initiative. The full cycle is:
 
-1. You draft findings and post them as a **pending** review. Only the user can see them.
-2. The user reads, tweaks, deletes, and adds — possibly over several turns (Phase 7).
-3. **The user submits the review themselves, outside this session.** From that moment the comments are public and the PR author has read them.
-4. The author pushes fixes and/or replies to the comments. The user comes back and asks for another look.
+1. You draft findings and post them as a **pending** review. Only the user can see them. If there are no findings, there's no pending review — see Phase 6.
+2. You recommend how the user should submit it — comment or approve (Phase 6).
+3. The user reads, tweaks, deletes, and adds — possibly over several turns (Phase 7).
+4. **The review gets submitted** — usually by the user outside this session, or by you via the CLI if the user explicitly asks. From that moment the comments are public and the PR author has read them.
+5. The author pushes fixes and/or replies to the comments. The user comes back and asks for another look.
 
-Step 3 is invisible to you — nothing in the session tells you it happened. So never assume the review you created earlier is still pending. Check the state before you touch anything (Phase 1), and re-check before any edit or delete in Phase 7.
+When the user submits outside the session, step 4 is invisible to you — nothing in the session tells you it happened. So never assume the review you created earlier is still pending. Check the state before you touch anything (Phase 1), and re-check before any edit or delete in Phase 7.
 
 Once a review is submitted its comments are no longer yours to rewrite. Editing one silently changes something the author has already read and may have replied to; deleting one erases a thread they're mid-conversation on. Leave them alone unless the user explicitly asks for a change to a specific comment, and put new findings in a new pending review.
 
@@ -40,7 +42,7 @@ Once a review is submitted its comments are no longer yours to rewrite. Editing 
    ```bash
    gh pr list --head "$(git branch --show-current)" --json number,title,baseRefName,url
    ```
-   If there's no PR yet, tell the user and stop — pending reviews need a PR.
+   If there's no PR yet, tell the user and stop — pending reviews need a PR. If no base branch was supplied, the base is `baseRefName` from this output.
 2. Work out where things stand — what you've already said, and what's happened since:
    ```bash
    # Reviews on this PR and their state (PENDING = drafted, not yet submitted)
@@ -67,7 +69,7 @@ Once a review is submitted its comments are no longer yours to rewrite. Editing 
    - **A `PENDING` review of yours** — the user hasn't submitted yet, you're still drafting. Add to that review (Phase 7); don't create a second one.
    - **A submitted review of yours** (`COMMENTED` / `CHANGES_REQUESTED` / `APPROVED`) — those comments are public. Its `commit_id` is the SHA you last reviewed, so `git diff <commit_id>...HEAD` is what the author has done since, and that's the focus of this pass. See the second-round rules in Phase 7.
    - **Resolved threads** are settled — don't re-raise them. **Unresolved threads with an author reply** are live arguments: read the reply and only push back if it doesn't hold up.
-3. Pull the diff against the supplied base: `git diff <base>...HEAD`. If it's large, save to `/tmp/pr_diff.patch` and Read in chunks rather than dumping into the context.
+3. Pull the diff against the base: `git fetch origin <base>` then `git diff origin/<base>...HEAD` (the remote ref, so a stale local `<base>` doesn't pollute the diff). If it's large, save to `/tmp/pr_diff.patch` and Read in chunks rather than dumping into the context.
 4. Read the surrounding context for every hunk you'll comment on — bugs in unchanged lines of a touched function are in scope.
 5. Use dependencies already present in the workspace when they help the review. Do not install or update dependencies during a review unless the user explicitly authorised that workspace mutation. If missing dependencies prevent meaningful verification, report the limitation or ask before installing them.
 
@@ -163,7 +165,11 @@ One more pass over the diff as a fresh reviewer holding the verified list, looki
 
 ## Phase 6 — Post as a pending review
 
-**This is non-negotiable. The review must land in `PENDING` state. Never submit.**
+**This is non-negotiable. The review must land in `PENDING` state. Never submit unless the user explicitly asks.**
+
+### No findings → no pending review
+
+If nothing survived Phases 3–4, don't create a review at all — an empty pending review is just noise the user has to clean up. Tell the user the PR looks clean, list the angles you covered so they can judge how hard you looked, and recommend approving (see below). Don't approve it yourself.
 
 Build a JSON payload with the comments and `POST` to the reviews endpoint **without an `event` field** — that's what makes it pending:
 
@@ -196,6 +202,27 @@ Expected response: `state: PENDING`. If you don't see that, something is wrong �
 - **Verify line numbers against the current file state**, not the diff line offsets.
 
 After posting, briefly summarise: count of comments, the review URL, and which findings (if any) were dropped because they fell outside the diff hunks.
+
+### Recommend how to submit
+
+End the summary with a one-line recommendation on how the user should submit the pending review, and why:
+
+- **Comment** — any finding is a CONFIRMED correctness bug, a PLAUSIBLE one that could bite in production, or a design question that should be settled before merge. The author needs to act or answer before this goes in.
+- **Approve with comments** — everything is a nitpick, suggestion, FYI, or non-blocking question the author can address (or not) without another look.
+
+When it's a judgement call, say which findings tipped it.
+
+### Submitting on request
+
+You never approve or submit by yourself. If the user explicitly asks — "approve it", "submit as a comment" — do it via the CLI, after re-checking state (Phase 1) so you act on what's actually there:
+
+- **Pending review exists** — submit that review with the requested event. Don't use `gh pr review`: it tries to create a second review and fails against the pending one.
+  ```bash
+  gh api -X POST /repos/<owner>/<repo>/pulls/<n>/reviews/<review_id>/events -f event=APPROVE   # or COMMENT
+  ```
+- **No pending review** (e.g. the no-findings case) — `gh pr review <n> --approve`.
+
+Confirm the returned `state` (`APPROVED` / `COMMENTED`) and report it. The approval is scoped to that one request — don't carry it forward to later rounds.
 
 ## Phase 7 — Follow-up workflow (CRITICAL)
 
@@ -276,11 +303,12 @@ gh api -X DELETE /repos/<owner>/<repo>/pulls/comments/<comment_id>
 | Get review node_id       | REST `GET /pulls/{n}/reviews/{id}` → `.node_id`                                         |
 | Get comment node_ids     | GraphQL `repository.pullRequest.reviews(states: PENDING).nodes.comments.nodes[].id`     |
 | Reply to submitted comment | REST `POST /pulls/{n}/comments` with `in_reply_to` (only once nothing is pending)      |
-| Submit (DO NOT)          | REST `POST /pulls/{n}/reviews/{id}/events` — never call this                            |
+| Submit (only on request) | REST `POST /pulls/{n}/reviews/{id}/events` with `event=APPROVE`/`COMMENT`                |
+| Approve, nothing pending | `gh pr review <n> --approve` (only on request)                                          |
 
 ### After the user has submitted (second round)
 
-The user submits outside this session, so the first sign is the state check: your review now reads `COMMENTED` / `CHANGES_REQUESTED` / `APPROVED` instead of `PENDING`, and there may be author replies on the threads. When that's the case:
+If the user submitted outside this session, the first sign is the state check: your review now reads `COMMENTED` / `CHANGES_REQUESTED` / `APPROVED` instead of `PENDING`, and there may be author replies on the threads. When that's the case:
 
 - **Don't edit or delete the submitted comments.** They're public and already read. Editing rewrites history under a conversation in progress. If the user explicitly asks to change one, say what it'll look like to the author first.
 - **Reply in-thread** to answer the author or concede a point — `in_reply_to` takes the original comment's `id`:
@@ -290,7 +318,7 @@ The user submits outside this session, so the first sign is the state check: you
   ```
   This endpoint works now — the "one pending review" restriction only bit while a pending review existed. Same voice rules as Phase 5.
 - **Review the new commits, not the whole PR again.** Diff from the submitted review's `commit_id` to `HEAD`. A finding that's now fixed is done — don't re-raise it. A finding that *isn't* fixed belongs in the existing thread as a reply, not as a fresh comment on the same line.
-- **New findings go in a new pending review** — same Phase 6 mechanics, same non-negotiable: don't submit it.
+- **New findings go in a new pending review** — same Phase 6 mechanics: don't create it empty, recommend comment vs approve, and don't submit it unless asked.
 
 ## Conduct
 
