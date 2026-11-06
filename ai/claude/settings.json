@@ -88,7 +88,7 @@
       "Bash(git clone:*)"
     ]
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "PostToolUse": [
       {
@@ -147,6 +147,7 @@
       }
     ]
   },
+  "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
@@ -169,6 +170,5 @@
   "editorMode": "vim",
   "autoCompactEnabled": true,
   "idleCompaction": false,
-  "skipAutoPermissionPrompt": true,
-  "workflowKeywordTriggerEnabled": false
+  "skipAutoPermissionPrompt": true
 }

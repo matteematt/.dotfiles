@@ -83,8 +83,7 @@ send_macos_notification() {
 
 # A Codex lifecycle hook cannot reach macOS UI services, but it can already reach
 # the tmux server to set markers and ring BEL. Ask that host-side server to launch
-# this script's small desktop-only mode for events (currently approval requests)
-# that Codex's external `notify` callback does not support.
+# this script's small desktop-only mode for completion alerts.
 relay_macos_notification_via_tmux() {
   local command
   printf -v command '%q ' "$0" "$agent" desktop "$1" "$2"
@@ -97,34 +96,10 @@ if [ "$mode" = "desktop" ]; then
   exit 0
 fi
 
-# Codex's `notify` config is deliberately separate from its lifecycle hooks. Stop
-# hooks run inside Codex's restricted execution context, which can update tmux but
-# cannot talk to macOS notification services. `notify` is the documented host-side
-# path for an external desktop alert and receives its payload as one JSON argument.
-# It must not touch the tmux markers or ring BEL: the Stop hook already did that.
+# Older Codex sessions may still invoke the global notify callback. Completion
+# alerts now come from the pane-aware Stop hook; ignore this callback to avoid
+# duplicates and alerts from unrelated sessions outside tmux.
 if [ "$mode" = "notify" ]; then
-  payload=${3:-}
-  [ "$(printf '%s' "$payload" | jq -r '.type // empty' 2>/dev/null)" = "agent-turn-complete" ] || exit 0
-
-  p=${TMUX_PANE:-}
-  sess=''
-  if [ -n "$p" ]; then
-    sess=$(tmux display -p -t "$p" '#S' 2>/dev/null)
-    wactive=$(tmux display -p -t "$p" '#{window_active}' 2>/dev/null)
-    sattached=$(tmux display -p -t "$p" '#{session_attached}' 2>/dev/null)
-    # Match the Claude behavior: no system alert if this pane is already visible.
-    [ "$wactive" = "1" ] && [ -n "$sattached" ] && [ "$sattached" != "0" ] && exit 0
-  fi
-  terminal_is_front && exit 0
-
-  # Outside tmux (or after its pane has gone), keep the title useful by naming the
-  # working directory. Inside tmux, retain the established "agent · session" title.
-  if [ -z "$sess" ]; then
-    cwd=$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null)
-    sess=${cwd##*/}
-    [ -n "$sess" ] || sess='turn complete'
-  fi
-  send_macos_notification "finished" "${agent_label} · ${sess}"
   exit 0
 fi
 
@@ -194,6 +169,11 @@ fi
 payload=$(cat)   # the hook JSON on stdin
 event=$(printf '%s' "$payload" | jq -r '.hook_event_name // empty'   2>/dev/null)
 ntype=$(printf '%s' "$payload" | jq -r '.notification_type // empty' 2>/dev/null)
+# Existing Codex sessions can retain the old PermissionRequest hook after the
+# config changes. It fires before the approval decision and is not evidence that
+# a person needs to act. Leave approval alerts to the TUI's approval-requested
+# notification, including for sessions which still invoke this script.
+[ "$agent" = "codex" ] && [ "$event" = "PermissionRequest" ] && exit 0
 is_approval=0
 if { [ "$event" = "Notification" ] && [ "$ntype" = "permission_prompt" ]; } || \
    [ "$event" = "PermissionRequest" ]; then
@@ -295,19 +275,21 @@ tty=$(tmux display       -p ${p:+-t "$p"} '#{pane_tty}' 2>/dev/null)
 wactive=$(tmux display   -p ${p:+-t "$p"} '#{window_active}' 2>/dev/null)
 sattached=$(tmux display -p ${p:+-t "$p"} '#{session_attached}' 2>/dev/null)
 
+# The active tmux window may still be hidden behind another macOS app. Relay
+# through tmux even in that case; desktop mode checks the actual front app on
+# the host, which the sandboxed hook cannot reliably inspect.
+if [ "$agent" = "codex" ] && [ "$event" = "Stop" ] && [ -n "$sess" ]; then
+  relay_macos_notification_via_tmux "finished" "${agent_label} · ${sess}"
+fi
+
 # Your tmux client is already on this window → you'll see it; don't bell/notify.
 [ "$wactive" = "1" ] && [ -n "$sattached" ] && [ "$sattached" != "0" ] && exit 0
 
 # You're elsewhere: ring the bell (BEL 0x07, non-printing) so tmux flags the window.
 [ -n "$tty" ] && printf '\a' > "$tty" 2>/dev/null
 
-# Codex's host-side `notify` command owns completion alerts. PermissionRequest has
-# no equivalent external event, so relay just that alert through the tmux server.
-# Keeping both out of this restricted hook process avoids the macOS UI failure and
-# prevents completed turns from notifying twice.
+# Codex completion alerts were relayed through tmux above.
 if [ "$agent" = "codex" ]; then
-  [ "$is_approval" -eq 1 ] && \
-    relay_macos_notification_via_tmux "needs approval" "${agent_label} · ${sess}"
   exit 0
 fi
 

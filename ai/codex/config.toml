@@ -1,7 +1,6 @@
 approvals_reviewer = "auto_review"
-model = "gpt-5.6-sol"
+model = "gpt-6.1-terra"
 model_reasoning_effort = "high"
-notify = ["/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh", "codex", "notify"]
 
 [features]
 hooks = true
@@ -20,12 +19,6 @@ type = "command"
 
 [[hooks.PreToolUse.hooks]]
 command = "/Users/matt.walker/.git-ai/bin/git-ai checkpoint codex --hook-input stdin"
-type = "command"
-
-[[hooks.PermissionRequest]]
-
-[[hooks.PermissionRequest.hooks]]
-command = "/Users/matt.walker/.dotfiles/config/tmux/scripts/agent_notify.sh codex"
 type = "command"
 
 [[hooks.UserPromptSubmit]]
@@ -91,10 +84,20 @@ trust_level = "trusted"
 [projects."/Users/matt.walker/.dotfiles"]
 trust_level = "trusted"
 
+[projects."/Users/matt.walker/genesis/platform-cloud-ide-infra"]
+trust_level = "trusted"
+
+[projects."/Users/matt.walker/genesis/blank-app-seed"]
+trust_level = "trusted"
+
 [mcp_servers.openaiDeveloperDocs]
 url = "https://developers.openai.com/mcp"
 
 [tui]
+# PermissionRequest hooks run before the approval decision, including decisions
+# that need no user input. Let the TUI ring only for an actual approval prompt.
+notifications = ["approval-requested"]
+notification_method = "bel"
 screen_reader_detection_done = true
 status_line = ["model-with-reasoning", "context-remaining", "five-hour-limit", "weekly-limit", "git-branch"]
 
