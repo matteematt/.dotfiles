@@ -1,0 +1,19 @@
+config/nvim/plugin/snapshot/snapshot_261106.json
+  s_cfab959a464cdc::t_fb06c537b55c63 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b85f3260df7ba7fa08b732665e7128d91e8a8abb",
+  "prompts": {},
+  "sessions": {
+    "s_cfab959a464cdc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a52c72c1-ca74-47da-a1e3-249e92432269",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
