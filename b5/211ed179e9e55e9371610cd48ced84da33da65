@@ -1,0 +1,21 @@
+ai/skills/deploy-to-fasthosts/server.md
+  s_ae4de11389dbf3::t_cf2c519c666cf9 18
+  s_ae4de11389dbf3::t_2765ebaa03fbd8 17
+  s_ae4de11389dbf3::t_fbd0836e4266ae 14-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b5211ed179e9e55e9371610cd48ced84da33da65",
+  "prompts": {},
+  "sessions": {
+    "s_ae4de11389dbf3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b52898a1-7fe5-47be-bbcb-cd23af05a67b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
