@@ -140,7 +140,7 @@ function changeDirInsideGitProject {
 # Find all branches inside of the projects _worktrees_git to jump to
 function changeWorktreeProject {
   top_level="$(cd "$(pwd | awk -v FS="_worktrees_git/" '{print $1}')" && git rev-parse --show-toplevel)"
-  chosen_dir=$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18- | fzf --header "Worktree Jump" --preview "cd $top_level/_worktrees_git/{} && git log")
+  chosen_dir=$(__listWorktreeBranches "$top_level" | fzf --header "Worktree Jump" --preview "cd $top_level/_worktrees_git/{} && git log")
 
   # Only proceed if fzf returned a selection (not cancelled with Esc/Ctrl-C)
   if [[ -n "$chosen_dir" ]]; then
