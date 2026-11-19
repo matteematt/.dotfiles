@@ -1,0 +1,21 @@
+shell/git_extras.sh
+  s_840a3df3a98c9f::t_f06ebc4db6343e 698-708,766
+shell/dir_jumping.sh
+  s_840a3df3a98c9f::t_f06ebc4db6343e 143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b34e7f671f57cc1a118bf54392ff4ed3a8c5523b",
+  "prompts": {},
+  "sessions": {
+    "s_840a3df3a98c9f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6ea0735e-9638-4b7f-92e3-5ece2518fc71",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
