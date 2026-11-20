@@ -7,6 +7,12 @@ disable-model-invocation: true
 
 Run a planning process with the user for the task in front of you (a ticket, a request, or what was just discussed). It has two phases, and the user decides when the first one is over. **No code changes in either phase.**
 
+## Two audiences, two styles
+
+**The plan file is written for other agents.** Subagents implementing a task, reviewers, and later sessions read it with no other context. Write it to be precise and complete for them: exact paths, `file:line` references, function and type names, numbered sections (`§1`, `§2`, …) and task ids (`T1`, `T2`, …) they can be pointed at, decisions with the reasons behind them, and what was ruled out. Briefs refer to the plan by section.
+
+**What you say to the user follows the `ste` skill** (Simple Technical English: plain words, short sentences, lead with the answer, concise, friendly to a reader without context). This holds for the whole process, during planning and during implementation. Talk about the work in terms of **features and behaviour**: what the user will see, what a change makes possible, what is risky. For example, "the PNG upload", "reading the tables in a PDF", "the cost question". Do not narrate the plan's structure: no "§3 step 4", no "T3b", no "decision 2" in chat, unless the user uses those labels first or asks where something is in the plan. Give a file path when the user needs to open it, not as a way of naming a feature. The plan's numbering is for agents.
+
 ## Where the plan lives
 
 `$ARGUMENTS` is optional.
@@ -66,7 +72,7 @@ Add three sections to the plan. Each refers back to the design by `§` number.
 - **The default model is Sonnet.** Mark **Opus** only where it is materially better, and say why on the row. Typical reasons: subtle architectural design, debugging with an unknown cause, security-sensitive changes, prompt or agent-behaviour design where a wrong call is costly.
 - **The plan must work fully in series.** One subagent at a time is the default. List **parallel candidates** separately, as proposals only: which tasks, why they do not collide, and the likely conflict. Never let the order depend on parallelism. Parallel runs need the user's yes for that batch.
 - **Rules every brief carries:** the plan path and the `§` it implements; files to touch and not touch; decisions already made; the test and typecheck commands; no git operations; the repo's own conventions (from CLAUDE.md and memory); what to return (files changed and why, dependency diffs, test output, anything undone or unsure).
-- **The review loop:** after each task, the orchestrator reads the diff and runs the tests and typechecks itself. Fixes go back to the same agent, and the orchestrator does not redo the work. Then the user commits, or the agent commits under `/allow-commit`.
+- **The review loop:** after each task, the orchestrator reads the diff and runs the tests and typechecks itself, then tells the user what now works and what is risky, in feature terms. Fixes go back to the same agent, and the orchestrator does not redo the work. Then the user commits, or the agent commits under `/allow-commit`.
 
 ### 3. Testing matrix
 
@@ -77,4 +83,4 @@ Add three sections to the plan. Each refers back to the design by `§` number.
 - **Cost.** What the live runs spend, and what they must measure for later steps.
 - **Not in the matrix.** What general tests should avoid, so they do not hit the new behaviour.
 
-When phase 2 is written, summarise the three sections briefly and ask whether to commit the plan and start the first task. Do not start it until the user says so.
+When phase 2 is written, summarise the three sections briefly, in the user-facing style above (features, not section numbers), and ask whether to commit the plan and start the first task. Do not start it until the user says so.
