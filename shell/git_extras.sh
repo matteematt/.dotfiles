@@ -695,6 +695,17 @@ function __renderWorktreeRisks() {
 	fi
 }
 
+# Print each registered worktree under <top_level>/_worktrees_git, relative to
+# that directory. Asks git rather than walking the disk: a find would descend
+# into leftover non-worktree directories (copies with node_modules) for minutes.
+function __listWorktreeBranches {
+	local prefix="$1/_worktrees_git/"
+	git -C "$1" worktree list --porcelain 2>/dev/null |
+		while IFS= read -r line; do
+			[[ "$line" == "worktree $prefix"* ]] && print -r -- "${line#worktree $prefix}"
+		done
+}
+
 # List all branches inside the projects to remove
 # Worktrees with a process still running inside them, changes to tracked files,
 # new source files, or commits held nowhere else are reported and skipped; pass
@@ -752,7 +763,7 @@ function gitWorktreeCleanup {
 	local -A merged_map merged_at_map merged_by_map merged_title_map
 	local -a fzf_lines safe_lines caution_lines unsafe_lines worktree_branches
 	local branch detail
-	worktree_branches=(${(f)"$(cd "$top_level" && find ./_worktrees_git -type d -exec test -e '{}/.git' ';' -print -prune | cut -c 18-)"})
+	worktree_branches=(${(f)"$(__listWorktreeBranches "$top_level")"})
 	worktree_branches=(${worktree_branches:#})
 	__collectWorktreeRisks "${worktree_branches[@]}"
 	for branch in "${worktree_branches[@]}"; do
