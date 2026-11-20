@@ -1,0 +1,21 @@
+ai/skills/blueprint/SKILL.md
+  s_cb1205ae18d319::t_a775639474ffae 10-15
+  s_cb1205ae18d319::t_9b661ff9634ac5 75
+  s_cb1205ae18d319::t_e1fcdcf594c6cc 86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "91ddf7ac4e16282d766044d71b71183fb8370359",
+  "prompts": {},
+  "sessions": {
+    "s_cb1205ae18d319": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb2eb6aa-ad7f-4bed-85f0-7a69f749121a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Walker <matt.walker@genesis.global>"
+    }
+  }
+}
