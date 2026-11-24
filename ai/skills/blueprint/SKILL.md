@@ -61,8 +61,18 @@ Add three sections to the plan. Each refers back to the design by `§` number.
   - Titles follow the repo's commit convention, read from `git log` (prefix, ticket key, wording).
 - **Every PR leaves the main branch working and honest if the stack stopped there.** Nothing a PR accepts is half-handled or dropped silently. When a later PR finishes a feature, the earlier one does something smaller but true. For example, it reports what it cannot handle yet.
 - Put the riskiest infrastructure in its own early PR, with nothing user-visible beside it. Put the smallest user-visible win early, so it could merge first. Split a reviewer-sensitive change (prompts, shared paths) from the bulk of the code.
-- A short **Why this order** paragraph.
+- **Slice by file footprint, not only by feature.** List the files each layer will touch, as a small layer × file table in the plan. Each layer should own its files. When two or more layers would edit the same file (often a core module and its test file), that is the cost to weigh: a fix to the lower layer conflicts at every layer above it, on every pass, and no tool avoids it. Fold such layers into one PR, or move the shared change into the lowest layer so later ones only add new files. Keep a layer separate only when the review benefit is worth the conflicts, and say so in the plan.
+- A short **Why this order** paragraph, including why any layers that share files were kept apart.
 - **Mechanics:** the `gh stack` commands (`init`, `add`, `submit`, `sync`), who runs them, and where the plan itself goes (usually in PR 1). Git and `gh` operations are the user's unless they have granted them (for example with `/allow-commit`).
+- **Working the stack** (also write this into the plan, so a later session follows it):
+  - `git config rerere.enabled true` before the first rebase, so Git replays a conflict resolution it has seen when the same hunk comes up again further up the stack.
+  - A fix goes on the lowest layer that introduced the code: `gh stack checkout <branch>`, fix, commit, `gh stack rebase --upstack`, then `gh stack push`. Never fix at the top and move it down; never leave a lower PR wrong because a higher one patches it.
+  - Work bottom-up, one layer at a time, so each fix's commit hash is final when it is pushed and replied to.
+  - On a conflict, merge the hunks; take one side wholesale only for a commit that is pure formatting. Before `gh stack rebase --continue`, run that layer's lint and tests. If a layer is broken mid-rebase, `gh stack rebase --abort`, fix it on its own branch, and rebase once, rather than carrying the breakage up.
+  - `gh stack rebase` refuses to run with uncommitted or untracked files: move them aside first, and put them back after.
+  - Sync with trunk often (`gh stack sync`, or `gh stack rebase` without `--no-trunk`), not only at the end, so each catch-up is small. After a bottom PR merges, `gh stack sync --prune`.
+  - `gh stack submit --auto` creates draft PRs with titles from the branch names: set each PR's title (in the repo's convention; it becomes the squash commit) and a short description, then mark them ready.
+  - **Every layer must pass the repo's full CI locally before it is pushed:** lint (it is part of CI and the easiest to forget), typecheck and the full unit suite, not a filtered subset. A test filter can silently skip files.
 
 ### 2. Implementation tasks
 
@@ -71,8 +81,9 @@ Add three sections to the plan. Each refers back to the design by `§` number.
   - Split a PR when part of it can be written and tested as pure logic without the rest (for example a detection algorithm over plain data).
 - **The default model is Sonnet.** Mark **Opus** only where it is materially better, and say why on the row. Typical reasons: subtle architectural design, debugging with an unknown cause, security-sensitive changes, prompt or agent-behaviour design where a wrong call is costly.
 - **The plan must work fully in series.** One subagent at a time is the default. List **parallel candidates** separately, as proposals only: which tasks, why they do not collide, and the likely conflict. Never let the order depend on parallelism. Parallel runs need the user's yes for that batch.
-- **Rules every brief carries:** the plan path and the `§` it implements; files to touch and not touch; decisions already made; the test and typecheck commands; no git operations; the repo's own conventions (from CLAUDE.md and memory); what to return (files changed and why, dependency diffs, test output, anything undone or unsure).
-- **The review loop:** after each task, the orchestrator reads the diff and runs the tests and typechecks itself, then tells the user what now works and what is risky, in feature terms. Fixes go back to the same agent, and the orchestrator does not redo the work. Then the user commits, or the agent commits under `/allow-commit`.
+- **Rules every brief carries:** the plan path and the `§` it implements; files to touch and not touch; decisions already made; the lint, typecheck and full test commands, exactly as CI runs them; no git operations; the repo's own conventions (from CLAUDE.md and memory); what to return (files changed and why, dependency diffs, test output, anything undone or unsure).
+- **The review loop:** after each task, the orchestrator reads the diff and runs lint, typechecks and the full test suite itself, then tells the user what now works and what is risky, in feature terms.
+- **Review comments on the PRs:** fix bottom-up, each on the PR it was made on, following "Working the stack". Reply on each thread once its fix is pushed, with the commit hash and one or two sentences on what changed. Brief the agent with the comment text and its file and line, ask for a failing test first where it is a bug, and ask for the reply line too. Fixes go back to the same agent, and the orchestrator does not redo the work. Then the user commits, or the agent commits under `/allow-commit`.
 
 ### 3. Testing matrix
 
